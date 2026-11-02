@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.5.2
+
+- Visão geral: o valor da **GPU** no gráfico agora usa as mesmas faixas de cor da CPU em **temperatura, carga e consumo** (azul tranquilo → amarelo → laranja → vermelho conforme aumenta), em vez do cinza fixo.
+- Versão atualizada para 0.5.2.
+
 ## 0.5.1
 
 - Visão geral, **cor da temperatura** de volta ao nosso azul quando está tranquila (abaixo de 60 °C), mantendo a mudança para amarelo (60–79), laranja (80–89) e vermelho (90+).

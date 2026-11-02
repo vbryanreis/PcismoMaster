@@ -223,6 +223,8 @@ public partial class MainWindow
         // A cor do valor segue faixas de atenção (azul tranquilo → amarelo → laranja → vermelho) em temperatura, carga e consumo.
         DashChartValue.Foreground = cNow is float cband ? BandBrush(metric, cband, yMax) : (Brush)FindResource("Fg");
         DashChartValue2.Text = gNow is float gv ? $"{gv:0.#}{unit}" : "—";
+        // A GPU segue as mesmas faixas de cor da CPU (azul tranquilo → amarelo → laranja → vermelho); cinza quando sem leitura.
+        DashChartValue2.Foreground = gNow is float gband ? BandBrush(metric, gband, yMax) : (Brush)FindResource("Muted");
         var firstC = data.Select(cpu).FirstOrDefault(v => v != null);
         DashChartDelta.Text = cNow is float a && firstC is float b
             ? $"{(a - b >= 0 ? "+" : "")}{a - b:0.#}{unit} em {(range >= 60 ? $"{range / 60} min" : $"{range} s")}"
