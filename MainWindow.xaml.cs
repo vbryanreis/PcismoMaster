@@ -80,6 +80,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        // Versão exibida no menu lateral lida do próprio assembly (fonte: <Version> em PcismoMaster.csproj)
+        SideVersion.Text = "v" + (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1.0");
         InitUltimate();
         ThemeManager.Apply(_settings.LightTheme);
         UpdateThemeButton();

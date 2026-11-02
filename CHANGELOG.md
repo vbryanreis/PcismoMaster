@@ -1,12 +1,26 @@
 # Histórico de versões
 
-## 0.2.3
+A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
+
+## 0.1.0
+
+- **Reinício do versionamento** no padrão profissional SemVer. A versão volta a `0.1.0` como marco inicial desta nova fase (o histórico anterior fica preservado mais abaixo).
+- Abas de navegação (MASTER, JOGOS, DESEMPENHO, FERRAMENTAS, MAKER, OTIMIZAÇÃO) com fonte nova, clean e legível no estilo de apps de tecnologia (Inter, com queda para Segoe UI Variable Display e Segoe UI).
+- Ao passar o mouse, a aba fica em **amarelo dourado iluminado** (com leve brilho).
+- Abas padronizadas em CAIXA ALTA; a aba **PcismoMaster** passou a se chamar **MASTER**.
+- O rótulo de versão no menu lateral agora é lido do próprio assembly, então nunca mais fica desatualizado.
+
+---
+
+## Histórico anterior (numeração antiga, antes do reinício em SemVer)
+
+### 0.2.3
 
 - Corrigido o erro "Could not find a part of the path ...\ModuleBackups\updates-pause.json" ao clicar em **Restaurar configuração anterior** no Windows Update sem ter pausado antes. Agora aparece um aviso de que não há nada para restaurar, e nenhum valor é alterado.
 - O motor de backup recusa restaurar sem backup com uma mensagem clara, coberta por um novo teste automático.
 - Versão atualizada para 0.2.3.
 
-## 0.2.2
+### 0.2.2
 
 - Removidas as ferramentas Background Apps e Store Settings da aba OTIMIZAÇÃO, junto com o script `Scripts/StoreSettings.ps1`. Fica somente a pausa do Windows Update.
 - "Updates Pause" passa a se chamar **Windows Update**.
@@ -16,7 +30,7 @@
 - Como não há mais scripts externos, o `.exe` avulso da Release volta a ter todas as funções.
 - Versão atualizada para 0.2.2.
 
-## 0.2.1
+### 0.2.1
 
 - Executável único: `PcismoMaster.exe` agora é publicado como arquivo único autocontido (não precisa instalar o .NET), com as bibliotecas nativas embutidas.
 - Lançamento automático: cada tag `vX.Y.Z` compila, testa e publica uma Release no GitHub com o `.exe`, um `.zip` (exe + Scripts, licenças e documentação) e as notas desta seção do CHANGELOG.
@@ -25,13 +39,13 @@
 
 Download recomendado: o `.zip`. O `.exe` avulso funciona, mas Store Settings precisa da pasta `Scripts` que vem no `.zip`.
 
-## 0.2.0
+### 0.2.0
 
 - Sub-abas verticais Updates Pause, Background Apps e Store Settings dentro de OTIMIZAÇÃO.
 - Background Apps com backup e restauração individual.
 - Store Settings executa o script Ultimate com seleção pela interface; redefinição não equivale a backup. Efeitos na Store ainda requerem validação manual.
 
-## 0.1.0
+### 0.1.0 (original)
 
 - Primeira versão PcismoMaster derivada do ResetExplode, com identidade própria e licenças preservadas.
 - Abertura direta na interface de hardware e diagnóstico da base.

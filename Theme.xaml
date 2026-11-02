@@ -18,6 +18,12 @@
 
     <FontFamily x:Key="Mono">Cascadia Mono, Consolas</FontFamily>
     <FontFamily x:Key="Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+    <!-- Fonte das abas de navegação: clean e bem legível, no estilo de apps de tecnologia.
+         Usa Inter quando instalada; cai para Segoe UI Variable Display (padrão do Windows 11) e depois Segoe UI. -->
+    <FontFamily x:Key="NavFont">Inter, Segoe UI Variable Display, Segoe UI</FontFamily>
+
+    <!-- Amarelo dourado iluminado do hover das abas de navegação -->
+    <SolidColorBrush x:Key="Gold" Color="#FFC94D"/>
 
     <!-- Canto entre as barras de rolagem e afins -->
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#000000"/>
@@ -179,8 +185,9 @@
     <!-- Categoria recolhível do menu lateral: clica e mostra/esconde as sub-abas -->
     <Style x:Key="NavGroup" TargetType="ToggleButton">
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
-        <Setter Property="FontSize" Value="11"/>
-        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontFamily" Value="{StaticResource NavFont}"/>
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Margin" Value="12,6,12,1"/>
         <Setter Property="Focusable" Value="False"/>
@@ -193,18 +200,25 @@
                                        VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                 <TextBlock.RenderTransform><RotateTransform Angle="-90"/></TextBlock.RenderTransform>
                             </TextBlock>
-                            <ContentPresenter VerticalAlignment="Center"/>
+                            <!-- O texto das abas já é escrito em CAIXA ALTA no MainWindow.xaml -->
+                            <ContentPresenter x:Name="label" VerticalAlignment="Center"/>
                         </DockPanel>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="bg" Property="Background" Value="{DynamicResource Hover}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
-                        </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
                             <Setter TargetName="chev" Property="RenderTransform">
                                 <Setter.Value><RotateTransform Angle="0"/></Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- Hover depois do IsChecked para que a cor dourada apareça mesmo na categoria aberta -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="bg" Property="Background" Value="{DynamicResource Hover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Gold}"/>
+                            <Setter TargetName="label" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#FFC94D" ShadowDepth="0" BlurRadius="10" Opacity="0.85"/>
+                                </Setter.Value>
                             </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
