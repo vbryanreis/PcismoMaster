@@ -547,6 +547,31 @@
         </Setter>
     </Style>
 
+    <!-- Item de lista selecionável: acende no hover e destaca a seleção com borda + fundo no nosso roxo -->
+    <Style x:Key="SelectItem" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="b" Background="Transparent" BorderBrush="Transparent" BorderThickness="1"
+                            CornerRadius="10" Margin="0,2" Padding="2">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource Hover}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AccentSoft}"/>
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="ListNavItem" TargetType="ListBoxItem">
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
         <Setter Property="Cursor" Value="Hand"/>

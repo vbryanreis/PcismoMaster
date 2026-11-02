@@ -2,6 +2,15 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.6.2
+
+- Nova sub-aba **Desinstalar Apps** em OTIMIZAÇÃO (abaixo de MAKER), um desinstalador no estilo do Revo, porém **seguro**:
+  - Lista só **programas de verdade** (componentes do Windows, drivers e atualizações ficam de fora) com nome, fabricante, versão e tamanho, com busca.
+  - Desinstala pelo **desinstalador oficial** do programa (o mesmo do Painel de Controle).
+  - Depois faz uma **varredura de sobras** (pastas em AppData/ProgramData/Program Files e chaves de registro de fornecedor) ligadas ao app e lista para você **revisar e marcar** o que remover.
+  - **Guardas de segurança**: só apaga dentro de Program Files / AppData / ProgramData e de ramos `Software\` do registro; **nunca** toca em pastas do Windows nem em chaves do sistema (Microsoft, Classes, Policies, Windows), e nada é apagado sem você marcar e confirmar.
+- Versão atualizada para 0.6.2.
+
 ## 0.6.1
 
 - Aba **Instalar apps** bem maior, no estilo do **Ninite**, com os apps organizados em **sub-abas de categoria**: Navegadores, Mensagens, Mídia, Imagem, Documentos, Segurança, Compactação, Utilitários, Desenvolvimento e Jogos (além de "Todos"). Clique numa categoria para filtrar; MARCAR TODOS / DESMARCAR agora valem para a categoria aberta.
