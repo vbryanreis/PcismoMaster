@@ -2,6 +2,14 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.6.1
+
+- Aba **Instalar apps** bem maior, no estilo do **Ninite**, com os apps organizados em **sub-abas de categoria**: Navegadores, Mensagens, Mídia, Imagem, Documentos, Segurança, Compactação, Utilitários, Desenvolvimento e Jogos (além de "Todos"). Clique numa categoria para filtrar; MARCAR TODOS / DESMARCAR agora valem para a categoria aberta.
+- Dezenas de apps novos (Firefox, Brave, Opera, Zoom, Telegram, Spotify, Audacity, HandBrake, iTunes, GIMP, Paint.NET, Krita, Inkscape, IrfanView, ShareX, Greenshot, Blender, LibreOffice, SumatraPDF, Foxit, Acrobat Reader, Malwarebytes, PeaZip, Everything, TeamViewer, KeePassXC, WinDirStat, VS Code, Git, Python, Notepad++, PuTTY, WinSCP, Epic Games, entre outros), todos via winget.
+- Nada vem pré-marcado (como no Ninite): você escolhe o que instalar.
+- Os VC++ Redistributables **não** entram aqui de propósito (virão por outro caminho).
+- Versão atualizada para 0.6.1.
+
 ## 0.6.0
 
 - Nova sub-aba **Utilidades** em FERRAMENTAS, com ferramentas do dia a dia em sub-sub-abas:

@@ -2419,6 +2419,19 @@
                                     cada fabricante e confere o arquivo antes de instalar. Os apps são instalados um de cada vez, sem janelas.
                                     O que já está instalado aparece marcado como INSTALADO.
                                 </TextBlock>
+                                <WrapPanel x:Name="AppsCatPanel" Margin="0,0,0,10">
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Todos" Tag="" IsChecked="True" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Navegadores" Tag="Navegadores" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mensagens" Tag="Mensagens" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mídia" Tag="Mídia" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Imagem" Tag="Imagem" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Documentos" Tag="Documentos" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Segurança" Tag="Segurança" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Compactação" Tag="Compactação" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Utilitários" Tag="Utilitários" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Desenvolvimento" Tag="Desenvolvimento" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Jogos" Tag="Jogos" Checked="AppsCat_Checked"/>
+                                </WrapPanel>
                                 <ItemsControl x:Name="AppsList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>

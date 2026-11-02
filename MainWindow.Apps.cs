@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace ResetExplode;
 
@@ -8,6 +10,12 @@ public partial class MainWindow
 {
     private List<InstallableApp>? _installApps;
     private bool _appsBusy, _appsStop;
+    private string _appsCat = ""; // sub-aba de categoria selecionada ("" = Todos)
+
+    /// <summary>Apps da categoria selecionada no momento (ou todos).</summary>
+    private IEnumerable<InstallableApp> VisibleApps() =>
+        _installApps == null ? Enumerable.Empty<InstallableApp>()
+        : _installApps.Where(a => _appsCat.Length == 0 || a.Category == _appsCat);
 
     private void InitApps()
     {
@@ -16,6 +24,9 @@ public partial class MainWindow
         {
             _installApps = AppInstaller.Catalog();
             AppsList.ItemsSource = _installApps;
+            // Filtro das sub-abas de categoria (estilo Ninite).
+            CollectionViewSource.GetDefaultView(_installApps).Filter =
+                o => _appsCat.Length == 0 || ((InstallableApp)o).Category == _appsCat;
             AppInstaller.RefreshInstalled(_installApps);
             foreach (var a in _installApps) a.Selected = a.PreSelect && !a.Installed;
         }
@@ -34,13 +45,20 @@ public partial class MainWindow
     private void BtnAppsAll_Click(object sender, RoutedEventArgs e)
     {
         if (_installApps == null || _appsBusy) return;
-        foreach (var a in _installApps) a.Selected = !a.Installed;
+        foreach (var a in VisibleApps()) a.Selected = !a.Installed;
     }
 
     private void BtnAppsNone_Click(object sender, RoutedEventArgs e)
     {
         if (_installApps == null || _appsBusy) return;
-        foreach (var a in _installApps) a.Selected = false;
+        foreach (var a in VisibleApps()) a.Selected = false;
+    }
+
+    private void AppsCat_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_installApps == null) return; // disparado durante InitializeComponent
+        if (sender is RadioButton { Tag: string cat }) _appsCat = cat;
+        CollectionViewSource.GetDefaultView(_installApps).Refresh();
     }
 
     private void BtnAppsStore_Click(object sender, RoutedEventArgs e)
