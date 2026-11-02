@@ -177,7 +177,20 @@ public partial class MainWindow
 
     // Cor da temperatura por faixa: azul < 60 °C, amarelo 60–79, laranja 80–89, vermelho 90+.
     private Brush TempBrush(double c) =>
-        (Brush)FindResource(c >= 90 ? "TempCrit" : c >= 80 ? "TempHot" : c >= 60 ? "TempWarn" : "Accent");
+        (Brush)FindResource(c >= 90 ? "TempCrit" : c >= 80 ? "TempHot" : c >= 60 ? "TempWarn" : "TempCool");
+
+    // Cor do indicador por faixa de atenção (azul tranquilo → amarelo → laranja → vermelho), igual à temperatura.
+    //  • Carga (%): atenção a partir de 70, alta em 85, no limite em 95.
+    //  • Consumo (W): sem escala fixa, então usa a fração do pico do gráfico (scaleMax) — acende ao se aproximar do maior consumo do período.
+    private Brush BandBrush(string metric, double v, double scaleMax) => metric switch
+    {
+        "load" => (Brush)FindResource(v >= 95 ? "TempCrit" : v >= 85 ? "TempHot" : v >= 70 ? "TempWarn" : "TempCool"),
+        "power" => (Brush)FindResource(scaleMax <= 0 ? "TempCool"
+                                     : v >= scaleMax * 0.82 ? "TempCrit"
+                                     : v >= scaleMax * 0.70 ? "TempHot"
+                                     : v >= scaleMax * 0.55 ? "TempWarn" : "TempCool"),
+        _ => TempBrush(v),
+    };
 
     private void DrawDashChart()
     {
@@ -193,18 +206,7 @@ public partial class MainWindow
         string name = metric switch { "load" => "CARGA", "power" => "CONSUMO", _ => "TEMPERATURA" };
         var data = _dash.Skip(Math.Max(0, _dash.Count - range)).ToList();
 
-        // Cabeçalho: valor atual grande + variação no período (como o par e a cotação da referência).
-        float? cNow = data.Count > 0 ? cpu(data[^1]) : null, gNow = data.Count > 0 ? gpu(data[^1]) : null;
-        DashChartLabel.Text = $"CPU · {name}";
-        DashChartValue.Text = cNow is float cv ? $"{cv:0.#}{unit}" : "—";
-        // Em temperatura, a cor do valor segue as faixas: azul < 60, amarelo 60–79, laranja 80–89, vermelho 90+.
-        DashChartValue.Foreground = metric == "temp" && cNow is float ctemp ? TempBrush(ctemp) : (Brush)FindResource("Fg");
-        DashChartValue2.Text = gNow is float gv ? $"{gv:0.#}{unit}" : "—";
-        var firstC = data.Select(cpu).FirstOrDefault(v => v != null);
-        DashChartDelta.Text = cNow is float a && firstC is float b
-            ? $"{(a - b >= 0 ? "+" : "")}{a - b:0.#}{unit} em {(range >= 60 ? $"{range / 60} min" : $"{range} s")}"
-            : cNow == null && metric != "load" ? "sem leitura da CPU (veja o aviso no menu)" : "coletando…";
-
+        // Escala do eixo Y (calculada antes do cabeçalho para a cor do Consumo usar o pico do período).
         var all = data.SelectMany(s => new[] { cpu(s), gpu(s) }).Where(v => v != null).Select(v => (double)v!.Value).ToList();
         double yMin = metric == "temp" ? 20 : 0;
         double yMax = metric switch
@@ -213,6 +215,18 @@ public partial class MainWindow
             "power" => Math.Max(50, all.Count > 0 ? all.Max() * 1.2 : 50),
             _ => Math.Max(90, all.Count > 0 ? all.Max() + 5 : 90)
         };
+
+        // Cabeçalho: valor atual grande + variação no período (como o par e a cotação da referência).
+        float? cNow = data.Count > 0 ? cpu(data[^1]) : null, gNow = data.Count > 0 ? gpu(data[^1]) : null;
+        DashChartLabel.Text = $"CPU · {name}";
+        DashChartValue.Text = cNow is float cv ? $"{cv:0.#}{unit}" : "—";
+        // A cor do valor segue faixas de atenção (azul tranquilo → amarelo → laranja → vermelho) em temperatura, carga e consumo.
+        DashChartValue.Foreground = cNow is float cband ? BandBrush(metric, cband, yMax) : (Brush)FindResource("Fg");
+        DashChartValue2.Text = gNow is float gv ? $"{gv:0.#}{unit}" : "—";
+        var firstC = data.Select(cpu).FirstOrDefault(v => v != null);
+        DashChartDelta.Text = cNow is float a && firstC is float b
+            ? $"{(a - b >= 0 ? "+" : "")}{a - b:0.#}{unit} em {(range >= 60 ? $"{range / 60} min" : $"{range} s")}"
+            : cNow == null && metric != "load" ? "sem leitura da CPU (veja o aviso no menu)" : "coletando…";
         const double left = 48, bottom = 22, top = 8;
         double plotW = w - left, plotH = h - top - bottom;
         double X(int i) => left + plotW * i / Math.Max(1, range - 1) + plotW * (range - data.Count) / Math.Max(1, range - 1);

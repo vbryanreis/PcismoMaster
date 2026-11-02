@@ -28,6 +28,7 @@ public static class ThemeManager
         ("ThumbHover", "#5A5290", "#ABA2D6"),
         ("ThumbDrag", "#8A80C8", "#8A80C8"),
         ("Accent", "#A66BFF", "#8B3FF0"),
+        ("NavHover", "#3EC6EA", "#1E9BC4"), // hover das categorias: ciano no escuro, um azul mais fechado (menos claro) no modo claro
         (SystemColors.ControlBrushKey, "#07060D", "#FFFFFF"),
         (SystemColors.HighlightBrushKey, "#1B1830", "#ECE8FA"),
         (SystemColors.InactiveSelectionHighlightBrushKey, "#1B1830", "#ECE8FA"),

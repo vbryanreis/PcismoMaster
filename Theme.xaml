@@ -53,6 +53,7 @@
 
     <!-- ===== Paleta de cores dos indicadores (Visão geral) ===== -->
     <SolidColorBrush x:Key="Accent" Color="#A66BFF"/>    <!-- roxo do ícone (um tom mais claro para ler bem no escuro) -->
+    <SolidColorBrush x:Key="TempCool" Color="#4FA3F0"/>  <!-- temperatura/indicador tranquilo: nosso azul (abaixo da faixa de atenção) -->
     <SolidColorBrush x:Key="TempWarn" Color="#FFCF4D"/>  <!-- temperatura 60–79 °C (amarelo) -->
     <SolidColorBrush x:Key="TempHot" Color="#FF9F43"/>   <!-- temperatura 80–89 °C (laranja) -->
     <SolidColorBrush x:Key="TempCrit" Color="#FF5B5B"/>  <!-- temperatura 90 °C+ (vermelho) -->

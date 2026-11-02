@@ -161,13 +161,13 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="CPU" Foreground="{DynamicResource Faint}" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
+                                <TextBlock Text="CPU" Foreground="#A647FE" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideTemp" Grid.Column="1" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                                 <TextBlock x:Name="SideLoad" Grid.Column="2" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Foreground="{DynamicResource Muted}" Margin="0,3"/>
-                                <TextBlock Grid.Row="1" Text="GPU" Foreground="{DynamicResource Faint}" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="1" Text="GPU" Foreground="#7571F0" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideGpuTemp" Grid.Row="1" Grid.Column="1" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                                 <TextBlock x:Name="SideGpuLoad" Grid.Row="1" Grid.Column="2" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Foreground="{DynamicResource Muted}" Margin="0,3"/>
-                                <TextBlock Grid.Row="2" Text="TESTE" Foreground="{DynamicResource Faint}" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="2" Text="TESTE" Foreground="#29B4D9" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideStress" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="parado" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                             </Grid>
                         </Border>
@@ -2199,7 +2199,7 @@
                 <ScrollViewer x:Name="PageOptimize" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="OTIMIZA" Style="{StaticResource H1}"/>
+                            <TextBlock Text="OTIMIZAÇÃO" Style="{StaticResource H1}"/>
                             <TextBlock Text="Libera memória, fecha o que atrapalha e ajusta o Windows para jogos" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -2228,7 +2228,7 @@
                                     </TextBlock>
                                     <TextBlock x:Name="OptResult" TextWrapping="Wrap" Margin="0,10,0,0"/>
                                 </StackPanel>
-                                <Button x:Name="BtnOptimize" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="OTIMIZA"
+                                <Button x:Name="BtnOptimize" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="OTIMIZAÇÃO"
                                         FontSize="16" Padding="34,16" VerticalAlignment="Center" Click="BtnOptimize_Click"/>
                             </Grid>
                         </Border>

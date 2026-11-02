@@ -2,6 +2,15 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.5.1
+
+- Visão geral, **cor da temperatura** de volta ao nosso azul quando está tranquila (abaixo de 60 °C), mantendo a mudança para amarelo (60–79), laranja (80–89) e vermelho (90+).
+- O mesmo tratamento por faixa agora vale para **Carga** e **Consumo**: o valor acende em amarelo/laranja/vermelho quando entra em área de atenção (carga a partir de 70%; consumo ao se aproximar do pico do período).
+- Rodapé do menu lateral: **CPU, GPU e TESTE** agora aparecem na nossa paleta (roxo → azul do ícone), em vez do cinza.
+- No **modo claro**, o hover azul das categorias ficou um pouco mais fechado (menos claro) para ler melhor no fundo branco; no modo escuro continua igual.
+- Página **OTIMIZA** passou a se chamar **OTIMIZAÇÃO** (título e botão), alinhada com a categoria da navegação.
+- Versão atualizada para 0.5.1.
+
 ## 0.5.0
 
 - **JOGOS · Biblioteca com novo visual**: cabeçalho com busca, **Adicionar jogo (.exe)…** e **Procurar de novo**; "Meus jogos" em **cartões com a capa** de cada jogo (a mesma da biblioteca da Steam; jogos sem capa ganham as iniciais no degradê do ícone), nome, loja e os botões **Preparar e jogar** e **Ajustes**.
