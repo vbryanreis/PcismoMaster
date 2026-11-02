@@ -175,6 +175,10 @@ public partial class MainWindow
 
     // ---------------- gráfico de área ----------------
 
+    // Cor da temperatura por faixa: azul < 60 °C, amarelo 60–79, laranja 80–89, vermelho 90+.
+    private Brush TempBrush(double c) =>
+        (Brush)FindResource(c >= 90 ? "TempCrit" : c >= 80 ? "TempHot" : c >= 60 ? "TempWarn" : "Accent");
+
     private void DrawDashChart()
     {
         DashChart.Children.Clear();
@@ -193,6 +197,8 @@ public partial class MainWindow
         float? cNow = data.Count > 0 ? cpu(data[^1]) : null, gNow = data.Count > 0 ? gpu(data[^1]) : null;
         DashChartLabel.Text = $"CPU · {name}";
         DashChartValue.Text = cNow is float cv ? $"{cv:0.#}{unit}" : "—";
+        // Em temperatura, a cor do valor segue as faixas: azul < 60, amarelo 60–79, laranja 80–89, vermelho 90+.
+        DashChartValue.Foreground = metric == "temp" && cNow is float ctemp ? TempBrush(ctemp) : (Brush)FindResource("Fg");
         DashChartValue2.Text = gNow is float gv ? $"{gv:0.#}{unit}" : "—";
         var firstC = data.Select(cpu).FirstOrDefault(v => v != null);
         DashChartDelta.Text = cNow is float a && firstC is float b
@@ -238,16 +244,17 @@ public partial class MainWindow
 
         if (data.Count < 2) return;
 
-        // GPU: linha tracejada discreta
-        var gLine = new Polyline { Stroke = (Brush)FindResource("Muted"), StrokeThickness = 1.5, StrokeDashArray = new DoubleCollection { 3, 2 }, StrokeLineJoin = PenLineJoin.Round };
+        // GPU: linha tracejada em verde
+        var gLine = new Polyline { Stroke = (Brush)FindResource("ChartGpu"), StrokeThickness = 1.5, StrokeDashArray = new DoubleCollection { 3, 2 }, StrokeLineJoin = PenLineJoin.Round };
         for (int i = 0; i < data.Count; i++) if (gpu(data[i]) is float g) gLine.Points.Add(new Point(X(i), Y(g)));
         DashChart.Children.Add(gLine);
 
-        // CPU: área com degradê monocromático + linha
+        // CPU: área com degradê no nosso azul + linha
+        var cpuBrush = (SolidColorBrush)FindResource("Accent");
         var pts = new List<Point>();
         for (int i = 0; i < data.Count; i++) if (cpu(data[i]) is float c) pts.Add(new Point(X(i), Y(c)));
         if (pts.Count < 2) return;
-        var col = fg.Color;
+        var col = cpuBrush.Color;
         var area = new Polygon
         {
             Fill = new LinearGradientBrush(Color.FromArgb(0x55, col.R, col.G, col.B), Color.FromArgb(0x00, col.R, col.G, col.B), 90)
@@ -256,20 +263,20 @@ public partial class MainWindow
         area.Points.Add(new Point(pts[^1].X, top + plotH));
         area.Points.Add(new Point(pts[0].X, top + plotH));
         DashChart.Children.Add(area);
-        var line = new Polyline { Stroke = fg, StrokeThickness = 2, StrokeLineJoin = PenLineJoin.Round };
+        var line = new Polyline { Stroke = cpuBrush, StrokeThickness = 2, StrokeLineJoin = PenLineJoin.Round };
         foreach (var p in pts) line.Points.Add(p);
         DashChart.Children.Add(line);
 
         // Marcador do valor atual com balão (como o "76,000 B" da referência)
         var last = pts[^1];
         DashChart.Children.Add(new Line { X1 = last.X, X2 = last.X, Y1 = top, Y2 = top + plotH, Stroke = faint, StrokeDashArray = new DoubleCollection { 3, 3 } });
-        var dot = new Ellipse { Width = 11, Height = 11, Stroke = fg, StrokeThickness = 2, Fill = (Brush)FindResource("Card") };
+        var dot = new Ellipse { Width = 11, Height = 11, Stroke = cpuBrush, StrokeThickness = 2, Fill = (Brush)FindResource("Card") };
         Canvas.SetLeft(dot, last.X - 5.5); Canvas.SetTop(dot, last.Y - 5.5);
         DashChart.Children.Add(dot);
         var bubble = new Border
         {
             Background = (Brush)FindResource("Hover"), CornerRadius = new CornerRadius(8), Padding = new Thickness(10, 5, 10, 5),
-            Child = new TextBlock { Text = DashChartValue.Text, FontFamily = mono, FontWeight = FontWeights.SemiBold, Foreground = fg }
+            Child = new TextBlock { Text = DashChartValue.Text, FontFamily = mono, FontWeight = FontWeights.SemiBold, Foreground = DashChartValue.Foreground }
         };
         bubble.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         Canvas.SetLeft(bubble, Math.Max(left, last.X - bubble.DesiredSize.Width - 10));
@@ -291,10 +298,11 @@ public partial class MainWindow
         DashMemHero.Text = total > 0 ? $"{(total - avail) / 1073741824.0:0.0} GB" : "—";
         DashMemSub.Text = total > 0 ? $"de RAM em uso · {total / 1073741824.0:0} GB instalados" : "";
 
-        Brush fg = (Brush)FindResource("Fg"), muted = (Brush)FindResource("Muted"), faint = (Brush)FindResource("Faint");
-        var rings = new List<(double Frac, Brush Brush, string Label)> { (ram, fg, "RAM") };
-        if (vram is double v) rings.Add((v, muted, "VRAM"));
-        if (c0 != null) rings.Add((c0.UsedFraction, faint, $"Disco {c0.Letter}"));
+        Brush fg = (Brush)FindResource("Fg");
+        // RAM, VRAM e Disco em tonalidades de amarelo indo para laranja.
+        var rings = new List<(double Frac, Brush Brush, string Label)> { (ram, (Brush)FindResource("RingRam"), "RAM") };
+        if (vram is double v) rings.Add((v, (Brush)FindResource("RingVram"), "VRAM"));
+        if (c0 != null) rings.Add((c0.UsedFraction, (Brush)FindResource("RingDisk"), $"Disco {c0.Letter}"));
 
         DashRings.Children.Clear();
         double cx = DashRings.Width / 2, cy = DashRings.Height / 2;

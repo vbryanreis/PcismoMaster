@@ -171,7 +171,7 @@
                                 <TextBlock x:Name="SideStress" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="parado" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                             </Grid>
                         </Border>
-                        <TextBlock x:Name="SideVersion" Text="v0.2.4" Foreground="{DynamicResource Faint}" FontSize="11" Margin="4,10,0,0"/>
+                        <TextBlock x:Name="SideVersion" Text="v0.2.5" Foreground="{DynamicResource Faint}" FontSize="11" Margin="4,10,0,0"/>
                     </StackPanel>
 
                     <!-- Navegação por categorias -->
@@ -363,21 +363,21 @@
                                     </Grid>
                                     <Grid Margin="0,16,0,8">
                                         <StackPanel x:Name="DashRangePanel" Orientation="Horizontal">
-                                            <RadioButton Style="{StaticResource Chip}" GroupName="DashRange" Content="1 MIN" Tag="60" Checked="DashOption_Checked"/>
-                                            <RadioButton Style="{StaticResource Chip}" GroupName="DashRange" Content="5 MIN" Tag="300" IsChecked="True" Checked="DashOption_Checked"/>
-                                            <RadioButton Style="{StaticResource Chip}" GroupName="DashRange" Content="15 MIN" Tag="900" Checked="DashOption_Checked"/>
+                                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="DashRange" Content="1 MIN" Tag="60" Checked="DashOption_Checked"/>
+                                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="DashRange" Content="5 MIN" Tag="300" IsChecked="True" Checked="DashOption_Checked"/>
+                                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="DashRange" Content="15 MIN" Tag="900" Checked="DashOption_Checked"/>
                                         </StackPanel>
                                         <StackPanel x:Name="DashMetricPanel" Orientation="Horizontal" HorizontalAlignment="Right">
-                                            <RadioButton Style="{StaticResource Chip}" GroupName="DashMetric" Content="Temperatura" Tag="temp" IsChecked="True" Checked="DashOption_Checked"/>
-                                            <RadioButton Style="{StaticResource Chip}" GroupName="DashMetric" Content="Carga" Tag="load" Checked="DashOption_Checked"/>
-                                            <RadioButton Style="{StaticResource Chip}" GroupName="DashMetric" Content="Consumo" Tag="power" Checked="DashOption_Checked"/>
+                                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="DashMetric" Content="Temperatura" Tag="temp" IsChecked="True" Checked="DashOption_Checked"/>
+                                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="DashMetric" Content="Carga" Tag="load" Checked="DashOption_Checked"/>
+                                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="DashMetric" Content="Consumo" Tag="power" Checked="DashOption_Checked"/>
                                         </StackPanel>
                                     </Grid>
                                     <Canvas x:Name="DashChart" Height="210" ClipToBounds="True" SizeChanged="DashChart_SizeChanged"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                        <Rectangle Width="14" Height="2" Fill="{DynamicResource Fg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <Rectangle Width="14" Height="2" Fill="{DynamicResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                         <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
-                                        <Line X1="0" X2="14" Stroke="{DynamicResource Muted}" StrokeDashArray="3 2" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <Line X1="0" X2="14" Stroke="{DynamicResource ChartGpu}" StrokeThickness="1.5" StrokeDashArray="3 2" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                         <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="11"/>
                                     </StackPanel>
                                 </StackPanel>
@@ -488,7 +488,7 @@
                             <Border Style="{StaticResource CardBorder}" Padding="22,20">
                                 <StackPanel>
                                     <TextBlock Text="MEMÓRIA E DISCO" Style="{StaticResource Label}" Margin="0,0,0,4"/>
-                                    <TextBlock x:Name="DashMemHero" Text="—" Style="{StaticResource Hero}" FontFamily="{StaticResource Mono}" FontSize="28"/>
+                                    <TextBlock x:Name="DashMemHero" Text="—" Style="{StaticResource Hero}" Foreground="{DynamicResource Accent}" FontFamily="{StaticResource Mono}" FontSize="28"/>
                                     <TextBlock x:Name="DashMemSub" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,8"/>
                                     <Canvas x:Name="DashRings" Width="190" Height="190" HorizontalAlignment="Center" Margin="0,4,0,8"/>
                                     <ItemsControl x:Name="DashRingLegend">
