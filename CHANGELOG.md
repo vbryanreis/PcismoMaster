@@ -2,6 +2,13 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.6.0
+
+- Nova sub-aba **Utilidades** em FERRAMENTAS, com ferramentas do dia a dia em sub-sub-abas:
+  - **Baixar vídeos**: cola o link (YouTube, Instagram, etc.), escolhe **MP4 (vídeo)** ou **MP3 (áudio)**, define a pasta e baixa. Usa o **yt-dlp** + **ffmpeg** (grátis), que agora aparecem na aba **Instalar apps** para instalar uma vez pelo winget; enquanto não estiverem instalados, a ferramenta avisa e leva até lá.
+  - **Finder**: busca instantânea de arquivos e pastas no estilo do Everything, lendo a **MFT** dos discos NTFS (usa o modo administrador). Digite para filtrar em tempo real, alterne entre Tudo / Arquivos / Pastas e dê um duplo clique para abrir a pasta do item.
+- Versão atualizada para 0.6.0.
+
 ## 0.5.2
 
 - Visão geral: o valor da **GPU** no gráfico agora usa as mesmas faixas de cor da CPU em **temperatura, carga e consumo** (azul tranquilo → amarelo → laranja → vermelho conforme aumenta), em vez do cinza fixo.

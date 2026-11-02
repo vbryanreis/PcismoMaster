@@ -311,6 +311,12 @@
                                     <TextBlock Text="Integração" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavUtil" Style="{StaticResource NavItem}" Tag="PageUtil" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE90F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Utilidades" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             </StackPanel>
                             <ToggleButton x:Name="GrpMaker" Style="{StaticResource NavGroup}" Content="MAKER"/>
                             <StackPanel x:Name="GrpMakerItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpMaker, Converter={StaticResource BoolVis}}">
@@ -2451,6 +2457,105 @@
                                         Padding="14,7" Margin="0,12,0,0" HorizontalAlignment="Left" Visibility="Collapsed" Click="BtnAppsStore_Click"/>
                             </StackPanel>
                         </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ===== FERRAMENTAS · Utilidades (baixar vídeos + Finder) ===== -->
+                <ScrollViewer x:Name="PageUtil" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,14">
+                            <TextBlock Text="UTILIDADES" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ferramentas úteis do dia a dia" Style="{StaticResource Sub}"/>
+                        </StackPanel>
+
+                        <!-- Sub-sub-abas -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <RadioButton x:Name="UtilTabDownload" Style="{StaticResource TopTab}" GroupName="UtilTab" Content="Baixar vídeos" IsChecked="True" Checked="UtilTab_Checked"/>
+                            <RadioButton x:Name="UtilTabFinder" Style="{StaticResource TopTab}" GroupName="UtilTab" Content="Finder" Checked="UtilTab_Checked"/>
+                        </StackPanel>
+
+                        <!-- ===== BAIXAR VÍDEOS ===== -->
+                        <StackPanel x:Name="UtilDownloadPanel">
+                            <Border x:Name="DlToolsWarn" Style="{StaticResource CardBorder}" Margin="0,0,0,14" Visibility="Collapsed">
+                                <StackPanel>
+                                    <TextBlock Text="Faltam o yt-dlp e o ffmpeg" FontWeight="SemiBold" FontSize="14"/>
+                                    <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,4,0,10"
+                                               Text="O baixador usa o yt-dlp (motor) e o ffmpeg (conversor), ambos grátis. Instale os dois pela aba Instalar apps (uma vez só) e volte aqui."/>
+                                    <Button Style="{StaticResource PrimaryButton}" Content="IR PARA INSTALAR APPS" Padding="16,8" HorizontalAlignment="Left"
+                                            Click="BtnDlInstallTools_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="LINK" Style="{StaticResource Label}"/>
+                                    <TextBox x:Name="DlUrl" Tag="Cole o link do YouTube, Instagram, etc." Margin="0,0,0,14"/>
+
+                                    <TextBlock Text="FORMATO" Style="{StaticResource Label}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                        <RadioButton x:Name="DlFmtMp4" Style="{StaticResource ChipAccent}" GroupName="DlFormat" Content="MP4 (vídeo)" Tag="mp4" IsChecked="True"/>
+                                        <RadioButton x:Name="DlFmtMp3" Style="{StaticResource ChipAccent}" GroupName="DlFormat" Content="MP3 (áudio)" Tag="mp3"/>
+                                    </StackPanel>
+
+                                    <TextBlock Text="PASTA DE DESTINO" Style="{StaticResource Label}"/>
+                                    <Grid Margin="0,0,0,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="DlFolder" VerticalAlignment="Center" FontFamily="{StaticResource Mono}" FontSize="12"
+                                                   TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Muted}"/>
+                                        <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="ALTERAR" Padding="12,6" FontSize="11" Margin="10,0,8,0" Click="BtnDlFolder_Click"/>
+                                        <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Content="ABRIR" Padding="12,6" FontSize="11" Click="BtnDlOpenFolder_Click"/>
+                                    </Grid>
+
+                                    <Button x:Name="BtnDownload" Style="{StaticResource PrimaryButton}" Content="BAIXAR" Padding="28,11" HorizontalAlignment="Left" Click="BtnDownload_Click"/>
+                                    <TextBlock x:Name="DlStatus" TextWrapping="Wrap" Margin="0,12,0,0" FontFamily="{StaticResource Mono}" FontSize="12"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,10,0,0"
+                                       Text="Baixe apenas conteúdo que você tem direito de baixar. Para links privados do Instagram pode ser preciso estar logado no navegador."/>
+                        </StackPanel>
+
+                        <!-- ===== FINDER ===== -->
+                        <StackPanel x:Name="UtilFinderPanel" Visibility="Collapsed">
+                            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBox x:Name="FindQuery" Tag="Digite para buscar arquivos e pastas no PC…" TextChanged="FindQuery_TextChanged"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <RadioButton x:Name="FindAll" Style="{StaticResource ChipAccent}" GroupName="FindKind" Content="Tudo" Tag="all" IsChecked="True" Checked="FindKind_Checked"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="FindKind" Content="Arquivos" Tag="files" Checked="FindKind_Checked"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="FindKind" Content="Pastas" Tag="folders" Checked="FindKind_Checked"/>
+                                        <TextBlock x:Name="FindStatus" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <ListBox x:Name="FindResults" MaxHeight="440" ItemContainerStyle="{StaticResource PlainItem}"
+                                     MouseDoubleClick="FindResults_Open" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent" Padding="10,7" Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="15" VerticalAlignment="Center"
+                                                           Margin="0,0,12,0" Foreground="{DynamicResource Accent}"/>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding FullPath}" Foreground="{DynamicResource Muted}" FontSize="11.5"
+                                                               FontFamily="{StaticResource Mono}" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,10,0,0"
+                                       Text="Dê um duplo clique para abrir a pasta do item. Lê a MFT dos discos NTFS (precisa do modo administrador)."/>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
 

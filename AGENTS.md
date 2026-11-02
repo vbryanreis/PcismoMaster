@@ -6,9 +6,9 @@ Assistente e copilota deste projeto. Comunique-se em português.
 
 PcismoMaster é um aplicativo **Windows** (WPF, .NET 8, C#) para diagnóstico, monitoramento, benchmark e otimização de PC, derivado do **ResetExplode** e incorporando funções do **Ultimate**. Roda como administrador (manifesto `requireAdministrator`) para ler sensores de baixo nível (MSR, Super I/O, NVAPI/NVML).
 
-- Interface principal herdada do ResetExplode, com identidade própria. As categorias da navegação lateral aparecem em CAIXA ALTA e em negrito e acendem no nosso azul ao passar o mouse: **MASTER** (sistema, sensores, placa de vídeo, discos, energia, rede), **JOGOS**, **DESEMPENHO** (benchmark, stress test e **Overclock** no estilo do MSI Afterburner), **FERRAMENTAS**, **MAKER** e **OTIMIZAÇÃO** (sempre abaixo de MAKER; não recrie uma central separada).
+- Interface principal herdada do ResetExplode, com identidade própria. As categorias da navegação lateral aparecem em CAIXA ALTA e em negrito e acendem no nosso azul ao passar o mouse: **MASTER** (sistema, sensores, placa de vídeo, discos, energia, rede), **JOGOS**, **DESEMPENHO** (benchmark, stress test e **Overclock** no estilo do MSI Afterburner), **FERRAMENTAS** (inclui **Utilidades**: sub-sub-abas de baixar vídeos com yt-dlp/ffmpeg e o **Finder** de busca instantânea lendo a MFT NTFS), **MAKER** e **OTIMIZAÇÃO** (sempre abaixo de MAKER; não recrie uma central separada).
 - Projeto mantido **em dupla**; cada colaborador trabalha na própria conta. `origin` é o repositório PcismoMaster (`vbryanreis/PcismoMaster`); `upstream` é a referência original do GustavoReset. Publique somente no `origin`.
-- Versão atual: **0.5.2**.
+- Versão atual: **0.6.0**.
 
 Documentação de apoio em `docs/projeto/`: fluxo de colaboração (`FLUXO-COLABORACAO.md`), planejamento (`PLANEJAMENTO.md`) e versionamento/lançamento (`ATUALIZACOES.md`). Material de referência do ResetExplode/Ultimate fica em `docs/`.
 

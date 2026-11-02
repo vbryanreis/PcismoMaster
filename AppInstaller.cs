@@ -15,6 +15,9 @@ public sealed class InstallableApp : INotifyPropertyChanged
     public string WingetId { get; init; } = "";
     /// <summary>Começo do nome em "Aplicativos instalados" (Painel de Controle), para saber se já está instalado.</summary>
     public string DisplayPrefix { get; init; } = "";
+    /// <summary>Para pacotes portáteis do winget (yt-dlp, ffmpeg), que não aparecem em "Aplicativos instalados":
+    /// nome do executável a procurar na pasta Links do winget ou no PATH. Quando preenchido, substitui o DisplayPrefix.</summary>
+    public string ProbeExe { get; init; } = "";
     public bool PreSelect { get; init; } = true;
 
     private bool _selected, _installed;
@@ -54,6 +57,8 @@ public static class AppInstaller
         new() { Name = "7-Zip", Description = "Compactador gratuito (zip, rar, 7z). Abre e cria arquivos compactados.", WingetId = "7zip.7zip", DisplayPrefix = "7-Zip" },
         new() { Name = "WinRAR", Description = "Compactador clássico (pago após o teste). Escolha ele ou o 7-Zip.", WingetId = "RARLab.WinRAR", DisplayPrefix = "WinRAR", PreSelect = false },
         new() { Name = "VLC", Description = "Player de vídeo e música que abre qualquer formato.", WingetId = "VideoLAN.VLC", DisplayPrefix = "VLC media player" },
+        new() { Name = "yt-dlp", Description = "Motor de download de vídeos/áudio (usado pela aba Utilidades · Baixar vídeos). Grátis e open-source.", WingetId = "yt-dlp.yt-dlp", ProbeExe = "yt-dlp", PreSelect = false },
+        new() { Name = "ffmpeg", Description = "Conversor de áudio/vídeo que o yt-dlp usa para gerar mp3/mp4. Grátis e open-source.", WingetId = "Gyan.FFmpeg", ProbeExe = "ffmpeg", PreSelect = false },
     };
 
     public static string WingetPath =>
@@ -89,7 +94,9 @@ public static class AppInstaller
         var names = InstalledNames();
         foreach (var a in apps)
         {
-            a.Installed = names.Any(n => n.StartsWith(a.DisplayPrefix, StringComparison.OrdinalIgnoreCase));
+            a.Installed = a.ProbeExe.Length > 0
+                ? ExternalTools.Has(a.ProbeExe)
+                : names.Any(n => n.StartsWith(a.DisplayPrefix, StringComparison.OrdinalIgnoreCase));
             if (a.Installed) a.Selected = false;
         }
     }
