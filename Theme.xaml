@@ -22,8 +22,8 @@
          Usa Inter quando instalada; cai para Segoe UI Variable Display (padrão do Windows 11) e depois Segoe UI. -->
     <FontFamily x:Key="NavFont">Inter, Segoe UI Variable Display, Segoe UI</FontFamily>
 
-    <!-- Amarelo dourado iluminado do hover das abas de navegação -->
-    <SolidColorBrush x:Key="Gold" Color="#FFC94D"/>
+    <!-- Azul claro iluminado do hover das abas de navegação -->
+    <SolidColorBrush x:Key="NavHover" Color="#5FB0FF"/>
 
     <!-- Canto entre as barras de rolagem e afins -->
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#000000"/>
@@ -187,7 +187,7 @@
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
         <Setter Property="FontFamily" Value="{StaticResource NavFont}"/>
         <Setter Property="FontSize" Value="11.5"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Margin" Value="12,6,12,1"/>
         <Setter Property="Focusable" Value="False"/>
@@ -214,10 +214,10 @@
                         <!-- Hover depois do IsChecked para que a cor dourada apareça mesmo na categoria aberta -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="bg" Property="Background" Value="{DynamicResource Hover}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource Gold}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource NavHover}"/>
                             <Setter TargetName="label" Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="#FFC94D" ShadowDepth="0" BlurRadius="10" Opacity="0.85"/>
+                                    <DropShadowEffect Color="#5FB0FF" ShadowDepth="0" BlurRadius="10" Opacity="0.85"/>
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
