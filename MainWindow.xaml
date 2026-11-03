@@ -567,7 +567,7 @@
                             <!-- Saúde do PC (como "Rewards"): lista de verificação + ação -->
                             <Border Grid.Column="4" Style="{StaticResource CardBorder}" Padding="22,20">
                                 <DockPanel>
-                                    <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="OTIMIZA" Padding="20,13"
+                                    <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="OTIMIZAR" Padding="20,13"
                                             Margin="0,14,0,0" Click="DashOptimize_Click"/>
                                     <StackPanel>
                                         <TextBlock Text="Saúde do PC" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"/>

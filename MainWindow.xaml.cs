@@ -436,6 +436,9 @@ public partial class MainWindow : Window
         GpuName.Text = g.Name;
         GpuSubtitle.Text = g.Subtitle;
         GpuVendor.Text = g.Vendor;
+        // Rótulo-logo do canto na cor da marca dentro da nossa paleta: NVIDIA no ciano (azul mais perto do verde), AMD no vermelho.
+        GpuVendor.Foreground = (System.Windows.Media.Brush)FindResource(
+            g.Vendor == "NVIDIA" ? "AccentCyan" : g.Vendor == "AMD" ? "GpuAmd" : "Faint");
         GpuSections.ItemsSource = g.Sections;
 
         // Sensores do LibreHardwareMonitor deste hardware, em ordem fixa (clock, temperatura, carga...).
