@@ -128,6 +128,8 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                         WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="BtnMode" Style="{StaticResource ModeButton}" Click="Mode_Click" Margin="0,0,10,0" VerticalAlignment="Center"
+                        ToolTip="Simples mostra só o essencial e seguro. Avançado mostra tudo (sensores, overclock, scripts, ajustes técnicos)."/>
                 <Button x:Name="BtnTheme" Style="{StaticResource CaptionButton}" Content="&#xE706;" Click="Theme_Click" ToolTip="Modo claro"/>
                 <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Min_Click" ToolTip="Minimizar"/>
                 <Button x:Name="BtnMax" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="Max_Click" ToolTip="Maximizar"/>
@@ -177,9 +179,15 @@
                     <!-- Navegação por categorias -->
                     <ScrollViewer x:Name="NavScroll" VerticalScrollBarVisibility="Auto" Margin="0,2,0,0">
                         <StackPanel Margin="0,0,0,10">
-                            <RadioButton x:Name="NavDash" Style="{StaticResource NavItem}" Tag="PageDash" Checked="Nav_Checked" IsChecked="True">
+                            <RadioButton x:Name="NavHome" Style="{StaticResource NavItem}" Tag="PageHome" Checked="Nav_Checked" IsChecked="True">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE80F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Início" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavDash" Style="{StaticResource NavItem}" Tag="PageDash" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE9D2;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Visão geral" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
@@ -228,6 +236,33 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE90F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Reparos do Windows" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            </StackPanel>
+                            <ToggleButton x:Name="GrpTweak" Style="{StaticResource NavGroup}" Content="TWEAKING"/>
+                            <StackPanel x:Name="GrpTweakItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpTweak, Converter={StaticResource BoolVis}}">
+                            <RadioButton x:Name="NavTweak" Style="{StaticResource NavItem}" Tag="PageTweak" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE9E9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Iniciar" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTweakWin" Style="{StaticResource NavItem}" Tag="PageTweakWin" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE770;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Windows" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTweakHw" Style="{StaticResource NavItem}" Tag="PageTweakHw" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Hardware" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTweakAdv" Style="{StaticResource NavItem}" Tag="PageTweakAdv" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE713;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Avançado" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -305,6 +340,12 @@
                                     <TextBlock Text="Instalar apps" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Desinstalar Apps" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -339,31 +380,31 @@
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
-                            <ToggleButton x:Name="GrpOtim" Style="{StaticResource NavGroup}" Content="OTIMIZAÇÃO"/>
-                            <StackPanel x:Name="GrpOtimItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpOtim, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavWinStartup" Style="{StaticResource NavItem}" Tag="PageUltimate" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Inicialização do Windows" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Desinstalar Apps" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </DockPanel>
             </Border>
 
-            <!-- ===== Conteúdo ===== -->
-            <Grid Grid.Row="1" Grid.Column="1">
+            <!-- ===== Conteúdo (com a explicação curta da página no topo) ===== -->
+            <DockPanel Grid.Row="1" Grid.Column="1">
+            <Border x:Name="PageHelp" DockPanel.Dock="Top" Margin="20,0,24,10" Padding="16,10" CornerRadius="12"
+                    Background="{DynamicResource AccentSoft}" Visibility="Collapsed">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource CaptionButton}" Width="30" Content="&#xE711;" Click="PageHelpHide_Click"
+                            ToolTip="Esconder as explicações (voltam em Início)"/>
+                    <TextBlock Text="&#xE946;" FontFamily="{StaticResource Icons}" FontSize="15" Foreground="{DynamicResource Accent}" Margin="0,1,10,0" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="PageHelpText" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+            <Grid>
+
+                <!-- ===== INÍCIO (tarefas + busca; montado no código) ===== -->
+                <ScrollViewer x:Name="PageHome" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="HomeHost" Margin="24,10,28,24"/>
+                </ScrollViewer>
 
                 <!-- ===== VISÃO GERAL (painel) ===== -->
-                <ScrollViewer x:Name="PageDash" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageDash" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="20,6,24,20">
 
                         <!-- Linha 1: gráfico grande + desempenho -->
@@ -815,8 +856,19 @@
                 </ScrollViewer>
 
                 <!-- ===== DRIVER ===== -->
-                <ScrollViewer x:Name="PageDriver" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="36,30,36,30">
+                <Grid x:Name="PageDriver" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <!-- Sub-abas: Drivers (atual) e Profile Inspector -->
+                    <StackPanel Orientation="Horizontal" Margin="36,24,36,0">
+                        <RadioButton x:Name="DrvTabDrivers" Style="{StaticResource Chip}" GroupName="DrvTab" Content="Drivers" IsChecked="True" Checked="DrvTab_Changed"/>
+                        <RadioButton x:Name="DrvTabNvcp" Style="{StaticResource Chip}" GroupName="DrvTab" Content="Painel NVIDIA" Checked="DrvTab_Changed"/>
+                        <RadioButton x:Name="DrvTabNpi" Style="{StaticResource Chip}" GroupName="DrvTab" Content="Profile Inspector" Checked="DrvTab_Changed"/>
+                    </StackPanel>
+                <ScrollViewer x:Name="DrvPanel" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,16,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
                                 <TextBlock Text="DRIVER" Style="{StaticResource H1}"/>
@@ -831,6 +883,129 @@
                             </Border>
                         </Grid>
                         <TextBlock x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+
+                        <!-- Limpeza completa do driver de vídeo com o DDU (Ultimate · 5 Graphics · 1 Driver Clean) -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Limpeza completa do driver de vídeo (DDU)" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Remove o driver de vídeo por inteiro no modo de segurança, para reinstalar do zero" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,12">
+                                    Use quando o driver der problema (tela preta, travamentos, erro na instalação) ou ao trocar de placa. O PC reinicia no modo de
+                                    segurança, o Display Driver Uninstaller (Wagnardsoft) remove driver, painel, PhysX, GeForce Experience e Vulkan, e o PC volta
+                                    ao normal sem driver de vídeo: depois é só instalar o driver de novo.
+                                </TextBlock>
+                                <WrapPanel Margin="0,0,0,6">
+                                    <TextBlock Text="MODO" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
+                                    <RadioButton x:Name="DduAuto" Style="{StaticResource Chip}" GroupName="DduMode" Content="Automático (limpa e reinicia sozinho)" IsChecked="True"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduMode" Content="Manual (abre o DDU no modo de segurança)"/>
+                                </WrapPanel>
+                                <WrapPanel x:Name="DduGpuPanel" Margin="0,0,0,8">
+                                    <TextBlock Text="LIMPAR" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="NVIDIA" Tag="nvidia"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="AMD" Tag="amd"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="Intel" Tag="intel"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="Todas as placas" Tag="all"/>
+                                </WrapPanel>
+                                <CheckBox x:Name="DduBlockWu" Content="Impedir o Windows Update de instalar um driver de vídeo sozinho (dá para desfazer)" IsChecked="True" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="DduAudio" Content="Também remover drivers de áudio Realtek e Sound Blaster (o PC fica sem som até reinstalar)" Margin="0,0,0,12"/>
+                                <WrapPanel>
+                                    <Button x:Name="BtnDduRun" Style="{StaticResource PrimaryButton}" Content="Preparar e reiniciar no modo de segurança" Padding="18,9" Margin="0,0,10,8" Click="BtnDduRun_Click"/>
+                                    <Button x:Name="BtnDduCancel" Style="{StaticResource OutlineButton}" Content="Cancelar reinício" Padding="16,9" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnDduCancel_Click"/>
+                                    <Button x:Name="BtnDduLocal" Style="{StaticResource OutlineButton}" Content="Usar um DDU que eu baixei…" Padding="14,9" Margin="0,0,10,8" Click="BtnDduLocal_Click"
+                                            ToolTip="Escolha o instalador oficial do DDU baixado do site da Wagnardsoft"/>
+                                    <Button x:Name="BtnDduWuRestore" Style="{StaticResource OutlineButton}" Content="Liberar drivers pelo Windows Update" Padding="14,9" Margin="0,0,10,8"
+                                            Visibility="Collapsed" Click="BtnDduWuRestore_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="DduStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DduLog" Foreground="{DynamicResource Muted}" FontSize="11.5" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Instalar driver (normal ou enxuta) + configurações do Painel NVIDIA (Ultimate · 5 Graphics · 2, 3 e 4) -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                        <TextBlock Text="&#xE9F5;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Instalar driver e configurações" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Instalação normal ou enxuta; nas duas, as configurações marcadas abaixo são aplicadas logo depois" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock x:Name="GfxCardInfo" Visibility="Collapsed" Foreground="{DynamicResource AccentCyan}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="INSTALAÇÃO" Style="{StaticResource Label}" Margin="0,4,0,8"/>
+                                <WrapPanel Margin="0,0,0,8">
+                                    <RadioButton x:Name="InstNormal" Style="{StaticResource Chip}" GroupName="InstMode" Content="Normal (driver completo)" IsChecked="True" Checked="InstMode_Changed"/>
+                                    <RadioButton x:Name="InstDebloat" Style="{StaticResource Chip}" GroupName="InstMode" Content="Enxuta (debloat)" Checked="InstMode_Changed"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="InstModeHelp" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"
+                                           Text="Driver oficial com assinatura conferida, instalado sem telas e do zero (apaga as configurações antigas do driver)."/>
+                                <StackPanel x:Name="InstDebloatPanel" Visibility="Collapsed">
+                                    <TextBlock x:Name="DebloatNo7z" Visibility="Collapsed" Foreground="{DynamicResource TempWarn}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8">
+                                        Precisa do 7-Zip para abrir o pacote do driver. <Hyperlink Click="BtnDebloat7z_Click">Instalar o 7-Zip (winget)</Hyperlink>
+                                    </TextBlock>
+                                    <StackPanel x:Name="DebloatRows"/>
+                                </StackPanel>
+                                <WrapPanel Margin="0,4,0,0">
+                                    <Button x:Name="BtnDebloatLatest" Style="{StaticResource PrimaryButton}" Content="Baixar o driver NVIDIA mais recente e instalar" Padding="16,8" Margin="0,0,10,8" Click="BtnInstLatest_Click"/>
+                                    <Button x:Name="BtnDebloatFile" Style="{StaticResource OutlineButton}" Content="Escolher o instalador…" Padding="14,8" Margin="0,0,10,8" Click="BtnInstFile_Click"
+                                            ToolTip="Use um instalador de driver NVIDIA, AMD ou Intel que você já baixou"/>
+                                    <Button x:Name="BtnDebloatUndo" Style="{StaticResource OutlineButton}" Content="Desfazer as limpezas" Padding="14,8" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnDebloatUndo_Click"
+                                            ToolTip="Reativa os serviços e as entradas de inicialização que a instalação enxuta desligou"/>
+                                </WrapPanel>
+                                <WrapPanel x:Name="GfxNvInstallRow" Margin="0,0,0,4">
+                                    <Button Style="{StaticResource OutlineButton}" Content="Abrir Painel de Controle NVIDIA" Padding="14,8" Margin="0,0,10,6" Click="BtnGfxNvPanel_Click"
+                                            ToolTip="Se ainda não estiver instalado, abre a página dele na Microsoft Store"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Atalho na Área de Trabalho" Padding="14,8" Margin="0,0,10,6" Click="BtnGfxNvShortcut_Click"
+                                            ToolTip="Cria o atalho &quot;NVIDIA Control Panel&quot; na Área de Trabalho"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="DebloatStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,6"/>
+
+                                <TextBlock Text="CONFIGURAÇÕES (aplicadas depois de instalar, ou quando você clicar em Aplicar)" Style="{StaticResource Label}" Margin="0,10,0,0"/>
+                                <StackPanel x:Name="GfxRows" Margin="0,4,0,0"/>
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="BtnGfxApply" Style="{StaticResource PrimaryButton}" Content="Aplicar" Padding="18,8" Margin="0,0,10,8" Click="BtnGfxApply_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Marcar os recomendados" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxDefaults_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Desfazer tudo" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxUndoAll_Click"/>
+                                    <Button x:Name="BtnGfxNvDefault" Style="{StaticResource OutlineButton}" Content="Perfil global NVIDIA no padrão do driver" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxNvDefault_Click"
+                                            ToolTip="O &quot;NVIDIA Settings: Default&quot; do script: tira do perfil global tudo o que foi mudado (por qualquer programa)"/>
+                                    <Button x:Name="BtnGfxReboot" Style="{StaticResource OutlineButton}" Content="Reiniciar agora" Padding="14,8" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnGfxReboot_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="GfxStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Bibliotecas para jogos: só verificação (a instalação fica em Instalar apps) -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,10">
+                                    <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Content="Verificar de novo" Padding="12,6" VerticalAlignment="Center" Click="BtnRuntimeCheck_Click"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                            <TextBlock Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Bibliotecas para jogos (Visual C++ e DirectX)" FontSize="15" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Só confere o que está instalado. Para instalar, use a aba Instalar apps" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DockPanel>
+                                <StackPanel x:Name="RuntimeRows"/>
+                                <TextBlock x:Name="RuntimeNote" Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
@@ -854,9 +1029,17 @@
                                     <Button x:Name="BtnDrvInstall" Style="{StaticResource PrimaryButton}" Content="BAIXAR E INSTALAR" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvInstall_Click" IsEnabled="False"/>
                                     <Button x:Name="BtnDrvGpuPage" Style="{StaticResource OutlineButton}" Content="ABRIR PÁGINA OFICIAL" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvGpuPage_Click"/>
                                 </WrapPanel>
+                                <!-- Escolher o fabricante à mão (ex.: logo depois do DDU, quando o Windows ainda não reconhece a placa) -->
+                                <WrapPanel Margin="0,2,0,8">
+                                    <TextBlock Text="INSTALAR O DRIVER MAIS RECENTE DE" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="NVIDIA" Tag="NVIDIA" Padding="14,6" Margin="0,0,8,6" Click="BtnDrvVendor_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="AMD" Tag="AMD" Padding="14,6" Margin="0,0,8,6" Click="BtnDrvVendor_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Intel" Tag="Intel" Padding="14,6" Margin="0,0,8,6" Click="BtnDrvVendor_Click"/>
+                                </WrapPanel>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
                                     NVIDIA: o instalador é baixado do servidor oficial, a assinatura digital é conferida e um ponto de restauração é criado antes de abrir.
-                                    AMD: o programa procura o instalador na página oficial do seu modelo (RX série 4000 a 9000); se o site bloquear, use ABRIR PÁGINA OFICIAL. Intel: só a página oficial.
+                                    AMD: o programa procura o instalador na página oficial do seu modelo (RX série 4000 a 9000) ou o instalador que detecta a placa sozinho; se o site bloquear, use ABRIR PÁGINA OFICIAL. Intel: abre a lista de drivers gráficos para Windows 11.
+                                    Sem driver de vídeo (por exemplo, depois da limpeza com o DDU), a placa ainda é reconhecida; se não for, escolha o fabricante acima.
                                 </TextBlock>
                             </StackPanel>
                         </Border>
@@ -923,6 +1106,157 @@
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
+
+                <!-- ===== Painel NVIDIA ("Gerenciar as configurações em 3D" do Painel de Controle NVIDIA) ===== -->
+                <Grid x:Name="NvcpPanel" Grid.Row="1" Visibility="Collapsed" Margin="36,16,36,24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="18"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.ColumnSpan="3" Margin="0,0,0,14">
+                        <TextBlock Text="Painel NVIDIA" Style="{StaticResource H1}"/>
+                        <TextBlock Text="As configurações em 3D do Painel de Controle NVIDIA, com os mesmos nomes e opções: globais (todos os jogos) ou de um programa."
+                                   Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <DockPanel Grid.Row="1">
+                        <TextBox x:Name="NvcpProfileSearch" DockPanel.Dock="Top" Tag="Buscar programa ou jogo…" Margin="0,0,0,8" TextChanged="NvcpProfileSearch_Changed"/>
+                        <TextBlock x:Name="NvcpProfileCount" DockPanel.Dock="Top" Foreground="{DynamicResource Muted}" FontSize="11.5" Margin="2,0,0,6"/>
+                        <Border Style="{StaticResource CardBorder}" Padding="4">
+                            <ListBox x:Name="NvcpProfiles" SelectionChanged="NvcpProfiles_Changed" VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.VirtualizationMode="Recycling" ItemContainerStyle="{StaticResource ListNavItem}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
+                                            <TextBlock Text="{Binding Detail}" FontSize="10.5" Opacity="0.6"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </DockPanel>
+
+                    <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource CardBorder}" Padding="20,16">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                                <TextBlock x:Name="NvcpTitle" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock x:Name="NvcpSubtitle" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+                                <WrapPanel>
+                                    <Button x:Name="BtnNvcpApply" Style="{StaticResource PrimaryButton}" Content="Aplicar" Padding="18,8" Margin="0,0,10,8" Click="BtnNvcpApply_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Descartar alterações" Padding="14,8" Margin="0,0,10,8" Click="BtnNvcpDiscard_Click"/>
+                                    <Button x:Name="BtnNvcpRestore" Style="{StaticResource OutlineButton}" Content="Restaurar" Padding="14,8" Margin="0,0,10,8" Click="BtnNvcpRestore_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="NvcpStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="NvcpRows" Margin="0,0,8,0"/>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <!-- ===== Profile Inspector (perfis do driver NVIDIA) ===== -->
+                <Grid x:Name="NpiPanel" Grid.Row="1" Visibility="Collapsed" Margin="36,16,36,24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="18"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.ColumnSpan="3" Margin="0,0,0,14">
+                        <TextBlock Text="Profile Inspector" Style="{StaticResource H1}"/>
+                        <TextBlock x:Name="NpiSub" Text="Todas as configurações dos perfis do driver NVIDIA, inclusive as que o Painel de Controle esconde."
+                                   Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <!-- Perfis -->
+                    <DockPanel Grid.Row="1">
+                        <TextBox x:Name="NpiProfileSearch" DockPanel.Dock="Top" Tag="Buscar perfil ou jogo…" Margin="0,0,0,8" TextChanged="NpiProfileSearch_Changed"/>
+                        <TextBlock x:Name="NpiProfileCount" DockPanel.Dock="Top" Foreground="{DynamicResource Muted}" FontSize="11.5" Margin="2,0,0,6"/>
+                        <Border Style="{StaticResource CardBorder}" Padding="4">
+                            <ListBox x:Name="NpiProfiles" SelectionChanged="NpiProfiles_Changed" VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.VirtualizationMode="Recycling" ItemContainerStyle="{StaticResource ListNavItem}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
+                                            <TextBlock Text="{Binding Detail}" FontSize="10.5" Opacity="0.6"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </DockPanel>
+
+                    <!-- Configurações do perfil -->
+                    <DockPanel Grid.Row="1" Grid.Column="2">
+                        <StackPanel DockPanel.Dock="Top">
+                            <TextBlock x:Name="NpiTitle" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                            <WrapPanel x:Name="NpiApps" Margin="0,6,0,0"/>
+                            <WrapPanel Margin="0,10,0,0">
+                                <Button x:Name="BtnNpiApply" Style="{StaticResource PrimaryButton}" Content="Aplicar alterações" Padding="16,8" Margin="0,0,8,8" Click="BtnNpiApply_Click"/>
+                                <Button x:Name="BtnNpiUndo" Style="{StaticResource OutlineButton}" Content="Desfazer" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiUndo_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="Restaurar padrão do perfil" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiRestore_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="Novo perfil…" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiNew_Click"/>
+                                <Button x:Name="BtnNpiDelete" Style="{StaticResource OutlineButton}" Content="Excluir perfil" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiDelete_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="Exportar .nip" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiExport_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="Importar .nip" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiImport_Click"/>
+                            </WrapPanel>
+                            <Grid Margin="0,2,0,8">
+                                <TextBox x:Name="NpiSettingSearch" Width="260" HorizontalAlignment="Left" Tag="Buscar configuração…" TextChanged="NpiFilter_Changed"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <CheckBox x:Name="NpiOnlyChanged" Content="Só alteradas" Margin="0,0,16,0" Click="NpiFilter_Changed"/>
+                                    <CheckBox x:Name="NpiShowAll" Content="Mostrar tudo (escondidas e sem nome)" Click="NpiShowAll_Changed"/>
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock x:Name="NpiStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                        </StackPanel>
+                        <Border Style="{StaticResource CardBorder}" Padding="6">
+                            <ListBox x:Name="NpiSettings" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                                     VirtualizingPanel.ScrollUnit="Pixel" ItemContainerStyle="{StaticResource PlainItem}" HorizontalContentAlignment="Stretch">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <!-- Cabeçalho de grupo -->
+                                            <Border Visibility="{Binding HeaderVisibility}" Background="{DynamicResource Hover}" CornerRadius="6" Padding="10,6" Margin="0,10,0,4">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
+                                            </Border>
+                                            <!-- Configuração -->
+                                            <Grid Visibility="{Binding RowVisibility}" Margin="6,2" ToolTip="{Binding Tip}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="330"/>
+                                                    <ColumnDefinition Width="82"/>
+                                                    <ColumnDefinition Width="32"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12.5"
+                                                           FontWeight="{Binding NameWeight}" Foreground="{Binding NameBrush}" Margin="0,0,10,0"/>
+                                                <ComboBox Grid.Column="1" IsEditable="True" ItemsSource="{Binding Choices}" IsEnabled="{Binding Editable}"
+                                                          Text="{Binding EditText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxDropDownHeight="320"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding SourceText}" Foreground="{Binding SourceBrush}" FontSize="11"
+                                                           VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                                <Button Grid.Column="3" Style="{StaticResource OutlineButton}" Content="↺" Padding="6,1" FontSize="12" BorderThickness="0"
+                                                        Visibility="{Binding ResetVisibility}" ToolTip="Tirar do perfil (volta a herdar o valor)" Click="BtnNpiReset_Click"/>
+                                            </Grid>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </DockPanel>
+                </Grid>
+                </Grid>
 
                 <!-- ===== INTEGRAÇÃO (iluminação) ===== -->
                 <ScrollViewer x:Name="PageInteg" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
@@ -1311,6 +1645,115 @@
                         </DataGrid>
                     </Border>
                 </Grid>
+
+                <!-- ===== TWEAKING · Iniciar (3 Setup do Ultimate) ===== -->
+                <ScrollViewer x:Name="PageTweak" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="INICIAR" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes do Windows do 3 Setup do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
+                            <StackPanel>
+                                <TextBlock Text="AJUSTES COM DESFAZER" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14">
+                                    Do "3 Setup" do Ultimate. Marque o que quer, clique em APLICAR; o valor anterior de cada um fica guardado e
+                                    desmarcar + APLICAR devolve. Os AVANÇADOS vêm desligados. Alguns só valem depois de reiniciar.
+                                </TextBlock>
+                                <StackPanel x:Name="TweakRows"/>
+                                <WrapPanel Margin="0,6,0,0">
+                                    <Button x:Name="BtnTweakApply" Style="{StaticResource PrimaryButton}" Content="APLICAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakApply_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="MARCAR RECOMENDADOS" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakDefaults_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="DESFAZER TUDO" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakUndoAll_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="TweakStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
+                            <StackPanel>
+                                <TextBlock Text="COMPRESSÃO DE MEMÓRIA" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    O Windows comprime parte da RAM para caber mais coisa, gastando um pouco de CPU. Desligar é o recomendado
+                                    do script para PCs com bastante RAM (16 GB ou mais); com pouca RAM, deixe ligada. Vale depois de reiniciar.
+                                </TextBlock>
+                                <TextBlock x:Name="TweakMemStatus" Text="Verificando…" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button x:Name="BtnTweakMemOff" Style="{StaticResource PrimaryButton}" Content="DESLIGAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakMemOff_Click"/>
+                                    <Button x:Name="BtnTweakMemOn" Style="{StaticResource OutlineButton}" Content="LIGAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakMemOn_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
+                            <StackPanel>
+                                <TextBlock Text="BITLOCKER" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    A criptografia dos discos gasta um pouco de desempenho no SSD. Desligar descriptografa os discos
+                                    (demora, o PC pode ser usado enquanto isso) e deixa os dados legíveis se o disco ou o PC for roubado.
+                                    Para ligar de novo, use as configurações do BitLocker.
+                                </TextBlock>
+                                <TextBlock x:Name="TweakBitStatus" Text="Verificando…" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button x:Name="BtnTweakBitOff" Style="{StaticResource PrimaryButton}" Content="DESLIGAR BITLOCKER" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakBitOff_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="ABRIR CONFIGURAÇÕES DO BITLOCKER" Padding="18,9" Margin="0,0,10,8" Tag="control.exe|/name microsoft.bitlockerdriveencryption" Click="BtnTweakOpen_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="ATALHOS DO WINDOWS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12">
+                                    O que o script só abre para você conferir e ajustar à mão.
+                                </TextBlock>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource OutlineButton}" Content="DATA, HORA E REGIÃO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:dateandtime" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="IDIOMA" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:regionlanguage" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="APPS DE INICIALIZAÇÃO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:startupapps" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="GERENCIADOR DE TAREFAS · INICIALIZAÇÃO" Padding="16,8" Margin="0,0,10,8" Tag="taskmgr.exe|/0 /startup" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="APPS EM SEGUNDO PLANO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:privacy-backgroundapps" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="CONFIGURAÇÕES DA STORE" Padding="16,8" Margin="0,0,10,8" Tag="ms-windows-store:settings" Click="BtnTweakOpen_Click"/>
+                                </WrapPanel>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                    Na Store, o script também desliga a reprodução automática de vídeos, os avisos de instalação e as
+                                    experiências personalizadas: o script completo da Store, abaixo, faz isso.
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                        <!-- Scripts completos do 3 Setup (MainWindow.ScriptCards.cs) -->
+                        <StackPanel x:Name="TweakIniHost" Margin="0,22,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ===== TWEAKING · Windows, Hardware e Avançado (pastas do Ultimate; cartões montados em MainWindow.TweakPages.cs) ===== -->
+                <ScrollViewer x:Name="PageTweakWin" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="WINDOWS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes do Windows da pasta Windows do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakWinHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageTweakHw" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="HARDWARE" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Mouse, escala, monitor, controle e rede da pasta Hardware do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakHwHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageTweakAdv" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="AVANÇADO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes da pasta Advanced do Ultimate · todos vêm desligados e trocam segurança ou estabilidade por desempenho" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakAdvHost"/>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- ===== MANUTENÇÃO · Reparos do Windows ===== -->
                 <ScrollViewer x:Name="PageMaint" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
@@ -1809,7 +2252,7 @@
                 </ScrollViewer>
 
                 <!-- ===== OVERLAY ===== -->
-                <ScrollViewer x:Name="PageOverlay" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageOverlay" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" IsVisibleChanged="PageOverlay_IsVisibleChanged">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
                             <TextBlock Text="Overlay" Style="{StaticResource H1}"/>
@@ -1818,35 +2261,92 @@
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <Grid>
-                                <StackPanel>
-                                    <CheckBox x:Name="ChkOverlay" Content="Mostrar overlay" FontSize="15" Checked="ChkOverlay_Changed" Unchecked="ChkOverlay_Changed"/>
-                                    <TextBlock Foreground="{DynamicResource Muted}" Margin="46,6,0,0" TextWrapping="Wrap">
-                                        Atalho global: <Run Text="Ctrl + Shift + O" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Fg}"/> liga e desliga, inclusive dentro do jogo.
-                                    </TextBlock>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="300"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Prévia com os números reais deste PC -->
+                                <Border Background="#0A0A0A" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="6" MinHeight="150" Padding="10">
+                                    <Grid>
+                                        <Border x:Name="OvPreviewBox" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="10" Padding="14,10"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,18">
+                                            <Grid TextElement.FontFamily="Segoe UI">
+                                            <ItemsControl x:Name="OvPreviewV" MinWidth="200">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <DockPanel Margin="0,3">
+                                                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="13" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                                                            <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                        </DockPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <ItemsControl x:Name="OvPreview" TextElement.FontSize="12">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal" Margin="0,1,14,1">
+                                                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="9" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                            <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            </Grid>
+                                        </Border>
+                                        <TextBlock Text="Prévia com os números reais deste PC" Foreground="{DynamicResource Faint}" FontSize="11"
+                                                   HorizontalAlignment="Left" VerticalAlignment="Bottom" IsHitTestVisible="False"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Column="2">
+                                    <CheckBox x:Name="ChkOverlay" Content="Mostrar overlay agora" FontSize="15" Checked="ChkOverlay_Changed" Unchecked="ChkOverlay_Changed"/>
+                                    <TextBlock Text="TECLA PARA LIGAR/DESLIGAR" Style="{StaticResource Label}" Margin="0,16,0,6"/>
+                                    <TextBox x:Name="OvHotkeyBox" IsReadOnly="True" Cursor="Hand" FontFamily="{StaticResource Mono}" IsReadOnlyCaretVisible="False"
+                                             PreviewKeyDown="OvHotkey_PreviewKeyDown" ToolTip="Clique e aperte a tecla ou combinação (Esc cancela)"/>
+                                    <TextBlock Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"
+                                               Text="Clique na caixa e aperte a tecla. Funciona com o jogo em primeiro plano; use uma tecla ou combinação que o jogo não use."/>
+                                    <TextBlock x:Name="OvHotkeyHint" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <WrapPanel>
-                                <StackPanel Margin="0,0,36,0">
-                                    <TextBlock Text="POSIÇÃO" Style="{StaticResource Label}"/>
-                                    <StackPanel x:Name="OvCornerPanel" Orientation="Horizontal">
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Superior esquerdo" Tag="TL" Margin="0,0,6,0" Checked="OvOption_Changed"/>
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Superior direito" Tag="TR" Margin="0,0,6,0" Checked="OvOption_Changed"/>
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Inferior esquerdo" Tag="BL" Margin="0,0,6,0" Checked="OvOption_Changed"/>
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Inferior direito" Tag="BR" Margin="0" Checked="OvOption_Changed"/>
-                                    </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="POSIÇÃO" Style="{StaticResource Label}"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" Text="No monitor onde o jogo está." Margin="0,0,0,6"/>
+                                <WrapPanel x:Name="OvCornerPanel">
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Superior esquerdo" Tag="TL" Margin="0,0,6,6" Checked="OvOption_Changed"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Centro superior" Tag="TC" Margin="0,0,6,6" Checked="OvOption_Changed"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Superior direito" Tag="TR" Margin="0,0,6,6" Checked="OvOption_Changed"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Inferior esquerdo" Tag="BL" Margin="0,0,6,6" Checked="OvOption_Changed"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Centro inferior" Tag="BC" Margin="0,0,6,6" Checked="OvOption_Changed"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Inferior direito" Tag="BR" Margin="0,0,6,6" Checked="OvOption_Changed"/>
+                                </WrapPanel>
+                                <TextBlock Text="FORMATO" Style="{StaticResource Label}" Margin="0,10,0,6"/>
+                                <StackPanel x:Name="OvLayoutPanel" Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvLayout" Content="Vertical (lista e gráfico)" Tag="V" Margin="0,0,6,0" Checked="OvOption_Changed"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="OvLayout" Content="Horizontal (barra)" Tag="H" Margin="0" Checked="OvOption_Changed"/>
                                 </StackPanel>
-                                <StackPanel>
-                                    <TextBlock Text="TAMANHO" Style="{StaticResource Label}"/>
-                                    <StackPanel x:Name="OvScalePanel" Orientation="Horizontal">
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvScale" Content="Pequeno" Tag="0.85" Margin="0,0,6,0" Checked="OvOption_Changed"/>
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvScale" Content="Médio" Tag="1" Margin="0,0,6,0" Checked="OvOption_Changed"/>
-                                        <RadioButton Style="{StaticResource Chip}" GroupName="OvScale" Content="Grande" Tag="1.3" Margin="0" Checked="OvOption_Changed"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </WrapPanel>
+                                <Grid Margin="0,16,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="170"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="OPACIDADE DO FUNDO" Style="{StaticResource Label}" VerticalAlignment="Center"/>
+                                    <Slider x:Name="OvOpacity" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.1" ValueChanged="OvSlider_Changed" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Text="TAMANHO" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                    <Slider x:Name="OvScale" Grid.Row="1" Grid.Column="1" Minimum="0.7" Maximum="2" SmallChange="0.05" LargeChange="0.1" ValueChanged="OvSlider_Changed" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                </Grid>
+                            </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
@@ -2543,87 +3043,165 @@
                 <!-- ===== INSTALAR APPS (pós-formatação, via winget) ===== -->
                 <ScrollViewer x:Name="PageApps" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
-                        <Grid Margin="0,0,0,20">
-                            <StackPanel Margin="0,0,250,0">
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
                                 <TextBlock Text="INSTALAR APPS" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Os essenciais depois de formatar o PC · versão oficial mais recente, instalação silenciosa" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
-                            <Button x:Name="BtnAppsInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR SELECIONADOS" Padding="20,9"
-                                    HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnAppsInstall_Click"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="16,0,0,0">
+                                <TextBlock x:Name="AppsSelCount" Text="Nenhum selecionado" Foreground="{DynamicResource Muted}" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                <Button x:Name="BtnAppsInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR SELECIONADOS" Padding="20,9"
+                                        Click="BtnAppsInstall_Click"/>
+                            </StackPanel>
                         </Grid>
                         <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                            <Border Background="{DynamicResource AccentGradient}" RenderTransformOrigin="0,0.5">
                                 <Border.RenderTransform><ScaleTransform x:Name="AppsProgress" ScaleX="0"/></Border.RenderTransform>
                             </Border>
                         </Grid>
                         <TextBlock x:Name="AppsStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                        <Border Style="{StaticResource CardBorder}">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="APPS" Style="{StaticResource Label}"/>
-                                    <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-                                        <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODOS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnAppsAll_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnAppsNone_Click"/>
-                                    </WrapPanel>
-                                </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
-                                    Usa o winget, o instalador de pacotes da Microsoft que já vem no Windows 10/11: baixa do site oficial de
-                                    cada fabricante e confere o arquivo antes de instalar. Os apps são instalados um de cada vez, sem janelas.
-                                    O que já está instalado aparece marcado como INSTALADO.
-                                </TextBlock>
-                                <WrapPanel x:Name="AppsCatPanel" Margin="0,0,0,10">
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Todos" Tag="" IsChecked="True" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Navegadores" Tag="Navegadores" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mensagens" Tag="Mensagens" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mídia" Tag="Mídia" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Imagem" Tag="Imagem" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Documentos" Tag="Documentos" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Segurança" Tag="Segurança" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Compactação" Tag="Compactação" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Utilitários" Tag="Utilitários" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Desenvolvimento" Tag="Desenvolvimento" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Jogos" Tag="Jogos" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="ArtCraft" Tag="ArtCraft" Checked="AppsCat_Checked"/>
-                                </WrapPanel>
-                                <ItemsControl x:Name="AppsList">
-                                    <ItemsControl.ItemTemplate>
+                        <!-- Busca, filtros e categorias -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="280"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="AppsSearch" Tag="Buscar app…" TextChanged="AppsSearch_TextChanged"/>
+                            <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <CheckBox x:Name="AppsHideInstalled" Content="Esconder instalados" VerticalAlignment="Center" Margin="0,0,16,0"
+                                          Checked="AppsHideInstalled_Changed" Unchecked="AppsHideInstalled_Changed"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODOS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnAppsAll_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnAppsNone_Click"/>
+                            </WrapPanel>
+                        </Grid>
+                        <WrapPanel x:Name="AppsCatPanel" Margin="0,0,0,8">
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Todos" Tag="" IsChecked="True" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Navegadores" Tag="Navegadores" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mensagens" Tag="Mensagens" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mídia" Tag="Mídia" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Imagem" Tag="Imagem" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Documentos" Tag="Documentos" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Segurança" Tag="Segurança" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Compactação" Tag="Compactação" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Utilitários" Tag="Utilitários" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Desenvolvimento" Tag="Desenvolvimento" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Jogos" Tag="Jogos" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="ArtCraft" Tag="ArtCraft" Checked="AppsCat_Checked"/>
+                        </WrapPanel>
+
+                        <!-- Grade de cartões iguais, agrupada por categoria -->
+                        <ItemsControl x:Name="AppsList" Focusable="False">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
                                         <DataTemplate>
-                                            <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,10">
+                                            <StackPanel Orientation="Horizontal" Margin="2,14,0,10">
+                                                <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource Fg}"/>
+                                                <Border Background="{DynamicResource Hover}" CornerRadius="8" Padding="7,1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ItemCount}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Muted}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ItemsControl.GroupStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="268" Height="92" Margin="0,0,12,12" CornerRadius="10" BorderThickness="1" Padding="12"
+                                            Cursor="Hand" MouseLeftButtonUp="AppCard_Click" ToolTip="{Binding Description}">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{DynamicResource Card}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Line}"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource Hover}"/>
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding Selected}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Installed}" Value="True">
+                                                        <Setter Property="Cursor" Value="Arrow"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="44"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <!-- Ícone num quadrado claro: todos ficam iguais, mesmo os escuros -->
+                                            <Border Width="44" Height="44" CornerRadius="10" Background="{DynamicResource IconTile}" VerticalAlignment="Top">
                                                 <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <CheckBox IsChecked="{Binding Selected}" IsEnabled="{Binding CanSelect}" VerticalAlignment="Top" Margin="0,1,12,0"/>
-                                                    <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
-                                                        <TextBlock Text="{Binding Status}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,0"/>
-                                                    </StackPanel>
-                                                    <TextBlock Grid.Column="2" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Muted}"
-                                                               VerticalAlignment="Top" Margin="14,3,0,0">
+                                                    <TextBlock Text="{Binding Initial}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Accent}"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
-                                                                <Setter Property="Text" Value=""/>
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Installed}" Value="True">
-                                                                        <Setter Property="Text" Value="INSTALADO"/>
+                                                                    <DataTrigger Binding="{Binding HasIcon}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </TextBlock.Style>
                                                     </TextBlock>
+                                                    <Image Source="{Binding Icon}" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
                                                 </Grid>
                                             </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <Button x:Name="BtnAppsStore" Style="{StaticResource OutlineButton}" Content="ATUALIZAR O INSTALADOR DE APLICATIVO (MICROSOFT STORE)"
-                                        Padding="14,7" Margin="0,12,0,0" HorizontalAlignment="Left" Visibility="Collapsed" Click="BtnAppsStore_Click"/>
-                            </StackPanel>
-                        </Border>
+                                            <StackPanel Grid.Column="1" Margin="12,0,6,0">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13.5" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="11.5" TextWrapping="Wrap"
+                                                           TextTrimming="CharacterEllipsis" MaxHeight="31" Margin="0,2,0,0"/>
+                                                <TextBlock Text="{Binding Status}" FontSize="10.5" Foreground="{DynamicResource Accent}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                            <!-- Marcação: círculo (selecionável) ou selo INSTALADO -->
+                                            <Grid Grid.Column="2" VerticalAlignment="Top">
+                                                <Border x:Name="tick" Width="20" Height="20" CornerRadius="10" BorderThickness="1.5"
+                                                        BorderBrush="{DynamicResource LineStrong}" Background="Transparent">
+                                                    <TextBlock x:Name="tickGlyph" Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="11" FontWeight="Bold"
+                                                               Foreground="{DynamicResource OnAccent}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                                </Border>
+                                                <Border x:Name="installedChip" Background="#264ED17A" CornerRadius="6" Padding="6,2" Visibility="Collapsed">
+                                                    <TextBlock Text="INSTALADO" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource ChartGpu}"/>
+                                                </Border>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Selected}" Value="True">
+                                            <Setter TargetName="tick" Property="Background" Value="{DynamicResource Accent}"/>
+                                            <Setter TargetName="tick" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                            <Setter TargetName="tickGlyph" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Installed}" Value="True">
+                                            <Setter TargetName="tick" Property="Visibility" Value="Collapsed"/>
+                                            <Setter TargetName="installedChip" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,8,0,0">
+                            Clique num cartão para marcar. Usa o winget, o instalador de pacotes da Microsoft que já vem no Windows 10/11:
+                            baixa do site oficial de cada fabricante e confere o arquivo antes de instalar. Os apps são instalados um de cada
+                            vez, sem janelas. Os ícones vêm do site de cada app e ficam guardados no PC.
+                        </TextBlock>
+                        <Button x:Name="BtnAppsStore" Style="{StaticResource OutlineButton}" Content="ATUALIZAR O INSTALADOR DE APLICATIVO (MICROSOFT STORE)"
+                                Padding="14,7" Margin="0,12,0,0" HorizontalAlignment="Left" Visibility="Collapsed" Click="BtnAppsStore_Click"/>
                     </StackPanel>
                 </ScrollViewer>
 
@@ -2726,49 +3304,125 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== OTIMIZAÇÃO · Desinstalar Apps (desinstalador seguro + varredura de sobras) ===== -->
+                <!-- ===== FERRAMENTAS · Desinstalar Apps (desinstalador seguro + varredura de sobras) ===== -->
                 <ScrollViewer x:Name="PageUninstall" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,16">
                             <StackPanel Margin="0,0,190,0">
                                 <TextBlock Text="DESINSTALAR APPS" Style="{StaticResource H1}"/>
-                                <TextBlock Text="Remove programas pelo desinstalador oficial e procura sobras com segurança" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                                <TextBlock Text="Desinstalador oficial + varredura profunda de sobras (pastas, arquivos ocultos, registro, inicialização e tarefas), com Lixeira e backup" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnUnRefresh" Style="{StaticResource OutlineButton}" Content="ATUALIZAR LISTA" Padding="16,8"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnUnRefresh_Click"/>
                         </Grid>
 
-                        <TextBox x:Name="UnSearch" Tag="Buscar programa…" Margin="0,0,0,10" TextChanged="UnSearch_TextChanged"/>
-                        <TextBlock x:Name="UnStatus" Foreground="{DynamicResource Muted}" Margin="2,0,0,10" FontSize="12"/>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="320"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="UnSearch" Tag="Buscar programa ou fabricante…" TextChanged="UnSearch_TextChanged"/>
+                            <TextBlock x:Name="UnStatus" Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"
+                                       VerticalAlignment="Center" Margin="16,0,0,0"/>
+                        </Grid>
 
                         <Border Style="{StaticResource CardBorder}" Padding="8,6">
                             <ListBox x:Name="UninstallList" MaxHeight="430" ItemContainerStyle="{StaticResource SelectItem}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="Transparent" Padding="10,8" Cursor="Hand">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Muted}" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
-                                            </StackPanel>
+                                        <Border Background="Transparent" Padding="8,6" Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="36"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource IconTile}">
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Initial}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Accent}"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding HasIcon}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <Image Source="{Binding Icon}" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    </Grid>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Muted}" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </Border>
 
-                        <Button x:Name="BtnUninstall" Style="{StaticResource PrimaryButton}" Content="DESINSTALAR SELECIONADO" Padding="24,11"
-                                HorizontalAlignment="Left" Margin="0,14,0,0" Click="BtnUninstall_Click"/>
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,10,0,0"
-                                   Text="Mostramos só programas de verdade (componentes do Windows, drivers e atualizações ficam de fora). A desinstalação usa o próprio desinstalador do programa; depois procuramos sobras para você revisar."/>
+                        <!-- Profundidade da varredura (como o Revo) e ponto de restauração -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,14,0,0">
+                            <StackPanel>
+                                <TextBlock Text="VARREDURA DE SOBRAS" Style="{StaticResource Label}" Margin="0,0,0,8"/>
+                                <WrapPanel>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Seguro" Tag="Seguro" Checked="UnMode_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Moderado" Tag="Moderado" IsChecked="True" Checked="UnMode_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Avançado" Tag="Avancado" Checked="UnMode_Checked"/>
+                                    <CheckBox x:Name="UnRestorePoint" Content="Criar ponto de restauração antes" IsChecked="True" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="UnModeHint" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <WrapPanel Margin="0,14,0,0">
+                            <Button x:Name="BtnUninstall" Style="{StaticResource PrimaryButton}" Content="DESINSTALAR SELECIONADO" Padding="24,11"
+                                    Margin="0,0,10,8" Click="BtnUninstall_Click"/>
+                            <Button x:Name="BtnUnForce" Style="{StaticResource OutlineButton}" Content="REMOÇÃO FORÇADA" Padding="18,11" Margin="0,0,10,8"
+                                    Click="BtnUnForce_Click" ToolTip="Para programas que não desinstalam mais (desinstalador sumiu ou dá erro): não roda o desinstalador e procura tudo o que sobrou, inclusive a entrada em Programas e Recursos."/>
+                            <Button x:Name="BtnUnScanNow" Style="{StaticResource OutlineButton}" Content="JÁ TERMINEI · PROCURAR SOBRAS" Padding="18,11" Margin="0,0,10,8"
+                                    Visibility="Collapsed" Click="BtnUnScanNow_Click"/>
+                            <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR ÚLTIMA LIMPEZA" Padding="18,11" Margin="0,0,10,8" Click="BtnUnRestore_Click"
+                                    ToolTip="Devolve o registro e as tarefas da última remoção de sobras. Pastas e arquivos voltam pela Lixeira."/>
+                            <Button Style="{StaticResource OutlineButton}" Content="ABRIR BACKUPS" Padding="18,11" Margin="0,0,10,8" Click="BtnUnBackups_Click"/>
+                        </WrapPanel>
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,4,0,0"
+                                   Text="Mostramos só programas de verdade (componentes do Windows, drivers e atualizações ficam de fora). A desinstalação usa o próprio desinstalador do programa; depois procuramos sobras para você revisar. Nada sai sem você marcar e confirmar: pastas e arquivos vão para a Lixeira e o registro e as tarefas ganham backup."/>
 
                         <!-- Sobras encontradas após desinstalar -->
                         <Border x:Name="UnLeftoverCard" Style="{StaticResource CardBorder}" Margin="0,16,0,0" Visibility="Collapsed">
                             <StackPanel>
-                                <TextBlock x:Name="UnLeftoverTitle" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,12"
-                                           Text="Marque o que deseja remover. Só aparecem pastas e chaves ligadas ao programa, sempre fora do Windows e do registro do sistema."/>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock x:Name="UnLeftoverTitle" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <WrapPanel HorizontalAlignment="Right">
+                                        <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODAS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnUnMarkAll_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="SÓ AS CLARAS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnUnMarkStrong_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnUnMarkNone_Click"/>
+                                    </WrapPanel>
+                                </Grid>
+                                <TextBlock x:Name="UnLeftoverSummary" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"
+                                           Text="Marcado = ligação clara com o app. CONFIRA = só bate com o nome do fabricante ou é parecido: abra antes de remover. Pastas do Windows, pastas pessoais e o registro do sistema nunca aparecem."/>
                                 <ItemsControl x:Name="UnLeftoverList">
+                                    <ItemsControl.GroupStyle>
+                                        <GroupStyle>
+                                            <GroupStyle.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+                                                        <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="Bold"/>
+                                                        <Border Background="{DynamicResource Hover}" CornerRadius="8" Padding="7,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding ItemCount}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Muted}"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </GroupStyle.HeaderTemplate>
+                                        </GroupStyle>
+                                    </ItemsControl.GroupStyle>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,8">
@@ -2778,54 +3432,43 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                                    <Border Grid.Column="1" Background="{DynamicResource Hover}" CornerRadius="6" Padding="7,2" VerticalAlignment="Center" Margin="0,0,10,0">
-                                                        <TextBlock Text="{Binding Kind}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
-                                                    </Border>
-                                                    <TextBlock Grid.Column="2" Text="{Binding Display}" FontFamily="{StaticResource Mono}" FontSize="12"
-                                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
+                                                        <Border Background="{DynamicResource Hover}" CornerRadius="6" Padding="7,2">
+                                                            <TextBlock Text="{Binding Kind}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
+                                                        </Border>
+                                                        <Border x:Name="weak" Background="#26FFCF4D" CornerRadius="6" Padding="7,2" Margin="0,4,0,0" Visibility="Collapsed">
+                                                            <TextBlock Text="CONFIRA" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource TempWarn}"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Display}" FontFamily="{StaticResource Mono}" FontSize="12"
+                                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Display}"/>
+                                                        <TextBlock Text="{Binding Info}" Foreground="{DynamicResource Faint}" FontSize="11"
+                                                                   TextTrimming="CharacterEllipsis" Margin="0,2,0,0" ToolTip="{Binding Info}"/>
+                                                    </StackPanel>
                                                     <TextBlock Grid.Column="3" Text="{Binding SizeText}" Foreground="{DynamicResource Muted}" FontSize="11.5"
                                                                VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                                    <Button Grid.Column="4" Style="{StaticResource OutlineButton}" Content="ABRIR" Padding="9,3" FontSize="10.5"
+                                                            Margin="10,0,0,0" VerticalAlignment="Center" Tag="{Binding}" Click="UnLeftoverOpen_Click"
+                                                            ToolTip="Abre no Explorador, no Editor do Registro ou no Agendador de Tarefas para conferir"/>
                                                 </Grid>
                                             </Border>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Strong}" Value="False">
+                                                    <Setter TargetName="weak" Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
-                                    <Button Style="{StaticResource PrimaryButton}" Content="REMOVER MARCADAS" Padding="16,8" Click="BtnUnRemoveLeftovers_Click"/>
+                                    <Button x:Name="BtnUnRemove" Style="{StaticResource PrimaryButton}" Content="REMOVER MARCADAS" Padding="16,8" Click="BtnUnRemoveLeftovers_Click"/>
                                     <Button Style="{StaticResource OutlineButton}" Content="FECHAR" Padding="16,8" Margin="8,0,0,0" Click="BtnUnCloseLeftovers_Click"/>
-                                    <TextBlock x:Name="UnLeftoverStatus" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    <TextBlock x:Name="UnLeftoverStatus" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
                                 </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-
-                <!-- ===== OTIMIZAÇÃO · Inicialização do Windows (Windows Update) ===== -->
-                <ScrollViewer x:Name="PageUltimate" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="36,30,36,30">
-                        <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="INICIALIZAÇÃO DO WINDOWS" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Ajustes do Windows com backup · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                        <Border Style="{StaticResource CardBorder}">
-                            <StackPanel>
-                                <TextBlock Text="WINDOWS UPDATE" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12">
-                                    Pausa o Windows Update por 365 dias gravando seis datas de pausa. Inclui atualizações de recursos e de
-                                    segurança. A versão do Windows pode limitar ou ignorar esse prazo. Os valores anteriores ficam salvos
-                                    e podem ser restaurados.
-                                </TextBlock>
-                                <TextBlock x:Name="WuStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,6"/>
-                                <WrapPanel Margin="0,12,0,0">
-                                    <Button Style="{StaticResource PrimaryButton}" Content="PAUSAR POR 365 DIAS"
-                                            Padding="18,9" Margin="0,0,10,8" Click="BtnWuPause_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR CONFIGURAÇÃO ANTERIOR"
-                                            Padding="18,9" Margin="0,0,10,8" Click="BtnWuRestore_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="ABRIR WINDOWS UPDATE"
-                                            Padding="18,9" Margin="0,0,10,8" Click="BtnWuOpen_Click"/>
-                                </WrapPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -3486,6 +4129,7 @@
                     </Border>
                 </Grid>
             </Grid>
+            </DockPanel>
         </Grid>
     </Border>
 </Window>

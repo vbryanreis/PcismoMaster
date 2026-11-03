@@ -99,6 +99,39 @@ Test("Profiles clone deeply", () => {
     b.PointOffsetsMhz[1] = 99; b.FanCurve[0] = new(10, 10);
     Assert(a.PointOffsetsMhz[1] == 10); Assert(a.FanCurve[0] != b.FanCurve[0]);
 });
+Test("Binary (hex) settings apply and restore like DWORDs", () => {
+    var bin = new Module("bin-test", "t", "c", "d", "s", new[] { new Setting("HKLM", @"Software\Fake\UMD", "VSyncControl", 0, Hex: "3000") });
+    var engine = Engine("binary"); var before = bin.Settings.Select(fake.Read).ToArray();
+    engine.Enable(bin); Assert(engine.Matches(bin)); Assert(fake.Read(bin.Settings[0]).Kind == 3);
+    engine.Restore(bin); Assert(bin.Settings.Select(fake.Read).SequenceEqual(before));
+});
+Test("Remove settings delete the value and restore brings it back", () => {
+    var run = new Module("rm-test", "t", "c", "d", "s", new[] { new Setting("HKCU", @"Software\Fake\Run", "AMDNoiseSuppression", 0, Remove: true) });
+    fake.Values[run.Settings[0]] = new(true, 1, "\"C:\\\\amd.exe\"");
+    var engine = Engine("remove"); engine.Enable(run); Assert(engine.Matches(run)); Assert(!fake.Read(run.Settings[0]).Exists);
+    engine.Restore(run); Assert(fake.Read(run.Settings[0]) == new SavedValue(true, 1, "\"C:\\\\amd.exe\""));
+});
+Test("GPU generation and driver series from the PCI device ID", () => {
+    Assert(GpuCard.ArchOf(0x2684) == "Ada" && GpuCard.ArchOf(0x2504) == "Ampere" && GpuCard.ArchOf(0x1B80) == "Pascal" && GpuCard.ArchOf(0x13C2) == "Maxwell");
+    Assert(GpuCard.ArchOf(0x2C02) == "Blackwell" && GpuCard.ArchOf(0x2182) == "Turing" && GpuCard.ArchOf(0x0001) == "");
+    Assert(new GpuCard("", 0x2182, "Turing", false, 0, false, false).DriverSeries == "16 Series");
+    Assert(new GpuCard("", 0x1E87, "Turing", true, 0, false, false).DriverSeries == "RTX 20 Series");
+    Assert(new GpuCard("", 0x1B80, "Pascal", false, 0, false, false).DriverSeries == "10 Series");
+    Assert(GpuCard.DeviceIdOf(@"PCI\VEN_10DE&DEV_2684&SUBSYS_16F310DE") == 0x2684);
+});
+Test("Recommended profile adapts to the card", () => {
+    var desk = new GpuCard("RTX 4090", 0x2684, "Ada", true, 24576, false, false);
+    var lap = new GpuCard("RTX 3060 Laptop", 0x2560, "Ampere", true, 6144, true, true);
+    var nip = new (uint, uint, string)[] { (GpuRules.PowerMode, 1, "p"), (GpuRules.SysmemFallback, 1, "s"), (549528094, 1, "t") };
+    Assert(GpuRules.Adapt(nip, desk).Length == 3);
+    var l = GpuRules.Adapt(nip, lap);
+    Assert(l.Length == 3 && l.Any(x => x.Id == 549528094) && l.Any(x => x.Id == GpuRules.OptimusRendering) && !l.Any(x => x.Id == GpuRules.PowerMode));
+    var gtx = new GpuCard("GTX 1660", 0x2184, "Turing", false, 6144, false, false);
+    var dlisr = new DebloatItem("NvDLISR", "nvidia", "t", "d", false, true); var pcf = new DebloatItem("NVPCF", "nvidia", "t", "d", false, true);
+    Assert(GpuRules.ForCard(dlisr, gtx).Default && !GpuRules.ForCard(dlisr, desk).Default);
+    Assert(!GpuRules.ForCard(pcf, lap).Default && GpuRules.ForCard(pcf, desk).Default);
+    Assert(GpuCard.ArchOf(0x17C8) == "Maxwell" && GpuCard.IsRtx("Turing", "", 0x1F08) && !GpuCard.IsRtx("Turing", "NVIDIA GeForce GTX 1650", 0x1F82));
+});
 Test("Real registry roundtrip only inside isolated test key", () => {
     var path = @"Software\PcismoMaster.Tests\" + Guid.NewGuid();
     var setting = new Setting("HKCU", path, "Sample", 0); var store = new RegistryStore();
@@ -107,6 +140,176 @@ Test("Real registry roundtrip only inside isolated test key", () => {
             store.Write(setting, value); Assert(store.Read(setting) == value);
         }
     } finally { Registry.CurrentUser.DeleteSubKeyTree(path, false); }
+});
+Test("Finder index: names, paths across volumes, unsorted records and filters", () => {
+    const long Seq = 0x0003_0000_0000_0000; // sequência no FRN não atrapalha a ligação com o pai
+    var idx = MftIndex.FromRecords(new (char, long, long, bool, string)[] {
+        ('C', 40 | Seq, 30, false, "relatorio.txt"),   // vem antes do pai: ordem fora de registro
+        ('C', 5, 5, true, "."),                       // raiz do volume (pai de si mesma)
+        ('C', 30, 20 | Seq, true, "Docs"),
+        ('C', 20, 5, true, "Users"),
+        ('C', 50, 999, false, "orfao.txt"),           // pai que não existe
+        ('D', 5, 5, true, "."),
+        ('D', 30, 5, true, "Jogos"),
+        ('D', 41, 30, false, "Relatorio-final.pdf"),
+    });
+    Assert(idx.Ready && idx.Count == 8);
+    var all = idx.Search("relatorio", false, false, 10);
+    Assert(all.Count == 2 && all[0].FullPath == @"C:\Users\Docs\relatorio.txt" && all[1].FullPath == @"D:\Jogos\Relatorio-final.pdf");
+    Assert(idx.Search("orfao", false, false, 10).Single().FullPath == @"C:\orfao.txt");
+    Assert(idx.Search("o", false, true, 10).Select(h => h.Name).SequenceEqual(new[] { "Docs", "Jogos" }));
+    Assert(idx.Search("o", true, false, 10).All(h => !h.IsDir) && idx.Search("o", false, false, 2).Count == 2);
+    Assert(idx.Search("  ", false, false, 10).Count == 0 && idx.Search("xyz", false, false, 10).Count == 0);
+    idx.Release(); Assert(!idx.Ready && idx.Search("Docs", false, false, 10).Count == 0);
+});
+Test("Uninstaller: app name matching (clear, publisher only, unrelated)", () => {
+    var ff = Uninstaller.Matcher.For("Mozilla Firefox (x64 pt-BR) 120.0", "Mozilla", "");
+    Assert(ff.Level("Firefox") == 2 && ff.Level("Mozilla") == 1 && ff.Level("Thunderbird") == 0 && ff.Level("Mozilla Firefox") == 2);
+    var zip = Uninstaller.Matcher.For("7-Zip 23.01 (x64)", "Igor Pavlov", "");
+    Assert(zip.Level("7-Zip") == 2 && zip.Level("WinZip") == 0);
+    var discord = Uninstaller.Matcher.For("Discord", "Discord Inc.", "");
+    Assert(discord.Level("Discord") == 2 && discord.Level("discord-updater") == 2);
+    var git = Uninstaller.Matcher.For("Git", "The Git Development Community", "");
+    Assert(git.Level("Git") == 2 && git.Level("GitHub Desktop") == 0 && git.Level("Digital") == 0);
+    var epic = Uninstaller.Matcher.For("Epic Games Launcher", "Epic Games, Inc.", "");
+    Assert(epic.Level("EpicGamesLauncher") == 2 && epic.Level("My Games") == 0);
+    Assert(Uninstaller.CleanName("Notepad++ (64-bit x64) v8.6.2") == "Notepad++");
+});
+Test("Uninstaller: folder guards never allow Windows, roots or personal folders", () => {
+    string F(Environment.SpecialFolder f) => Environment.GetFolderPath(f);
+    string pf = F(Environment.SpecialFolder.ProgramFiles), prof = F(Environment.SpecialFolder.UserProfile), docs = F(Environment.SpecialFolder.MyDocuments);
+    Assert(!Uninstaller.IsSafeFolder(F(Environment.SpecialFolder.Windows)) && !Uninstaller.IsSafeFolder(Path.Combine(F(Environment.SpecialFolder.Windows), "Foo")));
+    Assert(!Uninstaller.IsSafeFolder(pf) && Uninstaller.IsSafeFolder(Path.Combine(pf, "FooApp")) && !Uninstaller.IsSafeFolder(Path.Combine(pf, "Common Files")));
+    Assert(!Uninstaller.IsSafeFolder(Path.Combine(pf, "Microsoft", "Edge")) && !Uninstaller.IsSafeFolder(@"C:\"));
+    Assert(Uninstaller.IsSafeFolder(Path.Combine(F(Environment.SpecialFolder.ApplicationData), "FooApp")));
+    Assert(!Uninstaller.IsSafeFolder(F(Environment.SpecialFolder.LocalApplicationData)) && !Uninstaller.IsSafeFolder(Path.Combine(F(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Foo")));
+    Assert(!Uninstaller.IsSafeFolder(docs) && Uninstaller.IsSafeFolder(Path.Combine(docs, "FooApp")));
+    Assert(!Uninstaller.IsSafeFolder(Path.Combine(prof, "Downloads", "FooApp")) && !Uninstaller.IsSafeFolder(Path.Combine(prof, ".ssh")));
+    Assert(Uninstaller.IsSafeFolder(Path.Combine(prof, ".fooapp")) && !Uninstaller.IsSafeFolder(prof));
+    Assert(!Uninstaller.IsSafeFolder(F(Environment.SpecialFolder.DesktopDirectory)) && Uninstaller.IsSafeFolder(Path.Combine(Path.GetTempPath(), "FooApp")));
+    Assert(Uninstaller.IsSafeFile(Path.Combine(F(Environment.SpecialFolder.DesktopDirectory), "FooApp.lnk")));
+    Assert(!Uninstaller.IsSafeFile(Path.Combine(F(Environment.SpecialFolder.System), "drivers", "foo.sys")));
+});
+Test("Uninstaller: registry guards (system branches out, exact exceptions in)", () => {
+    Assert(!Uninstaller.IsSafeRegPath("Software") && !Uninstaller.IsSafeRegPath(@"Software\Microsoft") && !Uninstaller.IsSafeRegPath(@"Software\Classes\foo"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\FooApp") && Uninstaller.IsSafeRegPath(@"Software\Contoso\FooApp"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\WOW6432Node\FooApp") && !Uninstaller.IsSafeRegPath(@"Software\WOW6432Node\Microsoft\X") && !Uninstaller.IsSafeRegPath(@"Software\WOW6432Node"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\FooApp") && Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\{1234-ABCD}"));
+    Assert(!Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall") && !Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\Foo\Bar"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\App Paths\fooapp.exe") && !Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\App Paths"));
+    Assert(!Uninstaller.IsSafeRegPath(@"Software\..\System") && !Uninstaller.IsSafeRegPath(@"System\CurrentControlSet\Services\Foo"));
+    Assert(Uninstaller.IsSafeRegValue(@"Software\Microsoft\Windows\CurrentVersion\Run", "FooApp") && !Uninstaller.IsSafeRegValue(@"Software\Microsoft\Windows\CurrentVersion\Run", ""));
+    Assert(!Uninstaller.IsSafeRegValue(@"Software\Microsoft\Windows\CurrentVersion", "FooApp"));
+    var (exe, args) = Uninstaller.ParseCommand("\"C:\\Program Files\\Foo\\unins000.exe\" /SILENT");
+    Assert(exe == @"C:\Program Files\Foo\unins000.exe" && args == "/SILENT");
+    string reg = Uninstaller.ValueRegFile(Microsoft.Win32.RegistryHive.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "Foo", Microsoft.Win32.RegistryValueKind.String, "\"C:\\Foo\\foo.exe\" -min");
+    Assert(reg.Contains(@"[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]") && reg.Contains("\"Foo\"=\"\\\"C:\\\\Foo\\\\foo.exe\\\" -min\""));
+});
+Test("Uninstaller: deep folder scan finds app and publisher\\app, counts hidden files, removes read-only", () => {
+    string root = Path.Combine(Path.GetTempPath(), "PCMasterTests-" + Guid.NewGuid().ToString("N")[..8]);
+    try {
+        string app = Path.Combine(root, "FooApp"), sub = Path.Combine(app, "cache");
+        Directory.CreateDirectory(sub);
+        File.WriteAllText(Path.Combine(app, "settings.json"), "{}");
+        string hidden = Path.Combine(sub, "state.bin"); File.WriteAllText(hidden, "x");
+        File.SetAttributes(hidden, FileAttributes.Hidden | FileAttributes.ReadOnly);
+        Directory.CreateDirectory(Path.Combine(root, "Contoso", "FooApp")); Directory.CreateDirectory(Path.Combine(root, "Contoso", "OtherApp"));
+        Directory.CreateDirectory(Path.Combine(root, "Contoso Labs", "FooApp Data"));
+        Directory.CreateDirectory(Path.Combine(root, "Unrelated"));
+        var m = Uninstaller.Matcher.For("FooApp 2.0", "Contoso Ltd", "");
+        var found = Uninstaller.ScanFolders(new[] { root }, m, ScanMode.Moderado).ToDictionary(f => Path.GetRelativePath(root, f.FilePath!), f => f);
+        Assert(found.Count == 3 && found.ContainsKey("FooApp") && found.ContainsKey(Path.Combine("Contoso", "FooApp")) && found.ContainsKey("Contoso Labs"));
+        Assert(found.Values.All(f => f.Strong) && found["FooApp"].Detail.Contains("2 arquivo(s)") && found["FooApp"].Detail.Contains("1 oculto(s)") && found["FooApp"].Detail.Contains("1 subpasta(s)"));
+        var adv = Uninstaller.ScanFolders(new[] { root }, m, ScanMode.Avancado);
+        Assert(adv.Count == 3); // "Contoso" com outro app dentro nunca entra inteira
+        var res = Uninstaller.DeleteLeftovers(new[] { found["FooApp"] }, "FooApp", recycle: false, backupRoot: Path.Combine(root, "bk"));
+        Assert(res.Ok == 1 && res.Fail == 0 && !Directory.Exists(app) && !Uninstaller.StillThere(found["FooApp"]));
+        Assert(Directory.Exists(Path.Combine(root, "Contoso", "OtherApp")) && Directory.Exists(Path.Combine(root, "Unrelated")));
+    } finally { foreach (var f in Directory.Exists(root) ? Directory.GetFiles(root, "*", SearchOption.AllDirectories) : Array.Empty<string>()) File.SetAttributes(f, FileAttributes.Normal); if (Directory.Exists(root)) Directory.Delete(root, true); }
+});
+Test("Overlay: linhas por componente, cor da temperatura e texto do atalho", () => {
+    var parts = new[] { new OverlayPart("GPU", "GPU", "98%", "98%"), new OverlayPart("GPU", "GPU °C", "66 °C", "66 °C", 66), new OverlayPart("CPU", "CPU °C", "88 °C", "88 °C", 88) };
+    var lines = OverlayMetrics.Lines(parts);
+    Assert(lines.Count == 2 && lines[0] == new OverlayLine("GPU", "98%  66 °C") && lines[1].Label == "CPU");
+    Assert(parts[0].Level == 0 && parts[1].Level == 1 && parts[2].Level == 3 && new OverlayPart("X", "X", "", "", 78).Level == 2);
+    Assert(OverlayHotkey.Describe(OverlayHotkey.Ctrl | OverlayHotkey.Shift, "O") == "Ctrl + Shift + O" && OverlayHotkey.Describe(0, "F5") == "F5" && OverlayHotkey.Describe(OverlayHotkey.Alt, "D5") == "Alt + 5");
+});
+Test("Tweaking: setup tweaks are unique, safe and undo exactly", () => {
+    var all = SetupTweaks.Static.Append(SetupTweaks.EdgeUpdate(_ => true)).ToArray();
+    Assert(all.Select(t => t.Id).Distinct().Count() == all.Length && all.All(t => t.Id.StartsWith("tw-") && t.Settings.Length > 0));
+    var keys = all.SelectMany(t => t.Settings).Select(s => s.Hive + s.Path + s.Name).ToArray();
+    Assert(keys.Distinct(StringComparer.OrdinalIgnoreCase).Count() == keys.Length);
+    Assert(all.Where(t => t.Advanced).All(t => !t.DefaultOn)); // avançados nunca vêm marcados
+    Assert(all.SelectMany(t => t.Settings).Where(s => s.Text?.StartsWith("http") == true && s.Name != "1").All(s => s.Text == SetupTweaks.NoUpdateServer));
+    Assert(SetupTweaks.EdgeUpdate(n => n == "edgeupdate").Settings.Single().Path.EndsWith(@"Services\edgeupdate") && SetupTweaks.EdgeUpdate(_ => false).Settings.Length == 0);
+    var store = new FakeStore(); var eng = new ModuleEngine(store, Path.Combine(temp, "tweak"));
+    var block = SetupTweaks.Static.Single(t => t.Id == "tw-block-updates").Module;
+    store.Values[block.Settings[0]] = new(true, 4, "0");
+    eng.Enable(block); Assert(eng.Matches(block) && eng.HasBackup(block));
+    eng.Restore(block); Assert(!eng.HasBackup(block) && store.Read(block.Settings[0]) == new SavedValue(true, 4, "0") && !store.Read(block.Settings[1]).Exists);
+});
+Test("Tweaking: .reg parser reads every value type, deletes and continuation lines", () => {
+    var r = RegFile.Parse("Windows Registry Editor Version 5.00\r\n\r\n[HKEY_CURRENT_USER\\Software\\T]\r\n\"S\"=\"a \\\"b\\\" c\\\\d\"\r\n\"D\"=dword:ffffffff\r\n" +
+        "\"B\"=hex:01,02,\\\r\n  03\r\n\"E\"=hex(2):25,00,41,00,25,00,00,00\r\n\"M\"=hex(7):61,00,00,00,62,00,00,00,00,00\r\n\"Q\"=hex(b):01,00,00,00,00,00,00,00\r\n" +
+        "\"X\"=-\r\n@=\"def\"\r\n\"D\"=dword:00000002\r\n[-HKEY_CLASSES_ROOT\\Folder\\shell\\x]\r\n[HKEY_USERS\\.DEFAULT\\Y]\r\n\"Z\"=dword:1\r\n");
+    var v = r.Settings.ToDictionary(s => s.Name);
+    Assert(v.Count == 8 && r.DeleteKeys.Single() == @"HKLM\SOFTWARE\Classes\Folder\shell\x" && r.Skipped == 2);
+    Assert(v["S"].Kind == 1 && System.Text.Json.JsonSerializer.Deserialize<string>(v["S"].Data!) == "a \"b\" c\\d");
+    Assert(v["D"].Kind == 4 && v["D"].Data == "2"); // o último valor vence
+    Assert(v["B"].Kind == 3 && System.Text.Json.JsonSerializer.Deserialize<byte[]>(v["B"].Data!)!.SequenceEqual(new byte[] { 1, 2, 3 }));
+    Assert(v["E"].Kind == 2 && v["E"].Data == "\"%A%\"" && v["M"].Kind == 7 && v["M"].Data == "[\"a\",\"b\"]" && v["Q"].Kind == 11 && v["Q"].Data == "1");
+    Assert(v["X"].Remove && v[""].Kind == 1);
+    var store = new FakeStore(); var eng = new ModuleEngine(store, Path.Combine(temp, "regfile"));
+    var m = new Module("tw-test-reg", "t", "Tweaking", "", "", r.Settings);
+    store.Values[v["X"]] = new(true, 4, "7");
+    eng.Enable(m); Assert(eng.Matches(m) && !store.Read(v["X"]).Exists);
+    eng.Restore(m); Assert(store.Read(v["X"]) == new SavedValue(true, 4, "7") && !store.Read(v["S"]).Exists);
+});
+Test("Tweaking: Windows, Hardware e Avançado catalogs are unique, safe and parse", () => {
+    var reg = TweakCatalog.WindowsRegTweaks().ToArray();
+    Assert(reg.Length == TweakCatalog.WindowsReg.Length && reg.All(t => t.Settings.Length > 0));
+    var cp = reg.Single(t => t.Id == "tw-win-control-panel");
+    Assert(cp.Settings.Length > 450 && cp.DeleteKeys!.Length == 2 && cp.Settings.Any(TweakCatalog.IsDisplayScale));
+    var all = SetupTweaks.Static.Concat(TweakCatalog.Windows).Concat(reg).Concat(TweakCatalog.Hardware).Concat(TweakCatalog.Advanced).ToArray();
+    Assert(all.Select(t => t.Id).Distinct().Count() == all.Length && all.All(t => t.Id.StartsWith("tw-")));
+    Assert(all.Where(t => t.Advanced).All(t => !t.DefaultOn) && TweakCatalog.Advanced.All(t => t.Advanced));
+    Assert(all.SelectMany(t => t.Settings).All(s => s.Hive is "HKCU" or "HKLM" && s.Path.Length > 0 && !s.Path.StartsWith('\\')));
+    // Depois do Dedupe nenhum valor fica em dois ajustes (desfazer fora de ordem não deixa valor errado).
+    var dedup = TweakCatalog.Dedupe(all);
+    var keys = dedup.SelectMany(t => t.Settings).Select(s => (s.Hive, s.Path.ToLowerInvariant(), s.Name.ToLowerInvariant())).ToArray();
+    Assert(keys.Distinct().Count() == keys.Length && dedup.Take(SetupTweaks.Static.Length).Zip(SetupTweaks.Static).All(p => p.First.Settings.Length == p.Second.Settings.Length));
+    Assert(TweakCatalog.Windows.Single(t => t.Id == "tw-win-context-menu").DeleteKeys!.All(k => k.StartsWith(@"HKLM\SOFTWARE\Classes\")));
+    // Escala: curvas de 40 bytes que crescem (o script tinha duas deslocadas) e LogPixels = 96 × escala.
+    foreach (var (pct, set) in TweakCatalog.Scaling)
+    {
+        var x = Convert.FromHexString(set.Single(s => s.Name == "SmoothMouseXCurve").Hex!);
+        var pts = Enumerable.Range(0, 5).Select(i => BitConverter.ToInt64(x, i * 8)).ToArray();
+        Assert(x.Length == 40 && pts[0] == 0 && pts.Zip(pts.Skip(1)).All(p => p.Second > p.First) && Math.Abs(pts[4] - 4 * pts[1]) < 0x100);
+        Assert(set.Single(s => s.Name == "LogPixels").Value == pct * 96 / 100);
+    }
+    Assert(TweakCatalog.PowerPlan.All(p => Guid.TryParse(p.Sub, out _) && Guid.TryParse(p.Setting, out _) && int.TryParse(p.Value, out _)));
+});
+Test("Tweaking: full Ultimate scripts are all embedded, flagged and never interactive", () => {
+    var asm = typeof(ScriptCatalog).Assembly;
+    var embedded = asm.GetManifestResourceNames().Where(n => n.StartsWith("Tweaks/Scripts/")).Select(n => n["Tweaks/Scripts/".Length..^4]).ToHashSet();
+    var options = ScriptCatalog.All.SelectMany(c => c.Options.Select(o => (c, o))).ToArray();
+    Assert(embedded.Count > 130 && options.Length == embedded.Count && options.All(x => embedded.Contains(x.o.Id)));
+    Assert(options.Select(x => x.o.Id).Distinct().Count() == options.Length && ScriptCatalog.All.All(c => c.Page is "setup" or "win" or "hw" or "adv"));
+    Assert(!embedded.Contains("setup-4") && !embedded.Contains("setup-12") && !embedded.Any(i => i.StartsWith("adv-8-") || i.StartsWith("adv-9-") || i.StartsWith("adv-10-")));
+    foreach (var (c, o) in options)
+    {
+        string ps = ScriptCatalog.Read(o.Id);
+        Assert(ps.StartsWith("# Ultimate (FR33THY, MIT)"));
+        Assert(!System.Text.RegularExpressions.Regex.IsMatch(ps, @"Read-Host|ReadKey|OpenFileDialog|Out-GridView")); // nada espera digitação
+        bool iwr = System.Text.RegularExpressions.Regex.IsMatch(ps, @"(?m)^\s*(IWR|Invoke-WebRequest)\b");
+        if (iwr != o.Downloads) throw new Exception($"{o.Id}: aviso de download errado");
+        if (ps.Contains("safeboot") != o.SafeMode) throw new Exception($"{o.Id}: aviso de Modo de Segurança errado");
+        if (o.SafeMode && !o.Restarts) throw new Exception($"{o.Id}: Modo de Segurança sem aviso de reinício");
+        Assert(!(o.IsDefault && o.Risk == ScriptRisk.Perigoso) && (o.NeedsUsb == ps.Contains("$env:PM_USB")));
+        var w = ScriptCatalog.Warnings(o, c);
+        if (o.Risk == ScriptRisk.Perigoso) Assert(w.Any(x => x.Contains("ponto de restauração")) && o.Warning != null);
+        if (o.Downloads) Assert(w.Any(x => x.Contains("terceiros")));
+    }
 });
 // ---- Promoções (IsThereAnyDeal): tudo com um handler falso, sem rede e sem chave de verdade ----
 Dictionary<string, string> QueryOf(string query) => query.Split('&').Select(p => p.Split('=', 2))
@@ -181,6 +384,59 @@ Test("ITAD: Steam lookup maps appids and skips games it does not know", () => {
     var h = new FakeItadHandler { Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("""{"app/220":"g-hl2","app/1":null}""") } };
     var map = new ItadClient(h) { UserKey = "k" }.LookupSteamAsync(new[] { "220", "1" }).GetAwaiter().GetResult();
     Assert(map.Count == 1 && map["220"] == "g-hl2" && h.Requests[0].RequestUri!.AbsolutePath == "/lookup/id/shop/61/v1");
+});
+Test("Bloatware: each item gets a Portuguese name, a risk and the script's keep-list stays locked", () => {
+    var json = """
+        {"apps":[{"n":"Microsoft.BingWeather","f":"Microsoft.BingWeather_8wekyb3d8bbwe","fw":false,"nr":false,"s":"Store"},
+        {"n":"Microsoft.Windows.Photos","f":"x","fw":false,"nr":false,"s":"Store"},{"n":"Microsoft.AAD.BrokerPlugin","f":"y","fw":false,"nr":false,"s":"System"},
+        {"n":"Microsoft.VCLibs.140.00","f":"z","fw":true,"nr":false,"s":"Store"},{"n":"Contoso.SomeThing","f":"c","fw":false,"nr":false,"s":"Store"},
+        {"n":"Microsoft.Windows.Search","f":"s","fw":false,"nr":true,"s":"System"}],
+        "caps":["Language.Speech~~~pt-BR~0.0.1.0","WMIC~~~~","Browser.InternetExplorer~~~~0.0.11.0"],
+        "feats":["Printing-PrintToPDFServices-Features","NetFx4-AdvSrvs","Microsoft-Hyper-V-All"],"progs":["onedrive","gameinput"]}
+        """;
+    var items = Bloatware.Parse(json);
+    BloatItem Get(string id) => items.Single(i => i.Id == id);
+    Assert(Get("Microsoft.BingWeather").Name == "Clima" && Get("Microsoft.BingWeather").Risk == ScriptRisk.Seguro && Get("Microsoft.BingWeather").Essential == null);
+    Assert(Get("Microsoft.Windows.Photos").Essential != null && Get("Microsoft.Windows.Search").Essential != null);
+    Assert(Get("Microsoft.AAD.BrokerPlugin").Risk == ScriptRisk.Perigoso && Get("Microsoft.VCLibs.140.00").Kind == BloatKind.Biblioteca);
+    Assert(Get("Contoso.SomeThing").Name == "Contoso Some Thing" && Get("Contoso.SomeThing").Risk == ScriptRisk.Atencao && Bloatware.Pretty("Microsoft.WindowsFeedbackHub") == "Windows Feedback Hub");
+    Assert(Bloatware.App("Claude", "c", false, false, "Developer").Risk == ScriptRisk.Atencao && Bloatware.App("1527c705-839a-4832-9118-54d4Bd6a0c89", "g", false, false, "System").Risk == ScriptRisk.Perigoso);
+    Assert(Bloatware.App("MicrosoftWindows.61869720.Voiess", "v", false, false, "System").Name.Contains("IA") && Bloatware.App("Microsoft.BingNews", "b", false, false, "Store").Risk == ScriptRisk.Seguro);
+    Assert(Get("Language.Speech~~~pt-BR~0.0.1.0").Name.Contains("voz (pt-BR)") && Get("Language.Speech~~~pt-BR~0.0.1.0").Risk == ScriptRisk.Atencao);
+    Assert(Get("WMIC~~~~").Essential != null && Get("NetFx4-AdvSrvs").Essential != null && Get("Microsoft-Hyper-V-All").Risk == ScriptRisk.Atencao);
+    Assert(items.Count(i => i.Kind == BloatKind.Programa) == 2 && items.First().Kind == BloatKind.App);
+});
+Test("Bloatware: commands quote ids, run one item at a time and only restore what has a way back", () => {
+    var weird = Bloatware.App("Evil'; Remove-Item C:\\ -Recurse; '", "f", false, false, "Store");
+    var cmd = Bloatware.RemoveCommand(weird);
+    Assert(cmd.Contains("-Name 'Evil''; Remove-Item C:\\ -Recurse; '''") && cmd.Contains("Remove-AppxPackage -AllUsers"));
+    var cap = Bloatware.Capability("Browser.InternetExplorer~~~~0.0.11.0");
+    var feat = Bloatware.Feature("SMB1Protocol");
+    Assert(Bloatware.RestoreCommand(cap)!.StartsWith("Add-WindowsCapability") && Bloatware.RestoreCommand(feat)!.Contains("Enable-WindowsOptionalFeature") && Bloatware.RestoreCommand(weird) == null);
+    var batch = Bloatware.BatchScript(new[] { weird, cap, feat }, restore: false);
+    Assert(batch.Split("try {").Length == 4 && batch.Contains("Removendo: Internet Explorer") && !batch.Contains("Read-Host"));
+    foreach (var p in Bloatware.Programs) Assert(Bloatware.RemoveCommand(new BloatItem(BloatKind.Programa, p.Id, p.Name, "", p.Risk, null)).Length > 20);
+    Assert(Bloatware.Programs.Where(p => p.RestoreOption != null).All(p => ScriptCatalog.All.Any(c => c.Options.Any(o => o.Id == p.RestoreOption))));
+    Assert(!Bloatware.ListScript.Contains("Remove-") && !Bloatware.ListScript.Contains("Disable-"));
+});
+Test("Friendly UI: all-caps button text becomes a sentence and keeps acronyms", () => {
+    Assert(FriendlyText.Apply("REMOVER OS MARCADOS") == "Remover os marcados");
+    Assert(FriendlyText.Apply("MOSTRAR OS 12 SCRIPTS") == "Mostrar os 12 scripts");
+    Assert(FriendlyText.Apply("ATUALIZAR DRIVER NVIDIA") == "Atualizar driver NVIDIA");
+    Assert(FriendlyText.Apply("DESINSTALAR APPS (NO APP)") == "Desinstalar apps (no app)");
+    Assert(FriendlyText.Apply("REINSTALAR PELA STORE") == "Reinstalar pela Store" && FriendlyText.Apply("RODAR E REINICIAR") == "Rodar e reiniciar");
+    Assert(FriendlyText.Apply("OK") == "OK" && FriendlyText.Apply("GPU") == "GPU" && FriendlyText.Apply("Já escrito") == "Já escrito" && FriendlyText.Apply("1 MIN") == "1 min");
+    Assert(FriendlyText.Apply("LIMPAR O PC") == "Limpar o PC" && FriendlyText.Apply("ÚLTIMA VERSÃO") == "Última versão");
+});
+Test("Friendly UI: home tasks and search lead to real pages, and simple mode hides the technical ones", () => {
+    string xaml = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "MainWindow.xaml"));
+    foreach (var p in PageCatalog.Pages) Assert(xaml.Contains($"x:Name=\"{p.Nav}\""));
+    Assert(PageCatalog.Pages.Select(p => p.Nav).Distinct().Count() == PageCatalog.Pages.Length);
+    foreach (var t in PageCatalog.Tasks) Assert(PageCatalog.ByNav(t.Nav) is { Advanced: false });
+    Assert(PageCatalog.Search("bloatware", false).First().Nav == "NavTweakWin");
+    Assert(PageCatalog.Search("manutencao", false).Any(p => p.Nav == "NavMaint") && PageCatalog.Search("MANUTENÇÃO", false).Any(p => p.Nav == "NavMaint"));
+    Assert(PageCatalog.Search("overclock", false).Count == 0 && PageCatalog.Search("overclock", true).First().Nav == "NavOc");
+    Assert(PageCatalog.Search("  ", true).Count == 0 && PageCatalog.Search("driver", false).First().Nav == "NavDriver");
 });
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);

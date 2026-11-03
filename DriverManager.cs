@@ -33,9 +33,20 @@ public sealed class GpuDriverStatus
     public string SizeText { get; set; } = "";
     public string OfficialPage { get; set; } = "";
     public string Message { get; set; } = "";
+    /// <summary>Placa sem driver de vídeo (o Windows a mostra como "Adaptador de Vídeo Básico", como depois do DDU).</summary>
+    public bool NoDriver { get; set; }
+    /// <summary>Código PCI do modelo (DEV_xxxx), lido mesmo sem driver; 0 se desconhecido.</summary>
+    public int DeviceId { get; set; }
     public bool CanAutoInstall => Vendor is "NVIDIA" or "AMD" && DownloadUrl.Length > 0;
     public bool UpdateAvailable =>
-        Vendor == "NVIDIA" && Latest.Length > 0 && Installed.Length > 0 && CompareVersions(Latest, Installed) > 0;
+        Vendor == "NVIDIA" && Latest.Length > 0 && (NoDriver || Installed.Length > 0 && CompareVersions(Latest, Installed) > 0);
+
+    /// <summary>Página de drivers gráficos da Intel já filtrada para Windows 11 (a mesma do Ultimate).</summary>
+    public const string IntelGraphicsPage = "https://www.intel.com/content/www/us/en/search.html#sortCriteria=%40lastmodifieddt%20descending&f-operatingsystem_en=Windows%2011%20Family*&f-downloadtype=Drivers&cf-tabfilter=Downloads&cf-downloadsppth=Graphics";
+
+    /// <summary>Dicas para depois de instalar o driver NVIDIA (o NVIDIA App vem junto e liga recursos que custam desempenho).</summary>
+    public const string NvidiaAppTips =
+        "Depois de instalar, no NVIDIA App desligue: Estatísticas, Filtros de jogo e \"Otimizar automaticamente jogos e aplicativos adicionados\".";
 
     public static int CompareVersions(string a, string b)
     {
@@ -137,14 +148,20 @@ public static class DriverManager
         var list = new List<GpuDriverStatus>();
         try
         {
-            using var s = new ManagementObjectSearcher("SELECT Name, DriverVersion, AdapterCompatibility FROM Win32_VideoController");
+            using var s = new ManagementObjectSearcher("SELECT Name, DriverVersion, AdapterCompatibility, PNPDeviceID FROM Win32_VideoController");
             foreach (ManagementObject o in s.Get())
             {
                 string name = Str(o, "Name") ?? "";
-                string maker = (Str(o, "AdapterCompatibility") ?? "") + " " + name;
+                string pnp = Str(o, "PNPDeviceID") ?? "";
+                // Pelo código PCI do fabricante a placa é reconhecida mesmo sem driver (depois do DDU o nome vira "Microsoft Basic…").
+                string pciVendor = pnp.Contains("VEN_10DE", StringComparison.OrdinalIgnoreCase) ? "NVIDIA"
+                    : pnp.Contains("VEN_1002", StringComparison.OrdinalIgnoreCase) ? "AMD"
+                    : pnp.Contains("VEN_8086", StringComparison.OrdinalIgnoreCase) ? "Intel" : "";
+                string maker = (Str(o, "AdapterCompatibility") ?? "") + " " + name + " " + pciVendor;
                 string ver = Str(o, "DriverVersion") ?? "";
-                if (name.Length == 0 || name.Contains("Microsoft Basic", StringComparison.OrdinalIgnoreCase)) continue;
-                var g = new GpuDriverStatus { GpuName = name };
+                bool basic = name.Contains("Microsoft Basic", StringComparison.OrdinalIgnoreCase);
+                if (name.Length == 0 || basic && pciVendor.Length == 0) continue;
+                var g = new GpuDriverStatus { GpuName = basic ? $"Placa {pciVendor} (sem driver de vídeo)" : name, NoDriver = basic, DeviceId = GpuCard.DeviceIdOf(pnp) };
                 if (maker.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase))
                 {
                     g.Vendor = "NVIDIA"; g.Installed = NvidiaFriendly(ver);
@@ -158,9 +175,10 @@ public static class DriverManager
                 else if (maker.Contains("Intel", StringComparison.OrdinalIgnoreCase))
                 {
                     g.Vendor = "Intel"; g.Installed = ver;
-                    g.OfficialPage = "https://www.intel.com/content/www/us/en/download-center/home.html";
+                    g.OfficialPage = GpuDriverStatus.IntelGraphicsPage;
                 }
                 else { g.Vendor = ""; g.Installed = ver; }
+                if (basic) g.Installed = "nenhum";
                 list.Add(g);
                 o.Dispose();
             }
@@ -175,7 +193,13 @@ public static class DriverManager
         g.Latest = ""; g.DownloadUrl = ""; g.SizeText = "";
         try
         {
-            var (psid, pfid) = await ResolveNvidiaIdsAsync(g.GpuName, ct);
+            // Modelo pelo nome; sem driver (depois do DDU), pela geração do código PCI e por ser notebook ou não — assim GTX 900/10
+            // e notebooks recebem o driver da série deles. Só se nada disso der, a consulta usa uma GeForce de mesa qualquer (a do Ultimate).
+            (int psid, int pfid) ids;
+            try { ids = await ResolveNvidiaIdsAsync(g, ct); }
+            catch (OperationCanceledException) { throw; }
+            catch { ids = (120, 929); }
+            var (psid, pfid) = ids;
             string url = "https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php" +
                          $"?func=DriverManualLookup&psid={psid}&pfid={pfid}&osID=57&languageCode=1033&beta=0&isWHQL=1&dch=1" +
                          $"&upCRD={(studio ? 1 : 0)}&qnf=0&sort1=1&numberOfResults=1";
@@ -191,7 +215,8 @@ public static class DriverManager
             g.Latest = ver!.Trim();
             g.DownloadUrl = dl!.Replace("http://", "https://");
             g.SizeText = size ?? "";
-            g.Message = g.UpdateAvailable ? $"Há um driver mais novo: {g.Latest} (instalado: {g.Installed})." : $"Você já está com o mais recente ({g.Installed}).";
+            g.Message = g.NoDriver ? $"Sem driver de vídeo instalado. Driver NVIDIA mais recente: {g.Latest}."
+                : g.UpdateAvailable ? $"Há um driver mais novo: {g.Latest} (instalado: {g.Installed})." : $"Você já está com o mais recente ({g.Installed}).";
         }
         catch (OperationCanceledException) { throw; }
         catch (Exception ex) { g.Message = "Não foi possível consultar a NVIDIA: " + ex.Message; }
@@ -208,7 +233,7 @@ public static class DriverManager
         try
         {
             var m = Regex.Match(g.GpuName, @"RX\s*(\d{4})\s*(XTX|XT|GRE|M)?", RegexOptions.IgnoreCase);
-            if (!m.Success) { g.Message = "AMD: modelo não reconhecido para consulta automática. Use a página oficial."; return; }
+            if (!m.Success) { await AmdAutoDetectAsync(g, ct); return; }
             int n = int.Parse(m.Groups[1].Value);
             string fam = $"radeon-rx-{n / 1000}000-series";
             string suffix = m.Groups[2].Success ? "-" + m.Groups[2].Value.ToLowerInvariant() : "";
@@ -228,6 +253,25 @@ public static class DriverManager
         }
         catch (OperationCanceledException) { throw; }
         catch (Exception ex) { g.Message = "Não foi possível consultar a AMD: " + ex.Message; }
+    }
+
+    /// <summary>
+    /// Quando o modelo não é conhecido (placa sem driver, escolhida à mão): o instalador "minimal setup" da AMD,
+    /// que detecta a placa sozinho e baixa o driver certo (o mesmo que o Ultimate usa).
+    /// </summary>
+    private static async Task AmdAutoDetectAsync(GpuDriverStatus g, CancellationToken ct)
+    {
+        g.OfficialPage = "https://www.amd.com/en/support/download/drivers.html";
+        using var req = new HttpRequestMessage(HttpMethod.Get, g.OfficialPage);
+        req.Headers.Referrer = new Uri("https://www.amd.com/");
+        using var resp = await Http.SendAsync(req, ct);
+        string html = await resp.Content.ReadAsStringAsync(ct);
+        var hit = Regex.Match(html, @"https://drivers\.amd\.com/drivers/installer/[^""'\s<>\\]*/whql/amd-software-adrenalin-edition-[^""'\s<>\\]*-minimalsetup-[^""'\s<>\\]*_web\.exe", RegexOptions.IgnoreCase);
+        if (!hit.Success) { g.Message = "AMD: o site não devolveu o instalador automático. Use a página oficial."; return; }
+        g.DownloadUrl = hit.Value;
+        var v = Regex.Match(hit.Value, @"edition-([\d.]+)", RegexOptions.IgnoreCase);
+        g.Latest = v.Success ? v.Groups[1].Value : "mais recente";
+        g.Message = $"AMD Software Adrenalin {g.Latest} (instalador que detecta a placa sozinho).";
     }
 
     private static void Find(JsonElement e, ref string? ver, ref string? dl, ref string? size)
@@ -250,28 +294,43 @@ public static class DriverManager
     }
 
     /// <summary>Descobre os códigos de série (psid) e produto (pfid) da placa na base de drivers da NVIDIA.</summary>
-    private static async Task<(int psid, int pfid)> ResolveNvidiaIdsAsync(string gpuName, CancellationToken ct)
+    private static async Task<(int psid, int pfid)> ResolveNvidiaIdsAsync(GpuDriverStatus g, CancellationToken ct)
     {
-        bool mobile = Regex.IsMatch(gpuName, @"Laptop|Max-Q|Mobile|Notebook", RegexOptions.IgnoreCase);
+        string gpuName = g.NoDriver ? "" : g.GpuName;
+        // Notebooks antigos (GTX 10 e antes) não têm "Laptop" no nome: confere também o gabinete do PC.
+        bool mobile = Regex.IsMatch(gpuName, @"Laptop|Max-Q|Mobile|Notebook", RegexOptions.IgnoreCase) || GpuDetect.IsLaptop();
         var m = Regex.Match(gpuName, @"(RTX|GTX|GT)\s*(\d{3,4})", RegexOptions.IgnoreCase);
-        if (!m.Success) throw new InvalidOperationException("Modelo de placa não reconhecido: " + gpuName);
-        string prefix = m.Groups[1].Value.ToUpperInvariant();
-        int n = int.Parse(m.Groups[2].Value);
 
         string series;
-        if (prefix == "RTX") series = $"RTX {n / 100} Series";
-        else if (n >= 1600 && n < 1700) series = "16 Series";
-        else if (n >= 1000 && n < 1100) series = "10 Series";
-        else if (n >= 900 && n < 1000) series = "900 Series";
-        else if (n >= 700 && n < 800) series = "700 Series";
-        else series = $"{n / 100 * 100} Series";
-        if (prefix == "RTX" && n >= 2000) series = $"RTX {n / 100} Series";
+        var mx = Regex.Match(gpuName, @"\bMX\s*(\d{3})", RegexOptions.IgnoreCase);
+        if (mx.Success) { series = $"MX{int.Parse(mx.Groups[1].Value) / 100 * 100} Series"; mobile = true; }
+        else if (m.Success)
+        {
+            string prefix = m.Groups[1].Value.ToUpperInvariant();
+            int n = int.Parse(m.Groups[2].Value);
+            if (prefix == "RTX") series = $"RTX {n / 100} Series";
+            else if (n >= 1600 && n < 1700) series = "16 Series";
+            else if (n >= 1000 && n < 1100) series = "10 Series";
+            else if (n >= 900 && n < 1000) series = "900 Series";
+            else if (n >= 700 && n < 800) series = "700 Series";
+            else series = $"{n / 100 * 100} Series";
+        }
+        else
+        {
+            // Sem nome (sem driver, TITAN, Quadro…): pela geração do código PCI.
+            string arch = GpuCard.ArchOf(g.DeviceId);
+            bool rtx = GpuCard.IsRtx(arch, "", g.DeviceId);
+            series = new GpuCard(gpuName, g.DeviceId, arch, rtx, 0, mobile, false).DriverSeries
+                     ?? throw new InvalidOperationException("Modelo de placa não reconhecido: " + g.GpuName);
+        }
 
         string xml = await Http.GetStringAsync("https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=2&ParentID=1", ct);
         var seriesList = XDocument.Parse(xml).Descendants("LookupValue")
             .Select(x => (Name: (string?)x.Element("Name") ?? "", Value: (string?)x.Element("Value") ?? "")).ToList();
-        var cand = seriesList.Where(s => s.Name.Contains(series, StringComparison.OrdinalIgnoreCase)
+        List<(string Name, string Value)> SeriesNamed(string name) => seriesList.Where(s => s.Name.Contains(name, StringComparison.OrdinalIgnoreCase)
                                          && s.Name.Contains("Notebook", StringComparison.OrdinalIgnoreCase) == mobile).OrderBy(s => s.Name.Length).ToList();
+        var cand = SeriesNamed(series);
+        if (cand.Count == 0 && mobile) cand = SeriesNamed(series.Replace(" Series", "M Series")); // notebooks antigos: "GeForce 900M Series (Notebooks)"
         if (cand.Count == 0) throw new InvalidOperationException("Série da placa não encontrada na NVIDIA (" + series + ").");
         int psid = int.Parse(cand[0].Value);
 
@@ -288,6 +347,18 @@ public static class DriverManager
 
     /// <summary>Baixa o instalador, confere a assinatura da NVIDIA e abre o instalador oficial.</summary>
     public static async Task<string> DownloadAndLaunchAsync(GpuDriverStatus g, Action<string, double> progress, CancellationToken ct)
+    {
+        string file = await DownloadAsync(g, progress, ct);
+
+        progress("Criando ponto de restauração (se o Windows permitir)…", 1);
+        string restore = await TryRestorePointAsync();
+
+        Process.Start(new ProcessStartInfo(file) { UseShellExecute = true, WorkingDirectory = DownloadFolder });
+        return $"Instalador {g.Latest} aberto (assinatura {g.Vendor} válida). {restore} Siga o instalador; a tela pode piscar durante a instalação.";
+    }
+
+    /// <summary>Só baixa o instalador e confere a assinatura do fabricante (usado também antes da limpeza com o DDU).</summary>
+    public static async Task<string> DownloadAsync(GpuDriverStatus g, Action<string, double> progress, CancellationToken ct)
     {
         Directory.CreateDirectory(DownloadFolder);
         string file = Path.Combine(DownloadFolder, Path.GetFileName(new Uri(g.DownloadUrl).AbsolutePath));
@@ -314,15 +385,11 @@ public static class DriverManager
 
         progress("Conferindo a assinatura digital…", 1);
         VerifyPublisher(file, g.Vendor == "AMD" ? "Advanced Micro Devices" : "NVIDIA");
-
-        progress("Criando ponto de restauração (se o Windows permitir)…", 1);
-        string restore = await TryRestorePointAsync();
-
-        Process.Start(new ProcessStartInfo(file) { UseShellExecute = true, WorkingDirectory = DownloadFolder });
-        return $"Instalador {g.Latest} aberto (assinatura {g.Vendor} válida). {restore} Siga o instalador; a tela pode piscar durante a instalação.";
+        return file;
     }
 
-    private static void VerifyPublisher(string path, string publisher)
+    /// <summary>Confere a assinatura Authenticode e o nome de quem assinou; apaga o arquivo e falha se não bater.</summary>
+    internal static void VerifyPublisher(string path, string publisher)
     {
         int trust = CorsairSdkInstaller.WinVerifyTrustFile(path);
         if (trust != 0)

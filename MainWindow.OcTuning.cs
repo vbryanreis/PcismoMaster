@@ -350,6 +350,8 @@ public partial class MainWindow
         // só continua se a curva de fans precisar da temperatura.
         if (_oc == null || _gpuBenchActive) return;
         if (WindowState == WindowState.Minimized && !P.FanCurveOn) return;
+        // Aba fechada e sem curva de fan: ninguém usa a leitura, então não consulta o driver a cada segundo.
+        if (PageOc.Visibility != Visibility.Visible && !P.FanCurveOn) return;
         OcSample s;
         if (!Monitor.TryEnter(_oc.Gate)) return; // APLICAR/REDEFINIR em andamento
         try { s = _oc.Sample(); } catch (Exception) { return; }

@@ -84,6 +84,10 @@ public sealed class AppSettings
 
     // Aparência
     public bool LightTheme { get; set; }
+    /// <summary>Modo avançado: mostra sensores, overclock, scripts e ajustes técnicos. Começa no Simples.</summary>
+    public bool AdvancedMode { get; set; }
+    /// <summary>Esconde a faixa com a explicação curta no topo de cada página.</summary>
+    public bool HidePageHelp { get; set; }
 
     // Overclock (aba no estilo Afterburner): perfil em edição, 5 perfis salvos e o último aplicado (reaplicado ao abrir o app, se marcado)
     public Modular.OcProfile OcCurrent { get; set; } = new();
@@ -94,6 +98,11 @@ public sealed class AppSettings
     // Jogos: biblioteca em lista (true) ou em cartões com capa (false)
     public bool LibListView { get; set; }
 
+    // Limpeza com o DDU: valor do Windows Update antes de bloquear (para desfazer) e o driver baixado antes da limpeza
+    public bool DduWuBlocked { get; set; }
+    public int? DduWuBackup { get; set; }
+    public string? DduDriverFile { get; set; }
+
     // Manutenção: quando foi a última revisão semanal concluída sem erros
     public DateTime? MaintWeeklyLast { get; set; }
     /// <summary>Curva V/F de fábrica (mV, MHz) lida sem offsets; serve de referência quando o app abre com overclock já aplicado.</summary>
@@ -102,6 +111,13 @@ public sealed class AppSettings
     // Overlay
     public string OverlayCorner { get; set; } = "TL";
     public double OverlayScale { get; set; } = 1.0;
+    /// <summary>"V" = lista vertical com gráfico; "H" = barra horizontal numa linha.</summary>
+    public string OverlayLayout { get; set; } = "V";
+    /// <summary>Opacidade do fundo do overlay (0 a 1).</summary>
+    public double OverlayOpacity { get; set; } = 0.78;
+    /// <summary>Atalho que liga/desliga o overlay: modificadores de RegisterHotKey e código virtual (padrão Ctrl + Shift + O).</summary>
+    public uint OverlayHotkeyMods { get; set; } = 0x2 | 0x4;
+    public uint OverlayHotkeyVk { get; set; } = 0x4F;
     /// <summary>Itens escolhidos para o overlay (chaves de OverlayMetrics); null = padrão.</summary>
     public List<string>? OverlayItems { get; set; }
 

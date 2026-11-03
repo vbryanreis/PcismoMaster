@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO;
 using Microsoft.Win32;
 
@@ -6,10 +7,29 @@ namespace ResetExplode;
 /// <summary>Um programa instalado, lido do registro de "Programas e Recursos" (chaves Uninstall).</summary>
 public sealed record InstalledProgram(
     string Name, string Version, string Publisher, string InstallLocation,
-    string UninstallCmd, bool Quiet, RegistryHive Hive, RegistryView View, string KeyPath, long SizeKb)
+    string UninstallCmd, bool Quiet, RegistryHive Hive, RegistryView View, string KeyPath, long SizeKb) : INotifyPropertyChanged
 {
     public string SizeText => SizeKb <= 0 ? "" : SizeKb >= 1048576 ? $"{SizeKb / 1048576.0:0.0} GB" : $"{SizeKb / 1024.0:0} MB";
-    public string Meta => string.Join("   ·   ", new[] { Publisher, Version, SizeText }.Where(s => s.Length > 0));
+    public string Meta => string.Join("   ·   ", new[] { Publisher, Version, SizeText, DateText }.Where(s => s.Length > 0));
+    public string DateText => InstallDate.Length == 8 && InstallDate.All(char.IsDigit)
+        ? $"instalado em {InstallDate[6..8]}/{InstallDate[4..6]}/{InstallDate[..4]}" : "";
+
+    /// <summary>DisplayIcon da entrada ("C:\app\app.exe,0").</summary>
+    public string DisplayIcon { get; init; } = "";
+    /// <summary>Data de instalação (InstallDate, aaaammdd), quando o instalador grava.</summary>
+    public string InstallDate { get; init; } = "";
+    public string Initial => Name.Length > 0 ? Name[..1].ToUpperInvariant() : "?";
+
+    private object? _icon;
+    /// <summary>Ícone carregado em segundo plano (ImageSource congelado).</summary>
+    public object? Icon
+    {
+        get => _icon;
+        set { _icon = value; PropertyChanged?.Invoke(this, new(nameof(Icon))); PropertyChanged?.Invoke(this, new(nameof(HasIcon))); }
+    }
+    public bool HasIcon => _icon != null;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
 
 /// <summary>
@@ -68,7 +88,11 @@ public static class ProgramInventory
                         bool quiet = quietCmd.Length > 0;
 
                         list.Add(new InstalledProgram(name, ver, pub, loc, quiet ? quietCmd : unCmd, quiet,
-                                                      hive, view, UninstallRoot + "\\" + subName, sizeKb));
+                                                      hive, view, UninstallRoot + "\\" + subName, sizeKb)
+                        {
+                            DisplayIcon = (k.GetValue("DisplayIcon") as string ?? "").Trim(),
+                            InstallDate = (k.GetValue("InstallDate") as string ?? "").Trim(),
+                        });
                     }
                     catch { }
                 }

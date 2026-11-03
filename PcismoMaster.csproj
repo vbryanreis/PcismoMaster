@@ -10,10 +10,13 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.7.0</Version>
+    <Version>0.8.0</Version>
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Fluidez: código já compilado no .exe publicado (sem engasgo do JIT ao abrir cada aba pela primeira vez) -->
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredPGO>true</TieredPGO>
     <!-- Deixa o .exe mais leve: comprime os assemblies dentro do single-file (nada é removido;
          tudo é descomprimido em memória ao abrir). Só vale no publish single-file (Release). -->
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
@@ -36,6 +39,12 @@
        Para incluir outro, basta criar a pasta com o .inf/.cat/.sys e ligá-la em MakerDrivers.Chips (Bundle). -->
   <ItemGroup>
     <EmbeddedResource Include="Drivers\**\*" Exclude="Drivers\*.md;Drivers\*.txt" LogicalName="Drivers/%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- Catálogo de configurações do driver NVIDIA (nomes, grupos e valores) do nvidiaProfileInspector, licença MIT -->
+    <EmbeddedResource Include="Npi\*.xml" LogicalName="Npi/%(Filename)%(Extension)" />
+    <!-- Ajustes .reg das sub-abas do TWEAKING, extraídos dos scripts do Ultimate (MIT) -->
+    <EmbeddedResource Include="Tweaks\*.reg" LogicalName="Tweaks/%(Filename)%(Extension)" />
+    <!-- Scripts completos (uma opção do menu por arquivo), só rodam quando o usuário confirma na tela -->
+    <EmbeddedResource Include="Tweaks\Scripts\*.ps1" LogicalName="Tweaks/Scripts/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- iCUE SDK da Corsair (INTEGRAÇÃO): se a DLL estiver em Native\, ela vai junto do .exe. Não é versionada no git. -->

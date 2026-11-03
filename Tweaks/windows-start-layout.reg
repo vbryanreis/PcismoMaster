@@ -1,0 +1,18 @@
+Windows Registry Editor Version 5.00
+
+; new start menu
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\14\2792562829]
+"EnabledState"=dword:00000002
+
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\14\3036241548]
+"EnabledState"=dword:00000002
+
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\14\734731404]
+"EnabledState"=dword:00000002
+
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\14\762256525]
+"EnabledState"=dword:00000002
+
+; set start menu apps view to list
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start]
+"AllAppsViewMode"=dword:00000002

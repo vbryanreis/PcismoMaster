@@ -2,7 +2,7 @@
 
 Aplicativo **Windows** (WPF, .NET 8) para **diagnóstico, monitoramento, benchmark e otimização** de PC. Roda **como administrador** para ler sensores de baixo nível e aplicar ajustes somente quando você pede.
 
-Versão atual: **0.7.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
+Versão atual: **0.8.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
 
 > Projeto mantido em dupla. Antes de mexer, sincronize com o `origin` (`git fetch` + `git pull --ff-only`) e trabalhe em branch própria, entregando por pull request.
 
@@ -15,16 +15,23 @@ Versão atual: **0.7.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de
 
 ## Navegação
 
+O app abre no **Início** ("O que você quer fazer?"), com as tarefas mais comuns em blocos e uma busca por tudo que ele faz. No topo fica o botão **Modo simples / Modo avançado**: o simples (padrão) mostra só o essencial e seguro; o avançado libera sensores, overclock, stress test, ajustes técnicos e os scripts completos. Cada página tem uma explicação curta no topo.
+
 A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o mouse):
 
 - **Visão geral** — painel inicial: estado do hardware, gráfico de CPU/GPU por faixa de cor, cartão *Saúde do PC* e o botão **OTIMIZAR**.
 - **MASTER** — Sistema, Sensores (no estilo HWiNFO), Placa de vídeo (com a logo da fabricante em destaque: NVIDIA em ciano, AMD em vermelho), Discos, Energia e Rede.
 - **MANUTENÇÃO → Reparos do Windows** — rotinas oficiais do Windows: SFC, DISM, CHKDSK, redefinir rede / Windows Update / spooler, reiniciar áudio, Bluetooth e o Explorer.
-- **JOGOS** — Biblioteca de jogos, **Promoções** (preço dos jogos agora nas lojas, com o menor preço da história, filtros, pesquisa que compara as lojas, jogos grátis e os seus jogos em promoção), FPS estimado, detector de Gargalo e Overlay de FPS sobre o jogo.
+- **TWEAKING** — quatro sub-abas com desfazer, das pastas do Ultimate:
+  - **Iniciar** (o "3 Setup"): apps em segundo plano, bloqueio de drivers e do Windows Update, Edge (segundo plano, uBlock Origin, aceleração de hardware, serviços de atualização) e Store; compressão de memória, BitLocker e atalhos.
+  - **Windows**: ponto de restauração; **bloatware escolhido app por app** (nome em português, selo de risco, travados os que o script mantém e "Removidos por aqui" com o caminho de volta); configurações do Painel de Controle do script, menu de contexto, Widgets, Copilot, energia, timer, barra de tarefas, Game Bar, placas de rede e dispositivos sem economia de energia, tema e tela de bloqueio pretos, cache de gravação e UAC; plano de energia Ultimate, rede só IPv4, limpeza e atalhos.
+  - **Hardware**: mouse sem limite de 125 Hz em segundo plano, escala maior sem aceleração (100–350%), testes de monitor/rede/controle e dicas.
+  - **Avançado** (desligados por padrão): NVMe nativo, MPO, tela cheia exclusiva, pesquisa, atalhos do teclado, Spectre/Meltdown, firewall, WHQL, AMD ULPS, Resizable BAR forçado (NVIDIA), MMAgent, DEP e prioridade/afinidade por jogo.
+  - **Scripts completos do Ultimate** no fim de cada sub-aba: todas as opções dos scripts (bloatware, Edge/WebView, Defender, serviços, Autoruns, hidusbf…) com selo de risco, confirmação com avisos e ponto de restauração.
+- **JOGOS** — Biblioteca de jogos, **Promoções** (preço dos jogos agora nas lojas, com o menor preço da história, filtros, pesquisa que compara as lojas, jogos grátis e os seus jogos em promoção), FPS estimado, detector de Gargalo e **Overlay** sobre o jogo (vertical em tabela ou barra numa linha, prévia ao vivo, posição, opacidade, tamanho e tecla à escolha).
 - **DESEMPENHO** — Benchmark (CPU, GPU, memória, disco e ray tracing DXR 1.1), Stress test (CPU / RAM / GPU) e **Overclock** no estilo do MSI Afterburner.
-- **FERRAMENTAS** — Otimização (ajustes do Windows para jogos, guardando o valor original para desfazer), Inicialização (o que abre junto com o Windows), **Instalar apps** (catálogo por categorias no estilo Ninite, via winget), Drivers (NVIDIA / AMD / Windows Update), Integração (RGB: iCUE e OpenRGB) e **Utilidades** — *Baixar vídeos* (YouTube/Instagram em MP4 ou MP3) e o **Finder**, busca instantânea de arquivos e pastas lendo a MFT dos discos NTFS.
+- **FERRAMENTAS** — Otimização (ajustes do Windows para jogos, guardando o valor original para desfazer), Inicialização (o que abre junto com o Windows), **Instalar apps** (cartões com o ícone de cada app, por categorias, via winget) e **Desinstalar Apps** (estilo Revo/Geek Uninstaller, com varredura profunda de sobras, Lixeira e backup), **Drivers** (limpeza com o DDU, instalação do driver normal ou enxuta com as configurações ajustadas à placa, Painel NVIDIA, Profile Inspector e verificação do Visual C++/DirectX), Integração (RGB: iCUE e OpenRGB) e **Utilidades** — *Baixar vídeos* (YouTube/Instagram em MP4 ou MP3) e o **Finder**, busca instantânea de arquivos e pastas lendo a MFT dos discos NTFS.
 - **MAKER** — Portas COM (resolve portas fantasmas/presas) e Drivers seriais (CH340, CP210x, FTDI, Prolific, Arduino + Arduino IDE).
-- **OTIMIZAÇÃO** (sempre abaixo de MAKER) — **Inicialização do Windows** (pausar o Windows Update com opção de restaurar os valores anteriores) e **Desinstalar Apps** (desinstalador seguro no estilo do Revo).
 
 ## Observações importantes
 
@@ -32,10 +39,9 @@ A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o 
 - **Desinstalar Apps é seguro por design:** usa o desinstalador oficial do programa e, na varredura de sobras, só apaga dentro de *Program Files* / *AppData* / *ProgramData* e de ramos `Software\` do registro. **Nunca** toca em pastas do Windows nem em chaves do sistema, e nada é removido sem você marcar e confirmar.
 - **Baixar vídeos** precisa do **yt-dlp** e do **ffmpeg** (grátis). Se faltarem, a ferramenta avisa e leva até *Instalar apps* para instalá-los uma vez pelo winget.
 - **Finder** depende do modo administrador e de discos **NTFS** (lê a MFT direto).
-- **Pausar o Windows Update** pode adiar também correções de segurança, e às vezes o próprio Windows limita a duração da pausa.
 - **Promoções** usa a API gratuita do [IsThereAnyDeal](https://isthereanydeal.com/) e precisa de internet. O `.exe` do Release já vem com a chave do app; se ela faltar (ou para usar a sua), clique em **Chave da API** na aba e cole uma chave grátis criada em isthereanydeal.com/apps (fica cifrada pelo Windows). Os preços saem na moeda do país configurado no Windows. O PcismoMaster não é afiliado ao IsThereAnyDeal.
 - **Overclock** funciona em placas **NVIDIA**: Core/Memory Clock, Power/Temp Limit, curva V/F com undervolt, curva de fans, 5 perfis e monitoramento ao vivo.
-- **Onde ficam os dados:** configurações em `%AppData%\PcismoMaster`; backups dos ajustes do Ultimate em `%LOCALAPPDATA%\PcismoMaster\ModuleBackups`; capas de jogos em `%LOCALAPPDATA%\PcismoMaster\covers`.
+- **Onde ficam os dados:** configurações em `%AppData%\PcismoMaster`; backups dos ajustes do Ultimate em `%LOCALAPPDATA%\PcismoMaster\ModuleBackups`; capas de jogos em `%LOCALAPPDATA%\PcismoMaster\covers`; registro da limpeza com o DDU em `%LOCALAPPDATA%\PcismoMaster\ddu-log.txt`.
 
 ## Compilar
 
@@ -52,4 +58,4 @@ A chave do app no IsThereAnyDeal fica no segredo **`ITAD_API_KEY`** do repositó
 
 ## Licenças e créditos
 
-Interface e base herdadas do **ResetExplode**; funções do **Ultimate** no grupo OTIMIZAÇÃO. A camada NVAPI de overclock/undervolt foi portada do [simple-nvidia-undervolt](https://github.com/vuplea/simple-nvidia-undervolt). Licenças preservadas em [LICENSE](LICENSE), [licenses/Ultimate-LICENSE.txt](licenses/Ultimate-LICENSE.txt) e [licenses/simple-nvidia-undervolt-LICENSE.txt](licenses/simple-nvidia-undervolt-LICENSE.txt).
+Interface e base herdadas do **ResetExplode**; funções do **Ultimate** em FERRAMENTAS. O Profile Inspector e o Painel NVIDIA usam o catálogo do [NVIDIA Profile Inspector](https://github.com/Orbmu2k/nvidiaProfileInspector) (licença em `licenses/nvidiaProfileInspector-LICENSE.txt`); a limpeza do driver usa o DDU da Wagnardsoft (baixado na hora, com a assinatura conferida). A camada NVAPI de overclock/undervolt foi portada do [simple-nvidia-undervolt](https://github.com/vuplea/simple-nvidia-undervolt). Licenças preservadas em [LICENSE](LICENSE), [licenses/Ultimate-LICENSE.txt](licenses/Ultimate-LICENSE.txt) e [licenses/simple-nvidia-undervolt-LICENSE.txt](licenses/simple-nvidia-undervolt-LICENSE.txt).

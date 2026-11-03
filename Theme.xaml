@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ResetExplode">
 
     <!-- ===== Paleta do ícone: escuro levemente arroxeado, destaque roxo → ciano =====
          (ThemeManager troca estes pincéis no modo claro; os valores aqui são os do modo escuro) -->
@@ -29,6 +30,8 @@
     </LinearGradientBrush>
     <SolidColorBrush x:Key="AccentCyan" Color="#29B4D9"/>
     <SolidColorBrush x:Key="AccentSoft" Color="#26A647FE"/>
+    <!-- Quadrado claro atrás dos ícones de apps (Instalar/Desinstalar): ícones escuros e coloridos ficam todos legíveis -->
+    <SolidColorBrush x:Key="IconTile" Color="#F4EFEA"/>
 
     <!-- Selo pequeno ("Cria ponto de restauração", "Recomendado 1 vez por semana") da aba Manutenção -->
     <Style x:Key="MaintBadge" TargetType="Border">
@@ -75,12 +78,12 @@
         <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
     </Style>
     <Style x:Key="Sub" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
         <Setter Property="Margin" Value="0,4,0,0"/>
     </Style>
     <Style x:Key="Label" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="10.5"/>
+        <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
         <Setter Property="Margin" Value="0,0,0,8"/>
@@ -99,6 +102,13 @@
         <Setter Property="CornerRadius" Value="16"/>
         <Setter Property="Padding" Value="20"/>
     </Style>
+    <!-- Textos de botão e chip: o que foi escrito em CAIXA ALTA aparece como frase ("Remover os marcados"), mantendo siglas -->
+    <local:FriendlyCaseConverter x:Key="FriendlyCase"/>
+    <DataTemplate x:Key="FriendlyText">
+        <TextBlock Text="{Binding Converter={StaticResource FriendlyCase}}"/>
+    </DataTemplate>
+    <local:FriendlyTemplateSelector x:Key="FriendlySelector" Template="{StaticResource FriendlyText}"/>
+
 
     <!-- ===== Botões ===== -->
     <Style x:Key="PrimaryButton" TargetType="Button">
@@ -115,7 +125,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10" Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ContentPresenter ContentTemplateSelector="{StaticResource FriendlySelector}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -137,6 +147,13 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+    </Style>
+
+    <!-- Botão "Modo simples / avançado" da barra de título -->
+    <Style x:Key="ModeButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+        <Setter Property="Padding" Value="14,5"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
     </Style>
 
     <Style x:Key="CaptionButton" TargetType="Button">
@@ -183,7 +200,7 @@
     <!-- ===== Navegação lateral ===== -->
     <Style x:Key="NavItem" TargetType="RadioButton">
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
-        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="GroupName" Value="Nav"/>
         <Setter Property="Margin" Value="12,1"/>
@@ -236,7 +253,7 @@
     <Style x:Key="NavGroup" TargetType="ToggleButton">
         <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
         <Setter Property="FontFamily" Value="{StaticResource NavFont}"/>
-        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Margin" Value="12,6,12,1"/>
@@ -294,7 +311,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Grid x:Name="bg" Background="Transparent" Height="44">
-                        <ContentPresenter Margin="16,0" VerticalAlignment="Center"/>
+                        <ContentPresenter ContentTemplateSelector="{StaticResource FriendlySelector}" Margin="16,0" VerticalAlignment="Center"/>
                         <Rectangle x:Name="line" Height="2" VerticalAlignment="Bottom" Margin="16,0" Fill="{DynamicResource Fg}" Visibility="Hidden"/>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -322,7 +339,7 @@
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="b" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" CornerRadius="14"
                             Padding="13,5" Background="Transparent">
-                        <ContentPresenter VerticalAlignment="Center"/>
+                        <ContentPresenter ContentTemplateSelector="{StaticResource FriendlySelector}" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -354,7 +371,7 @@
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="b" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" CornerRadius="14"
                             Padding="13,5" Background="Transparent">
-                        <ContentPresenter VerticalAlignment="Center"/>
+                        <ContentPresenter ContentTemplateSelector="{StaticResource FriendlySelector}" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -386,7 +403,7 @@
                 <ControlTemplate TargetType="ToggleButton">
                     <Border x:Name="b" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" CornerRadius="14"
                             Padding="13,5" Background="Transparent">
-                        <ContentPresenter VerticalAlignment="Center"/>
+                        <ContentPresenter ContentTemplateSelector="{StaticResource FriendlySelector}" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -568,6 +585,94 @@
         <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+
+    <!-- ===== ComboBox escuro (editável ou não), no padrão do tema ===== -->
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="b" Background="Transparent" Padding="{TemplateBinding Padding}" CornerRadius="6">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource Hover}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
+        <Setter Property="Background" Value="{DynamicResource Bg}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="MinHeight" Value="28"/>
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border x:Name="frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1" CornerRadius="8"/>
+                        <ToggleButton x:Name="toggle" Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Background="Transparent">
+                                        <TextBlock Text="&#xE70D;" FontFamily="{StaticResource Icons}" FontSize="10" Foreground="{DynamicResource Muted}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <ContentPresenter x:Name="content" IsHitTestVisible="False" Margin="10,0,28,0" VerticalAlignment="Center"
+                                          Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                        <TextBox x:Name="PART_EditableTextBox" Visibility="Collapsed" Margin="2,0,26,0" Padding="6,0" VerticalAlignment="Center"
+                                 Background="Transparent" BorderThickness="0" Foreground="{TemplateBinding Foreground}" FontSize="{TemplateBinding FontSize}"
+                                 IsReadOnly="{TemplateBinding IsReadOnly}">
+                            <TextBox.Template>
+                                <ControlTemplate TargetType="TextBox">
+                                    <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Margin="4,0"/>
+                                </ControlTemplate>
+                            </TextBox.Template>
+                        </TextBox>
+                        <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade"
+                               IsOpen="{TemplateBinding IsDropDownOpen}">
+                            <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" CornerRadius="8"
+                                    Padding="4" Margin="0,4,0,0" MinWidth="{Binding ActualWidth, ElementName=frame}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditable" Value="True">
+                            <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="content" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="frame" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="frame" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="PlainItem" TargetType="ListBoxItem">

@@ -14,8 +14,11 @@ public partial class MainWindow
 
     private void InitDriver()
     {
+        InitDdu();
+        InitGfxTweaks();
         if (_drvInit) return;
         _drvInit = true;
+        InitRuntimes();
         BtnDrvScan_Click(this, new RoutedEventArgs());
     }
 
@@ -58,7 +61,7 @@ public partial class MainWindow
                 DrvSet($"Consultando {g.Vendor.ToUpperInvariant()} para {g.GpuName}…", 0.4 + 0.5 * i / Math.Max(1, _drvGpus.Count));
                 if (g.Vendor == "NVIDIA") await DriverManager.CheckNvidiaAsync(g, studio, _drvCts.Token);
                 else if (g.Vendor == "AMD") await DriverManager.CheckAmdAsync(g, _drvCts.Token);
-                else if (g.Vendor == "Intel") g.Message = $"{g.Vendor}: use a página oficial para ver a versão mais recente (instalado: {g.Installed}).";
+                else if (g.Vendor == "Intel") g.Message = $"Intel: a Intel não tem consulta automática; ABRIR PÁGINA OFICIAL mostra os drivers gráficos para Windows 11 (instalado: {g.Installed}).";
                 else g.Message = "Fabricante não reconhecido.";
                 i++;
             }
@@ -107,7 +110,35 @@ public partial class MainWindow
         try
         {
             string r = await DriverManager.DownloadAndLaunchAsync(g, (t, f) => Dispatcher.BeginInvoke(new Action(() => DrvSet(t, f))), _drvCts.Token);
-            DrvSet(r, 1);
+            DrvSet(r + (g.Vendor == "NVIDIA" ? "\n" + GpuDriverStatus.NvidiaAppTips : ""), 1);
+        }
+        catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
+        finally { DrvBusy(false); }
+    }
+
+    /// <summary>Instalar o driver mais recente escolhendo o fabricante (quando a placa não é reconhecida, como logo depois do DDU).</summary>
+    private async void BtnDrvVendor_Click(object sender, RoutedEventArgs e)
+    {
+        if (_drvBusy || ((FrameworkElement)sender).Tag is not string vendor) return;
+        if (vendor == "Intel") { OpenUrl(GpuDriverStatus.IntelGraphicsPage); DrvSet("Página de drivers gráficos da Intel aberta (Windows 11).", null); return; }
+        // Usa a placa detectada desse fabricante; se não houver, consulta o driver geral mais recente.
+        var g = _drvGpus.FirstOrDefault(x => x.Vendor == vendor) ?? new GpuDriverStatus { Vendor = vendor, GpuName = $"Placa {vendor}", NoDriver = true, Installed = "nenhum" };
+        DrvBusy(true);
+        _drvCts = new CancellationTokenSource();
+        try
+        {
+            DrvSet($"Procurando o driver {vendor} mais recente…", 0.2);
+            if (g.DownloadUrl.Length == 0)
+            {
+                if (vendor == "NVIDIA") await DriverManager.CheckNvidiaAsync(g, DrvStudio.IsChecked == true, _drvCts.Token);
+                else await DriverManager.CheckAmdAsync(g, _drvCts.Token);
+            }
+            if (!g.CanAutoInstall) { DrvSet(g.Message.Length > 0 ? g.Message : "Driver não encontrado. Use ABRIR PÁGINA OFICIAL.", 0); return; }
+            if (MessageBox.Show(this, $"Baixar e abrir o instalador {vendor} {g.Latest}{(g.SizeText.Length > 0 ? $" ({g.SizeText})" : "")}?\n" +
+                    "O arquivo vem do servidor oficial e a assinatura digital é conferida antes de abrir.", "Driver de vídeo",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) { DrvSet("", 0); return; }
+            string r = await DriverManager.DownloadAndLaunchAsync(g, (t, f) => Dispatcher.BeginInvoke(new Action(() => DrvSet(t, f))), _drvCts.Token);
+            DrvSet(r + (vendor == "NVIDIA" ? "\n" + GpuDriverStatus.NvidiaAppTips : ""), 1);
         }
         catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
         finally { DrvBusy(false); }

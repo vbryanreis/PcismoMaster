@@ -13,7 +13,9 @@ namespace ResetExplode;
 /// </summary>
 public partial class OverlayWindow : Window
 {
-    public string Corner { get; set; } = "TL"; // TL, TR, BL, BR
+    public string Corner { get; set; } = "TL"; // TL, TC, TR, BL, BC, BR
+    /// <summary>true = barra horizontal numa linha só; false = lista vertical com gráfico.</summary>
+    public bool Horizontal { get; set; }
 
     private IntPtr _hwnd, _hook;
     private IntPtr _monitor;                  // monitor do jogo (o da última janela ativa de outro programa)
@@ -46,6 +48,10 @@ public partial class OverlayWindow : Window
 
     public void SetScale(double s) { Scale.ScaleX = Scale.ScaleY = s; }
 
+    /// <summary>Opacidade do fundo (0 = transparente, 1 = preto sólido); o texto continua opaco.</summary>
+    public void SetBackgroundOpacity(double a) =>
+        Box.Background = new SolidColorBrush(Color.FromArgb((byte)Math.Round(Math.Clamp(a, 0, 1) * 255), 0, 0, 0));
+
     public void Reposition() => KeepOnTop();
 
     /// <summary>
@@ -64,7 +70,7 @@ public partial class OverlayWindow : Window
         int w = wr.Right - wr.Left, h = wr.Bottom - wr.Top;
         int m = (int)Math.Round(12 * VisualTreeHelper.GetDpi(this).DpiScaleX);
         var r = mi.rcMonitor;
-        int x = Corner.EndsWith("R") ? r.Right - w - m : r.Left + m;
+        int x = Corner.EndsWith("R") ? r.Right - w - m : Corner.EndsWith("C") ? r.Left + (r.Right - r.Left - w) / 2 : r.Left + m;
         int y = Corner.StartsWith("B") ? r.Bottom - h - m : r.Top + m;
         SetWindowPos(_hwnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
     }
@@ -86,51 +92,47 @@ public partial class OverlayWindow : Window
     }
 
     /// <summary>Atualiza o overlay. <paramref name="show"/> = itens escolhidos (chaves de OverlayMetrics).</summary>
-    public void Update(FrameStats? f, IReadOnlyList<OverlayLine> lines, IReadOnlySet<string> show, string? extra)
+    public void Update(FrameStats? f, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? extra)
     {
-        static Visibility V(bool on) => on ? Visibility.Visible : Visibility.Collapsed;
-        bool fps = show.Contains("fps"), ft = show.Contains("frametime");
-        OFpsRow.Visibility = V(fps || ft);
-        OFps.Visibility = OFpsUnit.Visibility = V(fps);
-        OFrameTime.Visibility = V(ft);
-        OFrameTime.Margin = new Thickness(fps ? 12 : 0, 0, 0, fps ? 4 : 0);
-        OLow.Visibility = V(show.Contains("low1"));
-        OGraph.Visibility = V(show.Contains("graph"));
+        VPanel.Visibility = Horizontal ? Visibility.Collapsed : Visibility.Visible;
+        HRow.Visibility = Horizontal ? Visibility.Visible : Visibility.Collapsed;
+        var cells = Cells(f, parts, show, extra);
+        if (Horizontal) { HRow.ItemsSource = cells; return; }
+        // Vertical: tabela (rótulo à esquerda, valor à direita) e, se escolhido, o gráfico de frametime embaixo.
+        VRows.ItemsSource = cells;
+        bool graph = show.Contains("graph");
+        OGraph.Visibility = graph ? Visibility.Visible : Visibility.Collapsed;
+        if (graph) DrawGraph(f?.RecentFrameTimes);
+    }
 
-        if (f != null)
-        {
-            OFps.Text = $"{f.Fps:0}";
-            OFrameTime.Text = $"{f.FrameTimeMs:0.0} ms";
-            OLow.Text = $"1% low {f.Low1Fps:0}";
-        }
-        else
-        {
-            OFps.Text = "—";
-            OFrameTime.Text = fps ? "" : "— ms";
-            OLow.Text = "aguardando jogo";
-        }
-        // Rodapé: nome do jogo e/ou hora.
-        var foot = new List<string>();
-        if (show.Contains("game") && f != null) foot.Add(f.ProcessName);
-        if (extra != null) foot.Add(extra);
-        OGame.Text = string.Join("  ·  ", foot);
-        OGame.Visibility = V(foot.Count > 0);
+    private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Accent = Frozen(0xA6, 0x6B, 0xFF),
+        Cool = Frozen(0x4A, 0xDE, 0x80), Warm = Frozen(0xFB, 0xBF, 0x24), Hot = Frozen(0xF8, 0x71, 0x71);
+    private static Brush Frozen(byte r, byte g, byte b) { var x = new SolidColorBrush(Color.FromRgb(r, g, b)); x.Freeze(); return x; }
 
-        ORows.ItemsSource = lines;
-        ORows.Visibility = V(lines.Count > 0);
-        if (OGraph.Visibility == Visibility.Visible) DrawGraph(f?.RecentFrameTimes);
+    /// <summary>Células do formato horizontal (também usadas na prévia da aba Overlay): FPS, frame, 1% low, sensores e jogo.</summary>
+    public static List<OverlayCell> Cells(FrameStats? f, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? extra)
+    {
+        var cells = new List<OverlayCell>();
+        if (show.Contains("fps")) cells.Add(new("FPS", f != null ? $"{f.Fps:0}" : "—", Accent));
+        if (show.Contains("frametime")) cells.Add(new("FRAME", f != null ? $"{f.FrameTimeMs:0.0} ms" : "—", Plain));
+        if (show.Contains("low1")) cells.Add(new("1% LOW", f != null ? $"{f.Low1Fps:0}" : "—", Plain));
+        foreach (var p in parts)
+            cells.Add(new(p.Short, p.Bare, p.Level switch { 1 => Cool, 2 => Warm, 3 => Hot, _ => Plain }));
+        if (show.Contains("game") && f != null) cells.Add(new("JOGO", f.ProcessName, Plain));
+        if (extra != null) cells.Add(new("HORA", extra, Plain));
+        return cells;
     }
 
     /// <summary>Frametimes recentes: picos para cima = engasgos.</summary>
     private void DrawGraph(IReadOnlyList<double>? ft)
     {
         OGraph.Children.Clear();
-        double w = OGraph.Width, h = OGraph.Height;
+        double w = OGraph.ActualWidth > 0 ? OGraph.ActualWidth : 200, h = OGraph.Height;
         OGraph.Children.Add(new Line { X1 = 0, X2 = w, Y1 = h - 0.5, Y2 = h - 0.5, Stroke = new SolidColorBrush(Color.FromArgb(0x30, 0xFF, 0xFF, 0xFF)) });
         if (ft == null || ft.Count < 2) return;
 
         double max = Math.Max(ft.Max(), ft.Average() * 2); // escala que mostra picos sem achatar o normal
-        var line = new Polyline { Stroke = Brushes.White, StrokeThickness = 1 };
+        var line = new Polyline { Stroke = Accent, StrokeThickness = 1.2 };
         double step = w / (ft.Count - 1);
         for (int i = 0; i < ft.Count; i++)
             line.Points.Add(new Point(i * step, h - 1 - (h - 2) * Math.Min(1, ft[i] / max)));
@@ -163,3 +165,6 @@ public partial class OverlayWindow : Window
     [DllImport("user32.dll")] private static extern IntPtr SetWinEventHook(uint min, uint max, IntPtr module, WinEventProc proc, uint pid, uint thread, uint flags);
     [DllImport("user32.dll")] private static extern bool UnhookWinEvent(IntPtr hook);
 }
+
+/// <summary>Célula do overlay em barra: rótulo pequeno, valor e a cor do valor.</summary>
+public sealed record OverlayCell(string Label, string Value, Brush Fg);

@@ -1,0 +1,44 @@
+Windows Registry Editor Version 5.00
+
+; disable game bar
+[HKEY_CURRENT_USER\System\GameConfigStore]
+"GameDVR_Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\GameDVR]
+"AppCaptureEnabled"=dword:00000000
+
+; disable enable open xbox game bar using game controller
+[HKEY_CURRENT_USER\Software\Microsoft\GameBar]
+"UseNexusForGameBarEnabled"=dword:00000000
+
+; disable use view + menu as guide button in apps
+[HKEY_CURRENT_USER\Software\Microsoft\GameBar]
+"GamepadNexusChordEnabled"=dword:00000000
+
+; disable ms-gamebar notifications with xbox controller plugged in
+[HKEY_CLASSES_ROOT\ms-gamebar]
+"(Default)"="URL:ms-gamebar"
+"URL Protocol"=""
+"NoOpenWith"=""
+
+[HKEY_CLASSES_ROOT\ms-gamebar\shell\open\command]
+"(Default)"="%SystemRoot%\\System32\\systray.exe"
+
+[HKEY_CLASSES_ROOT\ms-gamebarservices]
+"(Default)"="URL:ms-gamebarservices"
+"URL Protocol"=""
+"NoOpenWith"=""
+
+[HKEY_CLASSES_ROOT\ms-gamebarservices\shell\open\command]
+"(Default)"="%SystemRoot%\\System32\\systray.exe"
+
+[HKEY_CLASSES_ROOT\ms-gamingoverlay]
+"(Default)"="URL:ms-gamingoverlay"
+"URL Protocol"=""
+"NoOpenWith"=""
+
+[HKEY_CLASSES_ROOT\ms-gamingoverlay\shell\open\command]
+"(Default)"="%SystemRoot%\\System32\\systray.exe"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsRuntime\ActivatableClassId\Windows.Gaming.GameBar.PresenceServer.Internal.PresenceWriter]
+"ActivationType"=dword:00000000

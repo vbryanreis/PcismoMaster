@@ -82,10 +82,9 @@ public partial class MainWindow : Window
         InitializeComponent();
         // Versão exibida no menu lateral lida do próprio assembly (fonte: <Version> em PcismoMaster.csproj)
         SideVersion.Text = "v" + (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.2.5");
-        InitUltimate();
         ThemeManager.Apply(_settings.LightTheme);
         UpdateThemeButton();
-        ShowPage("PageDash");
+        ShowPage("PageHome");
 
         // Sensores: a lista começa vazia e é preenchida quando a detecção do hardware termina (LoadHardwareAsync).
         _monitor = new SensorMonitor();
@@ -102,7 +101,8 @@ public partial class MainWindow : Window
         InitBench();
         SnapshotUsb();
         RefreshDrives();
-        TitlePage.Text = "Visão geral";
+        TitlePage.Text = "Início";
+        InitHome();
         UpdateDashboard();
 
         // A janela aparece já; as coletas pesadas (WMI, sensores, GPU) rodam em paralelo fora da thread da janela.
@@ -260,6 +260,8 @@ public partial class MainWindow : Window
         var item = (FrameworkElement)sender;
         string page = (string)item.Tag;
         ShowPage(page);
+        // Discos e rede em detalhe só quando alguma página mostra esses sensores (ver SensorMonitor.FullDetail).
+        _monitor.FullDetail = page is "PageSensors" or "PageSystem" or "PageDisks" or "PageNet" or "PageGpu" or "PageEnergy";
 
         // Abre a categoria da página (ex.: quando o painel pula direto para o Benchmark)
         // e mostra "CATEGORIA · página" na barra de título.
@@ -272,6 +274,9 @@ public partial class MainWindow : Window
             name = $"{group.Content} · {name}";
         }
         TitlePage.Text = name;
+        UpdatePageHelp(item.Name);
+
+        if (page != "PageUtil") LeaveFinder();
 
         // Algumas páginas carregam dados só quando abertas.
         switch (page)
@@ -291,14 +296,17 @@ public partial class MainWindow : Window
             case "PageOptimize": InitOptimize(); break;
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
-            case "PageUltimate": RefreshWindowsUpdate(); break;
             case "PageMaint": InitMaint(); break;
+            case "PageTweak": InitTweak(); break;
+            case "PageTweakWin": InitTweakWin(); break;
+            case "PageTweakHw": InitTweakHw(); break;
+            case "PageTweakAdv": InitTweakAdv(); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageUltimate, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageTweak, PageTweakWin, PageTweakHw, PageTweakAdv, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -594,8 +602,11 @@ public partial class MainWindow : Window
         // Preferências do overlay
         foreach (var rb in OvCornerPanel.Children.OfType<RadioButton>())
             rb.IsChecked = (string)rb.Tag == _settings.OverlayCorner;
-        foreach (var rb in OvScalePanel.Children.OfType<RadioButton>())
-            rb.IsChecked = Math.Abs(double.Parse((string)rb.Tag, CultureInfo.InvariantCulture) - _settings.OverlayScale) < 0.01;
+        foreach (var rb in OvLayoutPanel.Children.OfType<RadioButton>())
+            rb.IsChecked = (string)rb.Tag == _settings.OverlayLayout;
+        OvScale.Value = _settings.OverlayScale;
+        OvOpacity.Value = _settings.OverlayOpacity;
+        ShowOverlayHotkey();
         BuildOverlayPicker();
         _overlayReady = true;
         UpdateOverlayStatus(null);
@@ -1301,8 +1312,7 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         System.Windows.Interop.HwndSource.FromHwnd(hwnd)?.AddHook(HotkeyHook);
-        // Ctrl + Shift + O, sem repetição ao segurar
-        RegisterHotKey(hwnd, HotkeyId, 0x0002 | 0x0004 | 0x4000, 0x4F);
+        RegisterOverlayHotkey(_settings.OverlayHotkeyMods, _settings.OverlayHotkeyVk);
     }
 
     private IntPtr HotkeyHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -1324,32 +1334,30 @@ public partial class MainWindow : Window
             _overlay ??= new OverlayWindow();
             ApplyOverlayOptions();
             _overlay.Show();
-            _overlayTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Normal,
-                                                  (_, _) => UpdateOverlay(), Dispatcher);
-            _overlayTimer.Start();
-            UpdateOverlay();
         }
-        else
-        {
-            _overlayTimer?.Stop();
-            _overlay?.Hide();
-        }
+        else _overlay?.Hide();
+        SyncOverlayTimer();
     }
 
     private void OvOption_Changed(object sender, RoutedEventArgs e)
     {
         if (!_overlayReady) return;
         _settings.OverlayCorner = CheckedTag(OvCornerPanel) ?? "TL";
-        _settings.OverlayScale = double.Parse(CheckedTag(OvScalePanel) ?? "1", CultureInfo.InvariantCulture);
+        _settings.OverlayLayout = CheckedTag(OvLayoutPanel) ?? "V";
+        _settings.OverlayScale = Math.Round(OvScale.Value, 2);
+        _settings.OverlayOpacity = Math.Round(OvOpacity.Value, 2);
         _settings.Save();
         ApplyOverlayOptions();
+        UpdateOverlay();
     }
 
     private void ApplyOverlayOptions()
     {
         if (_overlay == null) return;
         _overlay.Corner = _settings.OverlayCorner;
+        _overlay.Horizontal = _settings.OverlayLayout == "H";
         _overlay.SetScale(_settings.OverlayScale);
+        _overlay.SetBackgroundOpacity(_settings.OverlayOpacity);
         _overlay.Reposition();
     }
 
@@ -1357,11 +1365,16 @@ public partial class MainWindow : Window
     {
         _frames.Start(); // liga a escuta de FPS na primeira vez que o overlay precisa dela
         var f = _frames.GetForegroundStats();
+        bool onPage = PageOverlay.IsVisible;
+        if (!onPage && (_overlay == null || !_overlay.IsVisible)) return;
+        var parts = BuildOverlayParts(f);
+        string? hour = OvShow.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null;
         if (_overlay != null && _overlay.IsVisible)
         {
-            _overlay.Update(f, BuildOverlayLines(f), OvShow, OvShow.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null);
+            _overlay.Update(f, parts, OvShow, hour);
             _overlay.KeepOnTop(); // o jogo pode ter passado na frente (janela sem borda "sempre no topo")
         }
+        if (onPage) UpdateOverlayPreview(f, parts, hour);
         UpdateOverlayStatus(f);
     }
 
