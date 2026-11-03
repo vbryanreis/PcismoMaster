@@ -7,7 +7,7 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
 - **Overlay completo** (JOGOS · Overlay):
   - **Prévia ao vivo** na própria aba, com os números reais deste PC, no formato, na posição e na opacidade escolhidos.
   - **Formato horizontal (barra)**: tudo numa linha só (FPS, frame, 1% low, uso/temperatura/clock de CPU e GPU, VRAM, RAM, jogo).
-  - **Formato vertical de cara nova**: tabela com cantos arredondados, rótulo à esquerda e valor em negrito à direita, um item por linha (FPS em laranja, temperaturas coloridas) e o gráfico de frametime embaixo, se escolhido.
+  - **Formato vertical de cara nova**: tabela com cantos arredondados, rótulo à esquerda e valor em negrito à direita, um item por linha (FPS em roxo, temperaturas coloridas) e o gráfico de frametime embaixo, se escolhido.
   - **Centro superior e centro inferior**, além dos quatro cantos.
   - **Opacidade do fundo** e **tamanho** em controles deslizantes (o tamanho agora vai de 70% a 200%).
   - **Tecla de liga/desliga à sua escolha**: clique na caixa e aperte a tecla (F5, por exemplo) ou uma combinação; se outro programa já usa, avisa e mantém a anterior. O padrão continua Ctrl + Shift + O.

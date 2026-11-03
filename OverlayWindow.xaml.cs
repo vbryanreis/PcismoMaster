@@ -105,7 +105,7 @@ public partial class OverlayWindow : Window
         if (graph) DrawGraph(f?.RecentFrameTimes);
     }
 
-    private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Accent = Frozen(0xFF, 0x8A, 0x2B),
+    private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Accent = Frozen(0xA6, 0x6B, 0xFF),
         Cool = Frozen(0x4A, 0xDE, 0x80), Warm = Frozen(0xFB, 0xBF, 0x24), Hot = Frozen(0xF8, 0x71, 0x71);
     private static Brush Frozen(byte r, byte g, byte b) { var x = new SolidColorBrush(Color.FromRgb(r, g, b)); x.Freeze(); return x; }
 
