@@ -9,7 +9,7 @@ namespace ResetExplode;
 
 /// <summary>
 /// Baixa o SDK oficial da Corsair (github.com/CorsairOfficial/cue-sdk, última release) e extrai SOMENTE o iCUESDK.x64_2019.dll
-/// para %AppData%\ResetExplode. Só roda quando o usuário confirma. A assinatura digital da DLL é verificada pelo Windows:
+/// para %AppData%\PcismoMaster. Só roda quando o usuário confirma. A assinatura digital da DLL é verificada pelo Windows:
 /// assinatura inválida ou de outro fabricante apaga o arquivo e cancela; sem assinatura gera só um aviso.
 /// </summary>
 public static class CorsairSdkInstaller

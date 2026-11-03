@@ -4,20 +4,20 @@
 
 ## Visão do produto
 
-PcismoMaster é um aplicativo **Windows** (WPF / .NET 8) para diagnóstico, monitoramento e otimização de PC, derivado do **ResetExplode** e incorporando funções do **Ultimate**. A interface principal é a herdada do ResetExplode; as funções do Ultimate entram na navegação **abaixo de MAKER**, no grupo **OTIMIZAÇÃO** — sem recriar uma central separada.
+PcismoMaster é um aplicativo **Windows** (WPF / .NET 8) para diagnóstico, monitoramento e otimização de PC, derivado do **ResetExplode** e incorporando funções do **Ultimate**. A interface principal é a herdada do PcismoMaster; as funções do Ultimate entram na navegação **abaixo de MAKER**, no grupo **OTIMIZAÇÃO** — sem recriar uma central separada.
 
 Princípios inegociáveis:
 
 - **Nenhuma otimização é aplicada automaticamente** ao computador em build ou teste. Testes usam armazenamento simulado ou chave descartável.
 - Preservar **licenças e créditos** (LICENSE, `licenses/Ultimate-LICENSE.txt`).
-- Publicar somente no `origin` (repositório privado). `upstream` é só referência do ResetExplode original.
+- Publicar somente no `origin` (repositório privado). `upstream` é só referência do PcismoMaster original.
 
 ## Pronto (resumo — detalhes no CHANGELOG)
 
 - Interface de hardware/diagnóstico da base ResetExplode, abertura rápida com carregamento em paralelo.
 - Abas/grupos: JOGOS, DESEMPENHO, FERRAMENTAS, MAKER e OTIMIZAÇÃO.
 - OTIMIZAÇÃO → sub-aba **Inicialização do Windows** → **Windows Update** (pausar por 365 dias, restaurar valores anteriores com aviso quando não há backup, abrir configurações).
-- RESET MAKER com drivers seriais oficiais embutidos; RESET DRIVER (NVIDIA/AMD); overlay personalizável sobre jogos; benchmarks (inclusive ray tracing DXR 1.1).
+- MAKER com drivers seriais oficiais embutidos; DRIVER (NVIDIA/AMD); overlay personalizável sobre jogos; benchmarks (inclusive ray tracing DXR 1.1).
 - Executável único autocontido + release automática por tag no GitHub Actions.
 - Motor de backup/restauração do registro com testes de falha.
 

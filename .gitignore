@@ -16,7 +16,7 @@ ResetExplode-dist/
 # Local
 *.log
 
-# Drivers seriais embutidos (RESET MAKER): as DLLs fazem parte dos pacotes assinados
+# Drivers seriais embutidos (MAKER): as DLLs fazem parte dos pacotes assinados
 !Drivers/**
 
 dist/

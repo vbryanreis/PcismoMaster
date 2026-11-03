@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace ResetExplode;
 
-/// <summary>Aba RESET FERRAMENTAS · Instalar apps: essenciais pós-formatação pelo winget.</summary>
+/// <summary>Aba FERRAMENTAS · Instalar apps: essenciais pós-formatação pelo winget.</summary>
 public partial class MainWindow
 {
     private List<InstallableApp>? _installApps;

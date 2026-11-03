@@ -351,7 +351,7 @@ public partial class MainWindow
         if (_oc == null || _gpuBenchActive) return;
         if (WindowState == WindowState.Minimized && !P.FanCurveOn) return;
         OcSample s;
-        if (!Monitor.TryEnter(_oc.Gate)) return; // APLICAR/RESET em andamento
+        if (!Monitor.TryEnter(_oc.Gate)) return; // APLICAR/REDEFINIR em andamento
         try { s = _oc.Sample(); } catch (Exception) { return; }
         finally { Monitor.Exit(_oc.Gate); }
         _ocSamples.Add(s);
