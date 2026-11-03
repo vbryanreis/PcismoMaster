@@ -48,7 +48,8 @@ public partial class MainWindow
 
     private Button TweakButton(string text, bool primary, RoutedEventHandler click, string? tag = null)
     {
-        var b = new Button { Content = text, Style = (Style)FindResource(primary ? "PrimaryButton" : "OutlineButton"), Padding = new Thickness(16, 8, 16, 8), Margin = new Thickness(0, 0, 10, 8), Tag = tag };
+        var b = new Button { Content = text, Style = (Style)FindResource(primary ? "PrimaryButton" : "OutlineButton"), Padding = new Thickness(16, 8, 16, 8), Margin = new Thickness(0, 0, 10, 8), Tag = tag,
+            HorizontalAlignment = HorizontalAlignment.Left }; // sem esticar na largura do cartão
         b.Click += click;
         return b;
     }
