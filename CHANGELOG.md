@@ -10,6 +10,7 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
 - **Saúde do PC** (Visão geral): o botão **OTIMIZA** agora é **OTIMIZAR**.
 - **Placa de vídeo**: o nome da fabricante no canto do cartão de destaque aparece colorido como uma logo, dentro da nossa paleta — **NVIDIA** no ciano (azul mais próximo do verde) e **AMD** no vermelho; outras (Intel) seguem discretas.
 - Preservados os créditos ao projeto original (MIT) e o namespace interno do código.
+- **App mais leve**: o `.exe` agora usa compressão no single-file — o tamanho cai bastante sem remover nada (todos os módulos continuam presentes, só são descomprimidos em memória ao abrir; a primeira abertura pode levar uma fração de segundo a mais).
 - Versão atualizada para 0.6.3.
 
 ## 0.6.2

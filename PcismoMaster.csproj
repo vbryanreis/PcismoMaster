@@ -14,6 +14,9 @@
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Deixa o .exe mais leve: comprime os assemblies dentro do single-file (nada é removido;
+         tudo é descomprimido em memória ao abrir). Só vale no publish single-file (Release). -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
