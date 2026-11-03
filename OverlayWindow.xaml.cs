@@ -96,39 +96,13 @@ public partial class OverlayWindow : Window
     {
         VPanel.Visibility = Horizontal ? Visibility.Collapsed : Visibility.Visible;
         HRow.Visibility = Horizontal ? Visibility.Visible : Visibility.Collapsed;
-        if (Horizontal) { HRow.ItemsSource = Cells(f, parts, show, extra); return; }
-        var lines = OverlayMetrics.Lines(parts);
-        static Visibility V(bool on) => on ? Visibility.Visible : Visibility.Collapsed;
-        bool fps = show.Contains("fps"), ft = show.Contains("frametime");
-        OFpsRow.Visibility = V(fps || ft);
-        OFps.Visibility = OFpsUnit.Visibility = V(fps);
-        OFrameTime.Visibility = V(ft);
-        OFrameTime.Margin = new Thickness(fps ? 12 : 0, 0, 0, fps ? 4 : 0);
-        OLow.Visibility = V(show.Contains("low1"));
-        OGraph.Visibility = V(show.Contains("graph"));
-
-        if (f != null)
-        {
-            OFps.Text = $"{f.Fps:0}";
-            OFrameTime.Text = $"{f.FrameTimeMs:0.0} ms";
-            OLow.Text = $"1% low {f.Low1Fps:0}";
-        }
-        else
-        {
-            OFps.Text = "—";
-            OFrameTime.Text = fps ? "" : "— ms";
-            OLow.Text = "aguardando jogo";
-        }
-        // Rodapé: nome do jogo e/ou hora.
-        var foot = new List<string>();
-        if (show.Contains("game") && f != null) foot.Add(f.ProcessName);
-        if (extra != null) foot.Add(extra);
-        OGame.Text = string.Join("  ·  ", foot);
-        OGame.Visibility = V(foot.Count > 0);
-
-        ORows.ItemsSource = lines;
-        ORows.Visibility = V(lines.Count > 0);
-        if (OGraph.Visibility == Visibility.Visible) DrawGraph(f?.RecentFrameTimes);
+        var cells = Cells(f, parts, show, extra);
+        if (Horizontal) { HRow.ItemsSource = cells; return; }
+        // Vertical: tabela (rótulo à esquerda, valor à direita) e, se escolhido, o gráfico de frametime embaixo.
+        VRows.ItemsSource = cells;
+        bool graph = show.Contains("graph");
+        OGraph.Visibility = graph ? Visibility.Visible : Visibility.Collapsed;
+        if (graph) DrawGraph(f?.RecentFrameTimes);
     }
 
     private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Accent = Frozen(0xFF, 0x8A, 0x2B),
@@ -153,12 +127,12 @@ public partial class OverlayWindow : Window
     private void DrawGraph(IReadOnlyList<double>? ft)
     {
         OGraph.Children.Clear();
-        double w = OGraph.Width, h = OGraph.Height;
+        double w = OGraph.ActualWidth > 0 ? OGraph.ActualWidth : 200, h = OGraph.Height;
         OGraph.Children.Add(new Line { X1 = 0, X2 = w, Y1 = h - 0.5, Y2 = h - 0.5, Stroke = new SolidColorBrush(Color.FromArgb(0x30, 0xFF, 0xFF, 0xFF)) });
         if (ft == null || ft.Count < 2) return;
 
         double max = Math.Max(ft.Max(), ft.Average() * 2); // escala que mostra picos sem achatar o normal
-        var line = new Polyline { Stroke = Brushes.White, StrokeThickness = 1 };
+        var line = new Polyline { Stroke = Accent, StrokeThickness = 1.2 };
         double step = w / (ft.Count - 1);
         for (int i = 0; i < ft.Count; i++)
             line.Points.Add(new Point(i * step, h - 1 - (h - 2) * Math.Min(1, ft[i] / max)));

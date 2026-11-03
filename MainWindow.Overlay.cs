@@ -176,8 +176,11 @@ public partial class MainWindow
     private void UpdateOverlayPreview(FrameStats? f, IReadOnlyList<OverlayPart> parts, string? hour)
     {
         bool h = _settings.OverlayLayout == "H";
-        OvPreview.ItemsSource = OverlayWindow.Cells(f, parts, OvShow, hour);
-        OvPreview.MaxWidth = h ? double.PositiveInfinity : 230;
+        var cells = OverlayWindow.Cells(f, parts, OvShow, hour);
+        OvPreview.ItemsSource = h ? cells : null;
+        OvPreviewV.ItemsSource = h ? null : cells;
+        OvPreview.Visibility = h ? Visibility.Visible : Visibility.Collapsed;
+        OvPreviewV.Visibility = h ? Visibility.Collapsed : Visibility.Visible;
         OvPreviewBox.Background = new System.Windows.Media.SolidColorBrush(
             System.Windows.Media.Color.FromArgb((byte)Math.Round(_settings.OverlayOpacity * 255), 0, 0, 0));
         OvPreviewBox.HorizontalAlignment = _settings.OverlayCorner.EndsWith("R") ? HorizontalAlignment.Right

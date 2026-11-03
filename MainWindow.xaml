@@ -1969,9 +1969,20 @@
                                 <!-- Prévia com os números reais deste PC -->
                                 <Border Background="#0A0A0A" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="6" MinHeight="150" Padding="10">
                                     <Grid>
-                                        <Border x:Name="OvPreviewBox" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="4" Padding="10,6"
+                                        <Border x:Name="OvPreviewBox" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="10" Padding="14,10"
                                                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,18">
-                                            <ItemsControl x:Name="OvPreview" TextElement.FontFamily="Cascadia Mono, Consolas" TextElement.FontSize="12">
+                                            <Grid TextElement.FontFamily="Segoe UI">
+                                            <ItemsControl x:Name="OvPreviewV" MinWidth="200">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <DockPanel Margin="0,3">
+                                                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="13" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                                                            <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                        </DockPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <ItemsControl x:Name="OvPreview" TextElement.FontSize="12">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <WrapPanel/>
@@ -1986,6 +1997,7 @@
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
+                                            </Grid>
                                         </Border>
                                         <TextBlock Text="Prévia com os números reais deste PC" Foreground="{DynamicResource Faint}" FontSize="11"
                                                    HorizontalAlignment="Left" VerticalAlignment="Bottom" IsHitTestVisible="False"/>

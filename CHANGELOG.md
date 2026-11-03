@@ -6,11 +6,12 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
 
 - **Overlay completo** (JOGOS · Overlay):
   - **Prévia ao vivo** na própria aba, com os números reais deste PC, no formato, na posição e na opacidade escolhidos.
-  - **Formato horizontal (barra)**: tudo numa linha só (FPS, frame, 1% low, uso/temperatura/clock de CPU e GPU, VRAM, RAM, jogo), além do vertical com gráfico de frametime.
+  - **Formato horizontal (barra)**: tudo numa linha só (FPS, frame, 1% low, uso/temperatura/clock de CPU e GPU, VRAM, RAM, jogo).
+  - **Formato vertical de cara nova**: tabela com cantos arredondados, rótulo à esquerda e valor em negrito à direita, um item por linha (FPS em laranja, temperaturas coloridas) e o gráfico de frametime embaixo, se escolhido.
   - **Centro superior e centro inferior**, além dos quatro cantos.
   - **Opacidade do fundo** e **tamanho** em controles deslizantes (o tamanho agora vai de 70% a 200%).
   - **Tecla de liga/desliga à sua escolha**: clique na caixa e aperte a tecla (F5, por exemplo) ou uma combinação; se outro programa já usa, avisa e mantém a anterior. O padrão continua Ctrl + Shift + O.
-  - **Temperaturas coloridas** no formato barra: verde até 74 °C, âmbar de 75 a 84 °C e vermelho de 85 °C em diante.
+  - **Temperaturas coloridas**: verde até 74 °C, âmbar de 75 a 84 °C e vermelho de 85 °C em diante.
   - A leitura do overlay só roda com ele ligado ou com a aba aberta (para a prévia); fora disso, não gasta nada.
 
 - **Navegação**: o grupo OTIMIZAÇÃO foi para dentro de **FERRAMENTAS** (Inicialização do Windows logo abaixo de Inicialização e Desinstalar Apps logo abaixo de Instalar apps).
