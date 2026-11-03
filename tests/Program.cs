@@ -385,6 +385,40 @@ Test("ITAD: Steam lookup maps appids and skips games it does not know", () => {
     var map = new ItadClient(h) { UserKey = "k" }.LookupSteamAsync(new[] { "220", "1" }).GetAwaiter().GetResult();
     Assert(map.Count == 1 && map["220"] == "g-hl2" && h.Requests[0].RequestUri!.AbsolutePath == "/lookup/id/shop/61/v1");
 });
+Test("Bloatware: each item gets a Portuguese name, a risk and the script's keep-list stays locked", () => {
+    var json = """
+        {"apps":[{"n":"Microsoft.BingWeather","f":"Microsoft.BingWeather_8wekyb3d8bbwe","fw":false,"nr":false,"s":"Store"},
+        {"n":"Microsoft.Windows.Photos","f":"x","fw":false,"nr":false,"s":"Store"},{"n":"Microsoft.AAD.BrokerPlugin","f":"y","fw":false,"nr":false,"s":"System"},
+        {"n":"Microsoft.VCLibs.140.00","f":"z","fw":true,"nr":false,"s":"Store"},{"n":"Contoso.SomeThing","f":"c","fw":false,"nr":false,"s":"Store"},
+        {"n":"Microsoft.Windows.Search","f":"s","fw":false,"nr":true,"s":"System"}],
+        "caps":["Language.Speech~~~pt-BR~0.0.1.0","WMIC~~~~","Browser.InternetExplorer~~~~0.0.11.0"],
+        "feats":["Printing-PrintToPDFServices-Features","NetFx4-AdvSrvs","Microsoft-Hyper-V-All"],"progs":["onedrive","gameinput"]}
+        """;
+    var items = Bloatware.Parse(json);
+    BloatItem Get(string id) => items.Single(i => i.Id == id);
+    Assert(Get("Microsoft.BingWeather").Name == "Clima" && Get("Microsoft.BingWeather").Risk == ScriptRisk.Seguro && Get("Microsoft.BingWeather").Essential == null);
+    Assert(Get("Microsoft.Windows.Photos").Essential != null && Get("Microsoft.Windows.Search").Essential != null);
+    Assert(Get("Microsoft.AAD.BrokerPlugin").Risk == ScriptRisk.Perigoso && Get("Microsoft.VCLibs.140.00").Kind == BloatKind.Biblioteca);
+    Assert(Get("Contoso.SomeThing").Name == "Contoso Some Thing" && Get("Contoso.SomeThing").Risk == ScriptRisk.Atencao && Bloatware.Pretty("Microsoft.WindowsFeedbackHub") == "Windows Feedback Hub");
+    Assert(Bloatware.App("Claude", "c", false, false, "Developer").Risk == ScriptRisk.Atencao && Bloatware.App("1527c705-839a-4832-9118-54d4Bd6a0c89", "g", false, false, "System").Risk == ScriptRisk.Perigoso);
+    Assert(Bloatware.App("MicrosoftWindows.61869720.Voiess", "v", false, false, "System").Name.Contains("IA") && Bloatware.App("Microsoft.BingNews", "b", false, false, "Store").Risk == ScriptRisk.Seguro);
+    Assert(Get("Language.Speech~~~pt-BR~0.0.1.0").Name.Contains("voz (pt-BR)") && Get("Language.Speech~~~pt-BR~0.0.1.0").Risk == ScriptRisk.Atencao);
+    Assert(Get("WMIC~~~~").Essential != null && Get("NetFx4-AdvSrvs").Essential != null && Get("Microsoft-Hyper-V-All").Risk == ScriptRisk.Atencao);
+    Assert(items.Count(i => i.Kind == BloatKind.Programa) == 2 && items.First().Kind == BloatKind.App);
+});
+Test("Bloatware: commands quote ids, run one item at a time and only restore what has a way back", () => {
+    var weird = Bloatware.App("Evil'; Remove-Item C:\\ -Recurse; '", "f", false, false, "Store");
+    var cmd = Bloatware.RemoveCommand(weird);
+    Assert(cmd.Contains("-Name 'Evil''; Remove-Item C:\\ -Recurse; '''") && cmd.Contains("Remove-AppxPackage -AllUsers"));
+    var cap = Bloatware.Capability("Browser.InternetExplorer~~~~0.0.11.0");
+    var feat = Bloatware.Feature("SMB1Protocol");
+    Assert(Bloatware.RestoreCommand(cap)!.StartsWith("Add-WindowsCapability") && Bloatware.RestoreCommand(feat)!.Contains("Enable-WindowsOptionalFeature") && Bloatware.RestoreCommand(weird) == null);
+    var batch = Bloatware.BatchScript(new[] { weird, cap, feat }, restore: false);
+    Assert(batch.Split("try {").Length == 4 && batch.Contains("Removendo: Internet Explorer") && !batch.Contains("Read-Host"));
+    foreach (var p in Bloatware.Programs) Assert(Bloatware.RemoveCommand(new BloatItem(BloatKind.Programa, p.Id, p.Name, "", p.Risk, null)).Length > 20);
+    Assert(Bloatware.Programs.Where(p => p.RestoreOption != null).All(p => ScriptCatalog.All.Any(c => c.Options.Any(o => o.Id == p.RestoreOption))));
+    Assert(!Bloatware.ListScript.Contains("Remove-") && !Bloatware.ListScript.Contains("Disable-"));
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

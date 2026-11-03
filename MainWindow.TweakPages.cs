@@ -257,7 +257,8 @@ public partial class MainWindow
         wrap.Children.Add(TweakButton("INICIALIZAÇÃO (NO APP)", false, (_, _) => NavStartup.IsChecked = true));
         sc.Children.Add(wrap);
 
-        // Bloatware, Edge/WebView, Defender otimizado, Autoruns, fotos da conta, atalhos do Iniciar, Bloco de Notas, timer, EQ…
+        // Bloatware item a item; depois os scripts inteiros (Bloatware completo, Edge/WebView, Defender, Autoruns…)
+        AddBloatSection(host);
         AddScriptSection(host, "win");
     }
 

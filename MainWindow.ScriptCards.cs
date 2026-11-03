@@ -178,25 +178,33 @@ public partial class MainWindow
         if (_scriptProc != null) { MessageBox.Show(this, "Já tem um script rodando. Espere terminar ou clique em PARAR O SCRIPT.", "Tweaking"); return; }
         var choice = ConfirmScript(c, o);
         if (choice == null) return;
+        await RunPowerShellTextAsync($"{c.Title} · {o.Label}", o.Id, ScriptCatalog.Read(o.Id), choice.RestorePoint, choice.Usb);
+        if (o.Restarts) ScriptLog("O PC deve reiniciar agora.");
+    }
 
-        foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ {c.Title} · {o.Label}  ({DateTime.Now:HH:mm:ss})";
-        if (choice.RestorePoint)
+    /// <summary>Roda um texto de PowerShell (já confirmado pelo usuário) mostrando a saída nos logs; um por vez.</summary>
+    private async Task<bool> RunPowerShellTextAsync(string title, string fileId, string body, bool restorePoint, string? usb = null)
+    {
+        if (_scriptProc != null) { MessageBox.Show(this, "Já tem um script rodando. Espere terminar ou clique em PARAR.", "Tweaking"); return false; }
+        foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ {title}  ({DateTime.Now:HH:mm:ss})";
+        if (restorePoint)
         {
-            string? why = await Maintenance.CreateRestorePoint(new Maintenance.Ctx(new Progress<string>(ScriptLog), CancellationToken.None), c.Title);
-            if (why != null && MessageBox.Show(this, "O ponto de restauração não foi criado: " + why + "\n\nRodar o script mesmo assim?", "Ponto de restauração",
-                    MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) { ScriptLog("Cancelado."); return; }
+            string? why = await Maintenance.CreateRestorePoint(new Maintenance.Ctx(new Progress<string>(ScriptLog), CancellationToken.None), title);
+            if (why != null && MessageBox.Show(this, "O ponto de restauração não foi criado: " + why + "\n\nContinuar mesmo assim?", "Ponto de restauração",
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) { ScriptLog("Cancelado."); return false; }
         }
 
         Directory.CreateDirectory(ScriptDir);
-        string file = Path.Combine(ScriptDir, o.Id + ".ps1");
+        string file = Path.Combine(ScriptDir, fileId + ".ps1");
         // Saída em UTF-8 para os acentos chegarem certos na tela.
-        await File.WriteAllTextAsync(file, "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8\r\n" + ScriptCatalog.Read(o.Id), new UTF8Encoding(true));
+        await File.WriteAllTextAsync(file, "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8\r\n" + body, new UTF8Encoding(true));
         var psi = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, @"WindowsPowerShell\v1.0\powershell.exe"),
             $"-NoProfile -ExecutionPolicy Bypass -File \"{file}\"")
         { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true, RedirectStandardInput = true,
           StandardOutputEncoding = Encoding.UTF8, StandardErrorEncoding = Encoding.UTF8, WorkingDirectory = ScriptDir };
-        if (choice.Usb != null) psi.Environment["PM_USB"] = choice.Usb;
+        if (usb != null) psi.Environment["PM_USB"] = usb;
 
+        bool ok = false;
         try
         {
             var p = Process.Start(psi)!;
@@ -208,8 +216,8 @@ public partial class MainWindow
             var t2 = Pump(p.StandardError, progress);
             await p.WaitForExitAsync();
             await Task.WhenAll(t1, t2);
-            ScriptLog(p.ExitCode == 0 ? "✔ Terminou." : $"Terminou com código {p.ExitCode}.");
-            if (o.Restarts) ScriptLog("O PC deve reiniciar agora.");
+            ok = p.ExitCode == 0;
+            ScriptLog(ok ? "✔ Terminou." : $"Terminou com código {p.ExitCode}.");
         }
         catch (Exception ex) { ScriptLog("Não deu para rodar: " + ex.Message); }
         finally
@@ -219,6 +227,7 @@ public partial class MainWindow
             ScriptRunning(false);
             try { File.Delete(file); } catch { }
         }
+        return ok;
 
         static async Task Pump(StreamReader r, IProgress<string> to)
         {
