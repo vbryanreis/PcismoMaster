@@ -1,8 +1,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Win32;
 
 namespace ResetExplode;
@@ -20,6 +22,11 @@ public sealed class InstallableApp : INotifyPropertyChanged
     /// <summary>Para pacotes portáteis do winget (yt-dlp, ffmpeg), que não aparecem em "Aplicativos instalados":
     /// nome do executável a procurar na pasta Links do winget ou no PATH. Quando preenchido, substitui o DisplayPrefix.</summary>
     public string ProbeExe { get; init; } = "";
+    /// <summary>Apps fora do winget (ex.: ArtCraft): repositório GitHub "dono/repo" cuja última release traz o instalador.
+    /// Quando preenchido, o app é baixado e instalado direto do GitHub oficial, não pelo winget.</summary>
+    public string DownloadRepo { get; init; } = "";
+    /// <summary>Final do nome do arquivo da release a baixar (ex.: "windows-x64.msi").</summary>
+    public string AssetSuffix { get; init; } = "";
     /// <summary>Com o catálogo grande (estilo Ninite) nada vem pré-marcado: o usuário escolhe.</summary>
     public bool PreSelect { get; init; } = false;
 
@@ -56,6 +63,7 @@ public static class AppInstaller
     {
         "Navegadores", "Mensagens", "Mídia", "Imagem", "Documentos",
         "Segurança", "Compactação", "Utilitários", "Desenvolvimento", "Jogos",
+        "ArtCraft",
     };
 
     public static List<InstallableApp> Catalog() => new()
@@ -122,6 +130,13 @@ public static class AppInstaller
         // ---- Jogos ----
         new() { Category = "Jogos", Name = "Steam", Description = "Loja e biblioteca de jogos da Valve.", WingetId = "Valve.Steam", DisplayPrefix = "Steam" },
         new() { Category = "Jogos", Name = "Epic Games", Description = "Loja e launcher da Epic (Fortnite, jogos grátis).", WingetId = "EpicGames.EpicGamesLauncher", DisplayPrefix = "Epic Games Launcher" },
+
+        // ---- ArtCraft (apps de criação da ArtCraft; não estão no winget: baixamos o .msi oficial da última release no GitHub) ----
+        new() { Category = "ArtCraft", Name = "ArtCraft Launcher", Description = "Central oficial da ArtCraft: instala e mantém atualizados todos os apps de criação de uma vez. É o caminho recomendado pelo próprio site.", DownloadRepo = "storytold/craft-launcher", AssetSuffix = "windows-x64.msi", DisplayPrefix = "ArtCraft Launcher" },
+        new() { Category = "ArtCraft", Name = "PhotoCraft", Description = "Editor de imagens open-source, no estilo do Photoshop (early alpha).", DownloadRepo = "storytold/photocraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "PhotoCraft" },
+        new() { Category = "ArtCraft", Name = "PdfCraft", Description = "Central de PDF: ler, organizar, juntar, dividir e proteger PDFs (early alpha).", DownloadRepo = "storytold/pdfcraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "PdfCraft" },
+        new() { Category = "ArtCraft", Name = "FigCraft", Description = "Design de interfaces e prototipagem, no estilo do Figma (early alpha).", DownloadRepo = "storytold/figcraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "FigCraft" },
+        new() { Category = "ArtCraft", Name = "Craft Anything", Description = "Explora como um software funciona e ajuda a criar a sua própria versão (early alpha).", DownloadRepo = "storytold/craft-anything", AssetSuffix = "windows-x64.msi", DisplayPrefix = "Craft Anything" },
     };
 
     public static string WingetPath =>
@@ -167,6 +182,9 @@ public static class AppInstaller
     /// <summary>Instala um app em silêncio. Retorna (ok, mensagem curta).</summary>
     public static async Task<(bool Ok, string Message)> InstallAsync(InstallableApp app, CancellationToken ct, bool upgrade = false)
     {
+        // Apps fora do winget (ArtCraft): baixa o .msi oficial da última release no GitHub e instala em silêncio.
+        if (app.DownloadRepo.Length > 0) return await InstallDirectAsync(app, ct);
+
         var psi = new ProcessStartInfo(WingetPath,
             $"{(upgrade ? "upgrade" : "install")} --id {app.WingetId} -e --silent --accept-package-agreements --accept-source-agreements --disable-interactivity")
         {
@@ -189,6 +207,112 @@ public static class AppInstaller
             unchecked((int)0x8A150008) => (false, "Falha no download: confira a internet e tente de novo."),
             _ => (false, $"Falhou (código 0x{p.ExitCode:X8}). {LastLine(output)}".Trim()),
         };
+    }
+
+    // ---- Apps fora do winget (ArtCraft): download direto do .msi oficial no GitHub + instalação silenciosa ----
+
+    private static readonly HttpClient Http = CreateHttp();
+
+    private static HttpClient CreateHttp()
+    {
+        var c = new HttpClient { Timeout = TimeSpan.FromMinutes(30) }; // apps de criação podem ser grandes
+        c.DefaultRequestHeaders.UserAgent.ParseAdd("PcismoMaster");
+        c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+        return c;
+    }
+
+    /// <summary>
+    /// Instala um app ArtCraft: acha o instalador (<see cref="InstallableApp.AssetSuffix"/>) na última release do
+    /// repositório oficial, baixa, confere a assinatura digital pelo Windows e roda o msiexec em silêncio.
+    /// O progresso aparece no <see cref="InstallableApp.Status"/> do próprio item.
+    /// </summary>
+    private static async Task<(bool Ok, string Message)> InstallDirectAsync(InstallableApp app, CancellationToken ct)
+    {
+        // 1) Descobrir o instalador da última versão publicada.
+        app.Status = "Procurando a última versão…";
+        string tag = "?", url = "", assetName = "";
+        try
+        {
+            string json = await Http.GetStringAsync($"https://api.github.com/repos/{app.DownloadRepo}/releases/latest", ct);
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("tag_name", out var t)) tag = t.GetString() ?? "?";
+            if (root.TryGetProperty("assets", out var assets) && assets.ValueKind == JsonValueKind.Array)
+                foreach (var a in assets.EnumerateArray())
+                {
+                    string name = a.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+                    if (name.EndsWith(app.AssetSuffix, StringComparison.OrdinalIgnoreCase) &&
+                        a.TryGetProperty("browser_download_url", out var u) && u.GetString() is string link && link.StartsWith("https://"))
+                    {
+                        assetName = name; url = link; break;
+                    }
+                }
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex) { return (false, $"Não consegui consultar o GitHub: {ex.Message}"); }
+        if (url.Length == 0) return (false, $"A versão {tag} ainda não tem instalador do Windows ({app.AssetSuffix}).");
+
+        string tmpDir = Path.Combine(Path.GetTempPath(), "PcismoMaster-artcraft-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tmpDir);
+        string msiPath = Path.Combine(tmpDir, assetName);
+        try
+        {
+            // 2) Baixar o .msi (mostrando o progresso no item).
+            using (var resp = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct))
+            {
+                resp.EnsureSuccessStatusCode();
+                long total = resp.Content.Headers.ContentLength ?? 0;
+                await using var src = await resp.Content.ReadAsStreamAsync(ct);
+                await using var dst = File.Create(msiPath);
+                var buf = new byte[81920];
+                long done = 0; int read; long lastReport = 0;
+                while ((read = await src.ReadAsync(buf, ct)) > 0)
+                {
+                    await dst.WriteAsync(buf.AsMemory(0, read), ct);
+                    done += read;
+                    if (done - lastReport > 1_000_000)
+                    {
+                        lastReport = done;
+                        app.Status = total > 0
+                            ? $"Baixando {tag}… {done / 1_048_576.0:0.0} de {total / 1_048_576.0:0.0} MB"
+                            : $"Baixando {tag}… {done / 1_048_576.0:0.0} MB";
+                    }
+                }
+            }
+
+            // 3) Conferir a assinatura digital antes de rodar (o Windows valida o Authenticode do arquivo).
+            app.Status = "Verificando o instalador…";
+            int trust = CorsairSdkInstaller.WinVerifyTrustFile(msiPath);
+            // Sem assinatura: só avisa (o arquivo veio da release oficial no GitHub, por HTTPS). Assinatura inválida: cancela.
+            bool unsigned = trust is unchecked((int)0x800B0100) or unchecked((int)0x800B0003);
+            string note = unsigned ? " (instalador sem assinatura digital; origem: release oficial no GitHub)" : "";
+            if (!unsigned && trust != 0)
+                return (false, $"A assinatura digital do instalador é inválida (0x{trust:X8}). Nada foi instalado.");
+
+            // 4) Instalar em silêncio pelo msiexec.
+            app.Status = "Instalando…";
+            var psi = new ProcessStartInfo("msiexec.exe", $"/i \"{msiPath}\" /qn /norestart")
+            {
+                UseShellExecute = false, CreateNoWindow = true,
+            };
+            using var p = Process.Start(psi) ?? throw new InvalidOperationException("Não foi possível iniciar o msiexec.");
+            try { await p.WaitForExitAsync(ct); }
+            catch (OperationCanceledException) { try { p.Kill(true); } catch { } throw; }
+
+            return p.ExitCode switch
+            {
+                0 => (true, $"Instalado ({tag}).{note}"),
+                3010 => (true, $"Instalado ({tag}); reinicie o Windows para concluir.{note}"), // ERROR_SUCCESS_REBOOT_REQUIRED
+                1638 => (true, "Já estava instalado (ou já há uma versão instalada)."),         // ERROR_PRODUCT_VERSION
+                1602 => (false, "Instalação cancelada."),                                       // ERROR_INSTALL_USEREXIT
+                1618 => (false, "Outra instalação está em andamento. Aguarde e tente de novo."),// ERROR_INSTALL_ALREADY_RUNNING
+                1603 => (false, "Falha na instalação (1603). Feche o app se estiver aberto e tente de novo."),
+                _ => (false, $"Falhou (código {p.ExitCode})."),
+            };
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex) { return (false, $"Falhou: {ex.Message}"); }
+        finally { try { Directory.Delete(tmpDir, true); } catch { } }
     }
 
     /// <summary>Última linha útil da saída do winget (sem as barras de progresso).</summary>

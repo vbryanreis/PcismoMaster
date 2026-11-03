@@ -2,6 +2,13 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.6.4
+
+- Nova categoria **ArtCraft** na aba **Instalar apps**, ao lado das outras (Navegadores, Mensagens, Mídia…), com os apps de criação da [ArtCraft](https://getartcraft.com/apps): **ArtCraft Launcher** (central oficial que instala e atualiza todos de uma vez — recomendado), **PhotoCraft**, **PdfCraft**, **FigCraft** e **Craft Anything**.
+- Como esses apps **não estão no winget**, eles são baixados direto do **GitHub oficial** (sempre o instalador `.msi` da última versão), têm a **assinatura digital conferida** pelo Windows antes de rodar e são instalados **em silêncio** — igualzinho ao fluxo MARCAR / INSTALAR SELECIONADOS dos demais apps.
+- Os outros apps da ArtCraft ainda estão "in development" (sem instalador publicado); entram aqui assim que tiverem download.
+- Versão atualizada para 0.6.4.
+
 ## 0.6.3
 
 - **Limpeza da marca "RESET"** herdada do app-base: nomes de recursos deixam de levar o prefixo (`RESET BENCH` → **BENCH**, `RESET MAKER` → **MAKER**, `RESET DRIVER` → **DRIVER**, `RESET FERRAMENTAS` → **FERRAMENTAS**, `RESET JOGOS` → **JOGOS**, `RESET INTEGRAÇÃO` → **INTEGRAÇÃO**, `RESET OC` → **OC**, `RESET OTIMIZA` → **OTIMIZAÇÃO**) em textos, títulos de janelas, mensagens e comentários.

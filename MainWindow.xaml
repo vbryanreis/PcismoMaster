@@ -2437,6 +2437,7 @@
                                     <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Utilitários" Tag="Utilitários" Checked="AppsCat_Checked"/>
                                     <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Desenvolvimento" Tag="Desenvolvimento" Checked="AppsCat_Checked"/>
                                     <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Jogos" Tag="Jogos" Checked="AppsCat_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="ArtCraft" Tag="ArtCraft" Checked="AppsCat_Checked"/>
                                 </WrapPanel>
                                 <ItemsControl x:Name="AppsList">
                                     <ItemsControl.ItemTemplate>

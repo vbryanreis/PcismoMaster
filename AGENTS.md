@@ -8,7 +8,7 @@ PcismoMaster é um aplicativo **Windows** (WPF, .NET 8, C#) para diagnóstico, m
 
 - Interface principal herdada do ResetExplode, com identidade própria. As categorias da navegação lateral aparecem em CAIXA ALTA e em negrito e acendem no nosso azul ao passar o mouse: **MASTER** (sistema, sensores, placa de vídeo, discos, energia, rede), **JOGOS**, **DESEMPENHO** (benchmark, stress test e **Overclock** no estilo do MSI Afterburner), **FERRAMENTAS** (inclui **Utilidades**: sub-sub-abas de baixar vídeos com yt-dlp/ffmpeg e o **Finder** de busca instantânea lendo a MFT NTFS), **MAKER** e **OTIMIZAÇÃO** (sempre abaixo de MAKER; inclui **Desinstalar Apps**, um desinstalador seguro estilo Revo com varredura de sobras e guardas que nunca tocam no Windows/registro do sistema; não recrie uma central separada).
 - Projeto mantido **em dupla**; cada colaborador trabalha na própria conta. `origin` é o repositório PcismoMaster (`vbryanreis/PcismoMaster`); `upstream` é a referência original do GustavoReset. Publique somente no `origin`.
-- Versão atual: **0.6.3**.
+- Versão atual: **0.6.4**.
 
 Documentação de apoio em `docs/projeto/`: fluxo de colaboração (`FLUXO-COLABORACAO.md`), planejamento (`PLANEJAMENTO.md`) e versionamento/lançamento (`ATUALIZACOES.md`). Material de referência do ResetExplode/Ultimate fica em `docs/`.
 
