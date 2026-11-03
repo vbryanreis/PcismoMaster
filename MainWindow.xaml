@@ -231,6 +231,15 @@
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
+                            <ToggleButton x:Name="GrpTweak" Style="{StaticResource NavGroup}" Content="TWEAKING"/>
+                            <StackPanel x:Name="GrpTweakItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpTweak, Converter={StaticResource BoolVis}}">
+                            <RadioButton x:Name="NavTweak" Style="{StaticResource NavItem}" Tag="PageTweak" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE9E9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Tweaking" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            </StackPanel>
                             <ToggleButton x:Name="GrpGames" Style="{StaticResource NavGroup}" Content="JOGOS"/>
                             <StackPanel x:Name="GrpGamesItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpGames, Converter={StaticResource BoolVis}}">
                             <RadioButton x:Name="NavLauncher" Style="{StaticResource NavItem}" Tag="PageLauncher" Checked="Nav_Checked">
@@ -297,12 +306,6 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Inicialização" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavWinStartup" Style="{StaticResource NavItem}" Tag="PageUltimate" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Inicialização do Windows" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             <RadioButton x:Name="NavApps" Style="{StaticResource NavItem}" Tag="PageApps" Checked="Nav_Checked">
@@ -1601,6 +1604,22 @@
                         </DataGrid>
                     </Border>
                 </Grid>
+
+                <!-- ===== TWEAKING ===== -->
+                <ScrollViewer x:Name="PageTweak" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="TWEAKING" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes finos do Windows · cada um pede confirmação e guarda o valor anterior para desfazer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakRows">
+                            <Border Style="{StaticResource CardBorder}">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap"
+                                           Text="Os ajustes desta aba ainda vão ser adicionados."/>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- ===== MANUTENÇÃO · Reparos do Windows ===== -->
                 <ScrollViewer x:Name="PageMaint" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
@@ -3316,35 +3335,6 @@
                                     <Button Style="{StaticResource OutlineButton}" Content="FECHAR" Padding="16,8" Margin="8,0,0,0" Click="BtnUnCloseLeftovers_Click"/>
                                     <TextBlock x:Name="UnLeftoverStatus" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
                                 </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-
-                <!-- ===== FERRAMENTAS · Inicialização do Windows (Windows Update) ===== -->
-                <ScrollViewer x:Name="PageUltimate" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="36,30,36,30">
-                        <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="INICIALIZAÇÃO DO WINDOWS" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Ajustes do Windows com backup · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                        <Border Style="{StaticResource CardBorder}">
-                            <StackPanel>
-                                <TextBlock Text="WINDOWS UPDATE" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12">
-                                    Pausa o Windows Update por 365 dias gravando seis datas de pausa. Inclui atualizações de recursos e de
-                                    segurança. A versão do Windows pode limitar ou ignorar esse prazo. Os valores anteriores ficam salvos
-                                    e podem ser restaurados.
-                                </TextBlock>
-                                <TextBlock x:Name="WuStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,6"/>
-                                <WrapPanel Margin="0,12,0,0">
-                                    <Button Style="{StaticResource PrimaryButton}" Content="PAUSAR POR 365 DIAS"
-                                            Padding="18,9" Margin="0,0,10,8" Click="BtnWuPause_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR CONFIGURAÇÃO ANTERIOR"
-                                            Padding="18,9" Margin="0,0,10,8" Click="BtnWuRestore_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="ABRIR WINDOWS UPDATE"
-                                            Padding="18,9" Margin="0,0,10,8" Click="BtnWuOpen_Click"/>
-                                </WrapPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
