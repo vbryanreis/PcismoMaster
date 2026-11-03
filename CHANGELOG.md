@@ -17,7 +17,7 @@ Junta a 0.6.3, a 0.6.4 (ArtCraft) e a 0.7.0 (Promoções) do Bryan com as novida
   - A leitura do overlay só roda com ele ligado ou com a aba aberta (para a prévia); fora disso, não gasta nada.
 
 - **Navegação**: o grupo OTIMIZAÇÃO foi para dentro de **FERRAMENTAS** (Desinstalar Apps logo abaixo de Instalar apps) e a página **Inicialização do Windows** (pausa do Windows Update por 365 dias) saiu do app. Quem pausou por ela pode voltar ao normal em Configurações → Windows Update → Retomar atualizações.
-- Novo grupo **TWEAKING** logo abaixo de MANUTENÇÃO, com o "3 Setup" do Ultimate:
+- Novo grupo **TWEAKING** logo abaixo de MANUTENÇÃO, com a sub-aba **Setup** (o "3 Setup" do Ultimate):
   - **Ajustes com desfazer** (interruptores com selo SEGURO/AVANÇADO, backup de cada valor): apps em segundo plano desligados, bloquear drivers pelo Windows Update, Edge sem segundo plano e sem Startup Boost, Edge com o uBlock Origin; AVANÇADOS (desligados por padrão): bloquear o Windows Update (pede confirmação), Edge sem aceleração de hardware, Edge sem serviços de atualização (desativados, não apagados) e Store sem atualização automática de apps.
   - **Compressão de memória**: mostra o estado e liga/desliga (vale depois de reiniciar).
   - **BitLocker**: estado de cada disco e desligar (descriptografa, com aviso); para ligar, abre as configurações do BitLocker.

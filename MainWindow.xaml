@@ -236,7 +236,7 @@
                             <RadioButton x:Name="NavTweak" Style="{StaticResource NavItem}" Tag="PageTweak" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE9E9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Tweaking" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Setup" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -1605,11 +1605,11 @@
                     </Border>
                 </Grid>
 
-                <!-- ===== TWEAKING ===== -->
+                <!-- ===== TWEAKING · Setup (3 Setup do Ultimate) ===== -->
                 <ScrollViewer x:Name="PageTweak" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="TWEAKING" Style="{StaticResource H1}"/>
+                            <TextBlock Text="SETUP" Style="{StaticResource H1}"/>
                             <TextBlock Text="Ajustes do Windows do 3 Setup do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
