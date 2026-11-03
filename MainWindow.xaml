@@ -1610,14 +1610,76 @@
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
                             <TextBlock Text="TWEAKING" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Ajustes finos do Windows · cada um pede confirmação e guarda o valor anterior para desfazer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="Ajustes do Windows do 3 Setup do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel x:Name="TweakRows">
-                            <Border Style="{StaticResource CardBorder}">
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap"
-                                           Text="Os ajustes desta aba ainda vão ser adicionados."/>
-                            </Border>
-                        </StackPanel>
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
+                            <StackPanel>
+                                <TextBlock Text="AJUSTES COM DESFAZER" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14">
+                                    Do "3 Setup" do Ultimate. Marque o que quer, clique em APLICAR; o valor anterior de cada um fica guardado e
+                                    desmarcar + APLICAR devolve. Os AVANÇADOS vêm desligados. Alguns só valem depois de reiniciar.
+                                </TextBlock>
+                                <StackPanel x:Name="TweakRows"/>
+                                <WrapPanel Margin="0,6,0,0">
+                                    <Button x:Name="BtnTweakApply" Style="{StaticResource PrimaryButton}" Content="APLICAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakApply_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="MARCAR RECOMENDADOS" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakDefaults_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="DESFAZER TUDO" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakUndoAll_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="TweakStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
+                            <StackPanel>
+                                <TextBlock Text="COMPRESSÃO DE MEMÓRIA" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    O Windows comprime parte da RAM para caber mais coisa, gastando um pouco de CPU. Desligar é o recomendado
+                                    do script para PCs com bastante RAM (16 GB ou mais); com pouca RAM, deixe ligada. Vale depois de reiniciar.
+                                </TextBlock>
+                                <TextBlock x:Name="TweakMemStatus" Text="Verificando…" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button x:Name="BtnTweakMemOff" Style="{StaticResource PrimaryButton}" Content="DESLIGAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakMemOff_Click"/>
+                                    <Button x:Name="BtnTweakMemOn" Style="{StaticResource OutlineButton}" Content="LIGAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakMemOn_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
+                            <StackPanel>
+                                <TextBlock Text="BITLOCKER" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    A criptografia dos discos gasta um pouco de desempenho no SSD. Desligar descriptografa os discos
+                                    (demora, o PC pode ser usado enquanto isso) e deixa os dados legíveis se o disco ou o PC for roubado.
+                                    Para ligar de novo, use as configurações do BitLocker.
+                                </TextBlock>
+                                <TextBlock x:Name="TweakBitStatus" Text="Verificando…" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button x:Name="BtnTweakBitOff" Style="{StaticResource PrimaryButton}" Content="DESLIGAR BITLOCKER" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakBitOff_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="ABRIR CONFIGURAÇÕES DO BITLOCKER" Padding="18,9" Margin="0,0,10,8" Tag="control.exe|/name microsoft.bitlockerdriveencryption" Click="BtnTweakOpen_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="ATALHOS DO WINDOWS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12">
+                                    O que o script só abre para você conferir e ajustar à mão.
+                                </TextBlock>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource OutlineButton}" Content="DATA, HORA E REGIÃO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:dateandtime" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="IDIOMA" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:regionlanguage" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="APPS DE INICIALIZAÇÃO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:startupapps" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="GERENCIADOR DE TAREFAS · INICIALIZAÇÃO" Padding="16,8" Margin="0,0,10,8" Tag="taskmgr.exe|/0 /startup" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="APPS EM SEGUNDO PLANO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:privacy-backgroundapps" Click="BtnTweakOpen_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="CONFIGURAÇÕES DA STORE" Padding="16,8" Margin="0,0,10,8" Tag="ms-windows-store:settings" Click="BtnTweakOpen_Click"/>
+                                </WrapPanel>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                    Na Store, o script também desliga a reprodução automática de vídeos, os avisos de instalação e as
+                                    experiências personalizadas: faça isso nas configurações da Store.
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
 

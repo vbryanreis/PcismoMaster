@@ -234,6 +234,20 @@ Test("Overlay: linhas por componente, cor da temperatura e texto do atalho", () 
     Assert(parts[0].Level == 0 && parts[1].Level == 1 && parts[2].Level == 3 && new OverlayPart("X", "X", "", "", 78).Level == 2);
     Assert(OverlayHotkey.Describe(OverlayHotkey.Ctrl | OverlayHotkey.Shift, "O") == "Ctrl + Shift + O" && OverlayHotkey.Describe(0, "F5") == "F5" && OverlayHotkey.Describe(OverlayHotkey.Alt, "D5") == "Alt + 5");
 });
+Test("Tweaking: setup tweaks are unique, safe and undo exactly", () => {
+    var all = SetupTweaks.Static.Append(SetupTweaks.EdgeUpdate(_ => true)).ToArray();
+    Assert(all.Select(t => t.Id).Distinct().Count() == all.Length && all.All(t => t.Id.StartsWith("tw-") && t.Settings.Length > 0));
+    var keys = all.SelectMany(t => t.Settings).Select(s => s.Hive + s.Path + s.Name).ToArray();
+    Assert(keys.Distinct(StringComparer.OrdinalIgnoreCase).Count() == keys.Length);
+    Assert(all.Where(t => t.Advanced).All(t => !t.DefaultOn)); // avançados nunca vêm marcados
+    Assert(all.SelectMany(t => t.Settings).Where(s => s.Text?.StartsWith("http") == true && s.Name != "1").All(s => s.Text == SetupTweaks.NoUpdateServer));
+    Assert(SetupTweaks.EdgeUpdate(n => n == "edgeupdate").Settings.Single().Path.EndsWith(@"Services\edgeupdate") && SetupTweaks.EdgeUpdate(_ => false).Settings.Length == 0);
+    var store = new FakeStore(); var eng = new ModuleEngine(store, Path.Combine(temp, "tweak"));
+    var block = SetupTweaks.Static.Single(t => t.Id == "tw-block-updates").Module;
+    store.Values[block.Settings[0]] = new(true, 4, "0");
+    eng.Enable(block); Assert(eng.Matches(block) && eng.HasBackup(block));
+    eng.Restore(block); Assert(!eng.HasBackup(block) && store.Read(block.Settings[0]) == new SavedValue(true, 4, "0") && !store.Read(block.Settings[1]).Exists);
+});
 // ---- Promoções (IsThereAnyDeal): tudo com um handler falso, sem rede e sem chave de verdade ----
 Dictionary<string, string> QueryOf(string query) => query.Split('&').Select(p => p.Split('=', 2))
     .ToDictionary(p => p[0], p => Uri.UnescapeDataString(p.Length > 1 ? p[1] : ""));

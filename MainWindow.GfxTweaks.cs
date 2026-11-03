@@ -70,8 +70,11 @@ public partial class MainWindow
             : "Os recomendados já vêm marcados (os AVANÇADOS ficam desligados). Clique em Aplicar.";
     }
 
-    /// <summary>Linha com título, selo SEGURO/AVANÇADO (e APLICADO), descrição e o interruptor.</summary>
-    private void GfxRow(string id, string title, bool advanced, string desc, bool isApplied, bool defaultOn, Panel? target = null)
+    private void GfxRow(string id, string title, bool advanced, string desc, bool isApplied, bool defaultOn, Panel? target = null) =>
+        _gfxToggles[id] = ToggleRow(title, advanced, desc, isApplied, defaultOn, target ?? GfxRows);
+
+    /// <summary>Linha com título, selo SEGURO/AVANÇADO (e APLICADO), descrição e o interruptor (Tag = já aplicado). Usada também no TWEAKING.</summary>
+    private CheckBox ToggleRow(string title, bool advanced, string desc, bool isApplied, bool defaultOn, Panel target)
     {
         var grid = new Grid { Margin = new Thickness(0, 0, 0, 12) };
         grid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -96,8 +99,8 @@ public partial class MainWindow
         var sw = new CheckBox { VerticalAlignment = VerticalAlignment.Center, IsChecked = isApplied || defaultOn, Tag = isApplied };
         Grid.SetColumn(sw, 1);
         grid.Children.Add(sw);
-        (target ?? GfxRows).Children.Add(grid);
-        _gfxToggles[id] = sw;
+        target.Children.Add(grid);
+        return sw;
     }
 
     private void RebuildGfx() => _ = RebuildGfxAsync();

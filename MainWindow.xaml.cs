@@ -293,6 +293,7 @@ public partial class MainWindow : Window
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
             case "PageMaint": InitMaint(); break;
+            case "PageTweak": InitTweak(); break;
         }
     }
 
