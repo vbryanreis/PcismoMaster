@@ -1,5 +1,7 @@
 using System.IO;
+using System.Runtime;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Win32.SafeHandles;
 
 namespace ResetExplode;
@@ -9,20 +11,33 @@ namespace ResetExplode;
 /// pelo FSCTL_ENUM_USN_DATA (precisa de administrador — o PcismoMaster já roda elevado) e guarda em memória o nome
 /// e o pai de cada registro. O caminho completo é remontado só na hora de mostrar, e a busca por trecho do nome é
 /// instantânea. Só indexa volumes fixos NTFS prontos.
+/// <para>Leve para a RAM e para o GC: em vez de milhões de <see cref="string"/> e de um dicionário, os nomes ficam
+/// num buffer único de <c>char</c> (início/tamanho por item) e cada item guarda a posição do pai num <c>int[]</c>,
+/// resolvida uma vez só com busca binária. São poucos arrays grandes, ~10 bytes por item além do nome.</para>
 /// </summary>
 public sealed class MftIndex
 {
     public readonly record struct Hit(string Name, string FullPath, bool IsDir);
 
-    // Registro cru da MFT: nome do arquivo/pasta e referência do pai (para remontar o caminho).
-    private readonly record struct Node(string Name, long ParentFrn, bool IsDir, char Drive);
+    /// <summary>Índice pronto e imutável; a busca usa o retrato atual, então <see cref="Release"/> pode rodar a qualquer hora.</summary>
+    private sealed class Data
+    {
+        public required char[] Names;          // todos os nomes, um atrás do outro
+        public required int[] NameStart;       // início do nome de cada item em Names
+        public required ushort[] NameLen;      // tamanho do nome (até 255) | DirFlag
+        public required int[] Parent;          // posição do pai, ou -1 (raiz/desconhecido)
+        public required (char Drive, int End)[] Volumes; // itens [fim do anterior, End) são deste volume
+        public int Count => NameStart.Length;
+    }
 
-    private readonly List<Node> _nodes = new();
-    private readonly Dictionary<(char Drive, long Frn), int> _index = new(); // (volume, frn) -> posição em _nodes
+    private const ushort DirFlag = 0x8000;
     private const int MaxNodes = 4_000_000; // teto de segurança para memória
+    private const long RecordMask = 0x0000_FFFF_FFFF_FFFF; // FRN = nº do registro (48 bits) + sequência (16 bits)
 
-    public int Count => _nodes.Count;
-    public bool Ready { get; private set; }
+    private volatile Data? _data;
+
+    public int Count => _data?.Count ?? 0;
+    public bool Ready => _data != null;
 
     /// <summary>Volumes fixos NTFS prontos para indexar.</summary>
     public static IEnumerable<char> NtfsDrives() =>
@@ -34,57 +49,174 @@ public sealed class MftIndex
     /// <summary>Monta (ou remonta) o índice lendo a MFT de todos os volumes NTFS. Rode fora da thread da UI.</summary>
     public void Build()
     {
-        _nodes.Clear();
-        _index.Clear();
-        Ready = false;
+        _data = null;
+        var b = new Builder();
         foreach (char drive in NtfsDrives())
         {
-            try { ReadVolume(drive); }
-            catch { /* um volume que falha não impede os outros */ }
-            if (_nodes.Count >= MaxNodes) break;
+            try { ReadVolume(drive, b); }
+            catch { b.DropVolume(); /* um volume que falha não impede os outros */ }
+            b.EndVolume(drive);
+            if (b.Count >= MaxNodes) break;
         }
-        Ready = true;
+        _data = b.Finish();
+        CompactMemory(); // os arrays temporários da leitura (centenas de MB em discos cheios) voltam ao Windows já
+    }
+
+    /// <summary>Solta o índice da memória (a próxima busca indexa de novo).</summary>
+    public void Release()
+    {
+        if (_data == null) return;
+        _data = null;
+        CompactMemory();
+    }
+
+    private static void CompactMemory()
+    {
+        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
     }
 
     /// <summary>Busca por trecho do nome (sem diferenciar maiúsculas/acentos de caixa). Retorna até <paramref name="max"/> itens.</summary>
     public List<Hit> Search(string query, bool filesOnly, bool foldersOnly, int max)
     {
         var hits = new List<Hit>(max);
-        if (string.IsNullOrWhiteSpace(query)) return hits;
-        foreach (var node in _nodes)
+        var d = _data;
+        if (d == null || string.IsNullOrWhiteSpace(query)) return hits;
+        ReadOnlySpan<char> q = query;
+        char[] names = d.Names; int[] start = d.NameStart; ushort[] len = d.NameLen;
+        int vol = 0;
+        for (int i = 0; i < start.Length; i++)
         {
-            if (filesOnly && node.IsDir) continue;
-            if (foldersOnly && !node.IsDir) continue;
-            if (node.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-            {
-                hits.Add(new Hit(node.Name, BuildPath(node), node.IsDir));
-                if (hits.Count >= max) break;
-            }
+            bool isDir = (len[i] & DirFlag) != 0;
+            if (filesOnly && isDir) continue;
+            if (foldersOnly && !isDir) continue;
+            var name = new ReadOnlySpan<char>(names, start[i], len[i] & ~DirFlag);
+            if (!name.Contains(q, StringComparison.OrdinalIgnoreCase)) continue;
+            while (i >= d.Volumes[vol].End) vol++;
+            hits.Add(new Hit(name.ToString(), BuildPath(d, i, d.Volumes[vol].Drive), isDir));
+            if (hits.Count >= max) break;
         }
         return hits;
     }
 
     /// <summary>Remonta o caminho completo subindo pelos pais até a raiz do volume.</summary>
-    private string BuildPath(Node node)
+    private static string BuildPath(Data d, int node, char drive)
     {
-        var parts = new List<string> { node.Name };
-        long cur = node.ParentFrn;
-        char drive = node.Drive;
-        for (int guard = 0; guard < 512; guard++)
+        Span<int> chain = stackalloc int[512];
+        int n = 0;
+        chain[n++] = node;
+        for (int cur = d.Parent[node]; cur >= 0 && n < chain.Length; cur = d.Parent[cur])
         {
-            if (!_index.TryGetValue((drive, cur), out int i)) break;
-            var parent = _nodes[i];
-            if (parent.Name is "." or "") break; // raiz do volume
-            parts.Add(parent.Name);
-            cur = parent.ParentFrn;
+            int len = d.NameLen[cur] & ~DirFlag;
+            if (len == 0 || (len == 1 && d.Names[d.NameStart[cur]] == '.')) break; // raiz do volume
+            chain[n++] = cur;
         }
-        parts.Reverse();
-        return drive + ":\\" + string.Join('\\', parts);
+        var sb = new StringBuilder(64).Append(drive).Append(":\\");
+        for (int k = n - 1; k >= 0; k--)
+        {
+            int i = chain[k];
+            sb.Append(d.Names, d.NameStart[i], d.NameLen[i] & ~DirFlag);
+            if (k > 0) sb.Append('\\');
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>Monta o índice a partir de registros prontos (testes, sem tocar no disco).</summary>
+    internal static MftIndex FromRecords(IEnumerable<(char Drive, long Frn, long Parent, bool IsDir, string Name)> records)
+    {
+        var b = new Builder();
+        char? drive = null;
+        foreach (var r in records)
+        {
+            if (drive != r.Drive) { if (drive is char prev) b.EndVolume(prev); drive = r.Drive; }
+            int at = b.ReserveName(r.Name.Length);
+            r.Name.CopyTo(0, b.Names, at, r.Name.Length);
+            b.Add(r.Frn, r.Parent, r.IsDir, at, r.Name.Length);
+        }
+        if (drive is char last) b.EndVolume(last);
+        return new MftIndex { _data = b.Finish() };
+    }
+
+    /// <summary>Acumula os itens em arrays que crescem; os FRN (8 bytes cada) só existem durante a montagem.</summary>
+    private sealed class Builder
+    {
+        public char[] Names = new char[1 << 20];
+        private int _nameUsed;
+        private int[] _start = new int[1 << 16];
+        private ushort[] _len = new ushort[1 << 16];
+        private long[] _rec = new long[1 << 16], _parentRec = new long[1 << 16];
+        private int[] _parent = Array.Empty<int>();
+        private readonly List<(char, int)> _volumes = new();
+        private int _volStart;
+
+        public int Count { get; private set; }
+
+        public int ReserveName(int len)
+        {
+            if (_nameUsed + len > Names.Length) Array.Resize(ref Names, Math.Max(Names.Length * 2, _nameUsed + len));
+            return _nameUsed;
+        }
+
+        public void Add(long frn, long parent, bool isDir, int nameStart, int nameLen)
+        {
+            if (Count == _start.Length)
+            {
+                int cap = Math.Min(_start.Length * 2, MaxNodes);
+                Array.Resize(ref _start, cap); Array.Resize(ref _len, cap);
+                Array.Resize(ref _rec, cap); Array.Resize(ref _parentRec, cap);
+            }
+            nameLen = Math.Min(nameLen, 0x7FFF);
+            _start[Count] = nameStart;
+            _len[Count] = (ushort)(nameLen | (isDir ? DirFlag : 0));
+            _rec[Count] = frn & RecordMask;
+            _parentRec[Count] = parent & RecordMask;
+            _nameUsed = nameStart + nameLen;
+            Count++;
+        }
+
+        /// <summary>Descarta os itens do volume atual (leitura que falhou no meio).</summary>
+        public void DropVolume() { Count = _volStart; _nameUsed = Count == 0 ? 0 : _start[Count - 1] + (_len[Count - 1] & ~DirFlag); }
+
+        /// <summary>Fecha o volume: liga cada item ao pai por busca binária no nº do registro (só dentro do volume).</summary>
+        public void EndVolume(char drive)
+        {
+            int s = _volStart, e = Count;
+            if (e == s) return;
+            if (_parent.Length < _start.Length) Array.Resize(ref _parent, _start.Length);
+
+            // O FSCTL_ENUM_USN_DATA entrega em ordem de registro; se não vier, ordena uma cópia com a posição.
+            long[] keys; int[] pos;
+            bool sorted = true;
+            for (int i = s + 1; i < e && sorted; i++) sorted = _rec[i - 1] < _rec[i];
+            if (sorted) { keys = _rec; pos = Array.Empty<int>(); }
+            else
+            {
+                keys = _rec[s..e]; pos = new int[e - s];
+                for (int i = 0; i < pos.Length; i++) pos[i] = s + i;
+                Array.Sort(keys, pos);
+            }
+            int lo = sorted ? s : 0, n = e - s;
+            for (int i = s; i < e; i++)
+            {
+                int k = Array.BinarySearch(keys, lo, n, _parentRec[i]);
+                int p = k < 0 ? -1 : sorted ? k : pos[k - lo];
+                _parent[i] = p == i ? -1 : p;
+            }
+            _volumes.Add((drive, e));
+            _volStart = e;
+        }
+
+        public Data Finish()
+        {
+            Array.Resize(ref Names, _nameUsed);
+            Array.Resize(ref _start, Count); Array.Resize(ref _len, Count); Array.Resize(ref _parent, Count);
+            return new Data { Names = Names, NameStart = _start, NameLen = _len, Parent = _parent, Volumes = _volumes.ToArray() };
+        }
     }
 
     // ---------------- leitura da MFT via FSCTL_ENUM_USN_DATA ----------------
 
-    private void ReadVolume(char drive)
+    private static void ReadVolume(char drive, Builder b)
     {
         using SafeFileHandle h = CreateFile($@"\\.\{drive}:", GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                                             IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
@@ -112,15 +244,15 @@ public sealed class MftIndex
                     long frn = Marshal.ReadInt64(outBuf, offset + 8);
                     long parent = Marshal.ReadInt64(outBuf, offset + 16);
                     uint attrs = unchecked((uint)Marshal.ReadInt32(outBuf, offset + 52));
-                    int nameLen = (ushort)Marshal.ReadInt16(outBuf, offset + 56);
+                    int nameLen = (ushort)Marshal.ReadInt16(outBuf, offset + 56) / 2;
                     int nameOff = (ushort)Marshal.ReadInt16(outBuf, offset + 58);
-                    string name = Marshal.PtrToStringUni(outBuf + offset + nameOff, nameLen / 2) ?? "";
-                    bool isDir = (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
 
-                    _index[(drive, frn)] = _nodes.Count;
-                    _nodes.Add(new Node(name, parent, isDir, drive));
+                    // o nome vai direto do buffer do Windows para o buffer único, sem criar string
+                    int at = b.ReserveName(nameLen);
+                    if (nameLen > 0) Marshal.Copy(outBuf + offset + nameOff, b.Names, at, nameLen);
+                    b.Add(frn, parent, (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0, at, nameLen);
 
-                    if (_nodes.Count >= MaxNodes) return;
+                    if (b.Count >= MaxNodes) return;
                     offset += recLen;
                 }
                 med.StartFileReferenceNumber = next;

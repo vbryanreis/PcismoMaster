@@ -141,6 +141,27 @@ Test("Real registry roundtrip only inside isolated test key", () => {
         }
     } finally { Registry.CurrentUser.DeleteSubKeyTree(path, false); }
 });
+Test("Finder index: names, paths across volumes, unsorted records and filters", () => {
+    const long Seq = 0x0003_0000_0000_0000; // sequência no FRN não atrapalha a ligação com o pai
+    var idx = MftIndex.FromRecords(new (char, long, long, bool, string)[] {
+        ('C', 40 | Seq, 30, false, "relatorio.txt"),   // vem antes do pai: ordem fora de registro
+        ('C', 5, 5, true, "."),                       // raiz do volume (pai de si mesma)
+        ('C', 30, 20 | Seq, true, "Docs"),
+        ('C', 20, 5, true, "Users"),
+        ('C', 50, 999, false, "orfao.txt"),           // pai que não existe
+        ('D', 5, 5, true, "."),
+        ('D', 30, 5, true, "Jogos"),
+        ('D', 41, 30, false, "Relatorio-final.pdf"),
+    });
+    Assert(idx.Ready && idx.Count == 8);
+    var all = idx.Search("relatorio", false, false, 10);
+    Assert(all.Count == 2 && all[0].FullPath == @"C:\Users\Docs\relatorio.txt" && all[1].FullPath == @"D:\Jogos\Relatorio-final.pdf");
+    Assert(idx.Search("orfao", false, false, 10).Single().FullPath == @"C:\orfao.txt");
+    Assert(idx.Search("o", false, true, 10).Select(h => h.Name).SequenceEqual(new[] { "Docs", "Jogos" }));
+    Assert(idx.Search("o", true, false, 10).All(h => !h.IsDir) && idx.Search("o", false, false, 2).Count == 2);
+    Assert(idx.Search("  ", false, false, 10).Count == 0 && idx.Search("xyz", false, false, 10).Count == 0);
+    idx.Release(); Assert(!idx.Ready && idx.Search("Docs", false, false, 10).Count == 0);
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

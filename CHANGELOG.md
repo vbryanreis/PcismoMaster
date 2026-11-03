@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## Não lançado
+
+- **Utilidades · Finder mais leve**: o índice da MFT guarda os nomes num buffer único e liga cada item ao pai por posição (busca binária no número do registro), sem milhões de strings soltas nem dicionário. Num teste com 3,5 milhões de itens, a memória do índice caiu de ~480 MB para ~130 MB (processo: ~530 MB → ~190 MB) e a coleta completa do GC de ~40 ms para menos de 1 ms, com a mesma velocidade de busca.
+- O índice sai da memória **5 minutos depois de sair do Finder** (outra sub-aba ou outra página) e é refeito ao voltar.
+
 ## 0.7.0
 
 - **Drivers · nova sub-aba Painel NVIDIA**: o "Gerenciar as configurações em 3D" do Painel de Controle NVIDIA dentro do app, com os mesmos nomes e opções (em português), gravando direto nos perfis do driver.

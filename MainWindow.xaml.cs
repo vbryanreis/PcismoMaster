@@ -273,6 +273,8 @@ public partial class MainWindow : Window
         }
         TitlePage.Text = name;
 
+        if (page != "PageUtil") LeaveFinder();
+
         // Algumas páginas carregam dados só quando abertas.
         switch (page)
         {

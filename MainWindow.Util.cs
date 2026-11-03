@@ -26,6 +26,7 @@ public partial class MainWindow
     private bool _mftBuilding;
     private string _findKind = "all";
     private DispatcherTimer? _findDebounce;
+    private DispatcherTimer? _findRelease; // solta o índice da RAM alguns minutos depois de sair do Finder
 
     /// <summary>Item da lista de resultados do Finder.</summary>
     public sealed record FindRow(string Icon, string Name, string FullPath, bool IsDir);
@@ -40,6 +41,34 @@ public partial class MainWindow
             _findDebounce.Tick += (_, _) => { _findDebounce!.Stop(); RunSearch(); };
         }
         RefreshDlTools();
+        if (UtilTabFinder.IsChecked == true) EnterFinder();
+    }
+
+    /// <summary>Voltou ao Finder: cancela a liberação e reindexa se o índice já foi solto.</summary>
+    private async void EnterFinder()
+    {
+        _findRelease?.Stop();
+        if (!_mft.Ready) { await EnsureIndexAsync(); RunSearch(); }
+    }
+
+    /// <summary>Saiu do Finder (outra sub-aba ou outra página): agenda soltar o índice.</summary>
+    private void LeaveFinder()
+    {
+        if (!_mft.Ready && !_mftBuilding) return;
+        if (_findRelease == null)
+        {
+            _findRelease = new DispatcherTimer { Interval = TimeSpan.FromMinutes(5) };
+            _findRelease.Tick += (_, _) =>
+            {
+                if (_mftBuilding) return; // tenta de novo no próximo tique
+                _findRelease!.Stop();
+                _mft.Release();
+                FindResults.ItemsSource = null;
+                FindStatus.Text = "Índice liberado da memória · digite para indexar de novo.";
+            };
+        }
+        _findRelease.Stop();
+        _findRelease.Start();
     }
 
     // ---------------- sub-sub-abas ----------------
@@ -52,10 +81,11 @@ public partial class MainWindow
         UtilFinderPanel.Visibility = finder ? Visibility.Visible : Visibility.Collapsed;
         if (finder)
         {
+            _findRelease?.Stop();
             await EnsureIndexAsync();
             RunSearch();
         }
-        else RefreshDlTools();
+        else { RefreshDlTools(); LeaveFinder(); }
     }
 
     // ---------------- baixar vídeos ----------------
