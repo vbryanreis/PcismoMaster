@@ -248,6 +248,47 @@ Test("Tweaking: setup tweaks are unique, safe and undo exactly", () => {
     eng.Enable(block); Assert(eng.Matches(block) && eng.HasBackup(block));
     eng.Restore(block); Assert(!eng.HasBackup(block) && store.Read(block.Settings[0]) == new SavedValue(true, 4, "0") && !store.Read(block.Settings[1]).Exists);
 });
+Test("Tweaking: .reg parser reads every value type, deletes and continuation lines", () => {
+    var r = RegFile.Parse("Windows Registry Editor Version 5.00\r\n\r\n[HKEY_CURRENT_USER\\Software\\T]\r\n\"S\"=\"a \\\"b\\\" c\\\\d\"\r\n\"D\"=dword:ffffffff\r\n" +
+        "\"B\"=hex:01,02,\\\r\n  03\r\n\"E\"=hex(2):25,00,41,00,25,00,00,00\r\n\"M\"=hex(7):61,00,00,00,62,00,00,00,00,00\r\n\"Q\"=hex(b):01,00,00,00,00,00,00,00\r\n" +
+        "\"X\"=-\r\n@=\"def\"\r\n\"D\"=dword:00000002\r\n[-HKEY_CLASSES_ROOT\\Folder\\shell\\x]\r\n[HKEY_USERS\\.DEFAULT\\Y]\r\n\"Z\"=dword:1\r\n");
+    var v = r.Settings.ToDictionary(s => s.Name);
+    Assert(v.Count == 8 && r.DeleteKeys.Single() == @"HKLM\SOFTWARE\Classes\Folder\shell\x" && r.Skipped == 2);
+    Assert(v["S"].Kind == 1 && System.Text.Json.JsonSerializer.Deserialize<string>(v["S"].Data!) == "a \"b\" c\\d");
+    Assert(v["D"].Kind == 4 && v["D"].Data == "2"); // o último valor vence
+    Assert(v["B"].Kind == 3 && System.Text.Json.JsonSerializer.Deserialize<byte[]>(v["B"].Data!)!.SequenceEqual(new byte[] { 1, 2, 3 }));
+    Assert(v["E"].Kind == 2 && v["E"].Data == "\"%A%\"" && v["M"].Kind == 7 && v["M"].Data == "[\"a\",\"b\"]" && v["Q"].Kind == 11 && v["Q"].Data == "1");
+    Assert(v["X"].Remove && v[""].Kind == 1);
+    var store = new FakeStore(); var eng = new ModuleEngine(store, Path.Combine(temp, "regfile"));
+    var m = new Module("tw-test-reg", "t", "Tweaking", "", "", r.Settings);
+    store.Values[v["X"]] = new(true, 4, "7");
+    eng.Enable(m); Assert(eng.Matches(m) && !store.Read(v["X"]).Exists);
+    eng.Restore(m); Assert(store.Read(v["X"]) == new SavedValue(true, 4, "7") && !store.Read(v["S"]).Exists);
+});
+Test("Tweaking: Windows, Hardware e Avançado catalogs are unique, safe and parse", () => {
+    var reg = TweakCatalog.WindowsRegTweaks().ToArray();
+    Assert(reg.Length == TweakCatalog.WindowsReg.Length && reg.All(t => t.Settings.Length > 0));
+    var cp = reg.Single(t => t.Id == "tw-win-control-panel");
+    Assert(cp.Settings.Length > 450 && cp.DeleteKeys!.Length == 2 && cp.Settings.Any(TweakCatalog.IsDisplayScale));
+    var all = SetupTweaks.Static.Concat(TweakCatalog.Windows).Concat(reg).Concat(TweakCatalog.Hardware).Concat(TweakCatalog.Advanced).ToArray();
+    Assert(all.Select(t => t.Id).Distinct().Count() == all.Length && all.All(t => t.Id.StartsWith("tw-")));
+    Assert(all.Where(t => t.Advanced).All(t => !t.DefaultOn) && TweakCatalog.Advanced.All(t => t.Advanced));
+    Assert(all.SelectMany(t => t.Settings).All(s => s.Hive is "HKCU" or "HKLM" && s.Path.Length > 0 && !s.Path.StartsWith('\\')));
+    // Depois do Dedupe nenhum valor fica em dois ajustes (desfazer fora de ordem não deixa valor errado).
+    var dedup = TweakCatalog.Dedupe(all);
+    var keys = dedup.SelectMany(t => t.Settings).Select(s => (s.Hive, s.Path.ToLowerInvariant(), s.Name.ToLowerInvariant())).ToArray();
+    Assert(keys.Distinct().Count() == keys.Length && dedup.Take(SetupTweaks.Static.Length).Zip(SetupTweaks.Static).All(p => p.First.Settings.Length == p.Second.Settings.Length));
+    Assert(TweakCatalog.Windows.Single(t => t.Id == "tw-win-context-menu").DeleteKeys!.All(k => k.StartsWith(@"HKLM\SOFTWARE\Classes\")));
+    // Escala: curvas de 40 bytes que crescem (o script tinha duas deslocadas) e LogPixels = 96 × escala.
+    foreach (var (pct, set) in TweakCatalog.Scaling)
+    {
+        var x = Convert.FromHexString(set.Single(s => s.Name == "SmoothMouseXCurve").Hex!);
+        var pts = Enumerable.Range(0, 5).Select(i => BitConverter.ToInt64(x, i * 8)).ToArray();
+        Assert(x.Length == 40 && pts[0] == 0 && pts.Zip(pts.Skip(1)).All(p => p.Second > p.First) && Math.Abs(pts[4] - 4 * pts[1]) < 0x100);
+        Assert(set.Single(s => s.Name == "LogPixels").Value == pct * 96 / 100);
+    }
+    Assert(TweakCatalog.PowerPlan.All(p => Guid.TryParse(p.Sub, out _) && Guid.TryParse(p.Setting, out _) && int.TryParse(p.Value, out _)));
+});
 // ---- Promoções (IsThereAnyDeal): tudo com um handler falso, sem rede e sem chave de verdade ----
 Dictionary<string, string> QueryOf(string query) => query.Split('&').Select(p => p.Split('=', 2))
     .ToDictionary(p => p[0], p => Uri.UnescapeDataString(p.Length > 1 ? p[1] : ""));

@@ -41,6 +41,8 @@
     <EmbeddedResource Include="Drivers\**\*" Exclude="Drivers\*.md;Drivers\*.txt" LogicalName="Drivers/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Catálogo de configurações do driver NVIDIA (nomes, grupos e valores) do nvidiaProfileInspector, licença MIT -->
     <EmbeddedResource Include="Npi\*.xml" LogicalName="Npi/%(Filename)%(Extension)" />
+    <!-- Ajustes .reg das sub-abas do TWEAKING, extraídos dos scripts do Ultimate (MIT) -->
+    <EmbeddedResource Include="Tweaks\*.reg" LogicalName="Tweaks/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- iCUE SDK da Corsair (INTEGRAÇÃO): se a DLL estiver em Native\, ela vai junto do .exe. Não é versionada no git. -->

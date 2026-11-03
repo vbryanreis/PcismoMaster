@@ -1,7 +1,7 @@
 namespace ResetExplode.Modular;
 
 /// <summary>Um ajuste da aba TWEAKING: interruptor na tela, valores de registro com backup e desfazer.</summary>
-public sealed record SetupTweak(string Id, string Title, string Description, bool Advanced, bool DefaultOn, string Source, Setting[] Settings)
+public sealed record SetupTweak(string Id, string Title, string Description, bool Advanced, bool DefaultOn, string Source, Setting[] Settings, string[]? DeleteKeys = null)
 {
     public Module Module => new(Id, Title, "Tweaking", Description, Source, Settings);
 }

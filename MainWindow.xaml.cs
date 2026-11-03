@@ -294,12 +294,15 @@ public partial class MainWindow : Window
             case "PageUninstall": InitUninstall(); break;
             case "PageMaint": InitMaint(); break;
             case "PageTweak": InitTweak(); break;
+            case "PageTweakWin": InitTweakWin(); break;
+            case "PageTweakHw": InitTweakHw(); break;
+            case "PageTweakAdv": InitTweakAdv(); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageTweak, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageTweak, PageTweakWin, PageTweakHw, PageTweakAdv, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 

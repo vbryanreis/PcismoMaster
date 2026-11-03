@@ -3,8 +3,9 @@ using System.Text.Json;
 
 namespace ResetExplode.Modular;
 
-/// <summary>Valor de registro de um ajuste: DWORD (Value), texto (Text), binário em hexadecimal (Hex, ex.: "3000") ou apagar o valor (Remove).</summary>
-public sealed record Setting(string Hive, string Path, string Name, int Value, string? Text = null, string? Hex = null, bool Remove = false);
+/// <summary>Valor de registro de um ajuste: DWORD (Value), texto (Text), binário em hexadecimal (Hex, ex.: "3000"), apagar o valor (Remove)
+/// ou qualquer tipo já pronto (Kind + Data no formato do SavedValue: QWORD, texto expansível, multi-texto… vindos de um .reg).</summary>
+public sealed record Setting(string Hive, string Path, string Name, int Value, string? Text = null, string? Hex = null, bool Remove = false, int Kind = 0, string? Data = null);
 public sealed record SavedValue(bool Exists, int Kind, string Data);
 public sealed record Module(string Id, string Title, string Category, string Description, string Source, Setting[] Settings);
 public interface ISettingsStore
@@ -23,6 +24,7 @@ public sealed class ModuleEngine(ISettingsStore store, string directory)
     public bool HasBackup(Module module) => File.Exists(FileFor(module));
     public bool Matches(Module module) => module.Settings.All(s => store.Read(s) == Target(s));
     private static SavedValue Target(Setting s) => s.Remove ? new(false, 0, "")
+        : s.Data is not null ? new(true, s.Kind, s.Data)
         : s.Hex is not null ? new(true, 3, JsonSerializer.Serialize(Convert.FromHexString(s.Hex)))
         : s.Text is null ? new(true, 4, JsonSerializer.Serialize(s.Value)) : new(true, 1, JsonSerializer.Serialize(s.Text));
     public string Preview(Module module) => string.Join(Environment.NewLine, module.Settings.Select(s =>

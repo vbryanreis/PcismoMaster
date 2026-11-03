@@ -236,7 +236,25 @@
                             <RadioButton x:Name="NavTweak" Style="{StaticResource NavItem}" Tag="PageTweak" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE9E9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Setup" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Iniciar" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTweakWin" Style="{StaticResource NavItem}" Tag="PageTweakWin" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE770;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Windows" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTweakHw" Style="{StaticResource NavItem}" Tag="PageTweakHw" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Hardware" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTweakAdv" Style="{StaticResource NavItem}" Tag="PageTweakAdv" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE713;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Avançado" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -1605,11 +1623,11 @@
                     </Border>
                 </Grid>
 
-                <!-- ===== TWEAKING · Setup (3 Setup do Ultimate) ===== -->
+                <!-- ===== TWEAKING · Iniciar (3 Setup do Ultimate) ===== -->
                 <ScrollViewer x:Name="PageTweak" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="SETUP" Style="{StaticResource H1}"/>
+                            <TextBlock Text="INICIAR" Style="{StaticResource H1}"/>
                             <TextBlock Text="Ajustes do Windows do 3 Setup do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
@@ -1680,6 +1698,35 @@
                                 </TextBlock>
                             </StackPanel>
                         </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ===== TWEAKING · Windows, Hardware e Avançado (pastas do Ultimate; cartões montados em MainWindow.TweakPages.cs) ===== -->
+                <ScrollViewer x:Name="PageTweakWin" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="WINDOWS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes do Windows da pasta Windows do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakWinHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageTweakHw" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="HARDWARE" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Mouse, escala, monitor, controle e rede da pasta Hardware do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakHwHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageTweakAdv" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="AVANÇADO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes da pasta Advanced do Ultimate · todos vêm desligados e trocam segurança ou estabilidade por desempenho" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="TweakAdvHost"/>
                     </StackPanel>
                 </ScrollViewer>
 
