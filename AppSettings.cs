@@ -84,6 +84,10 @@ public sealed class AppSettings
 
     // Aparência
     public bool LightTheme { get; set; }
+    /// <summary>Modo avançado: mostra sensores, overclock, scripts e ajustes técnicos. Começa no Simples.</summary>
+    public bool AdvancedMode { get; set; }
+    /// <summary>Esconde a faixa com a explicação curta no topo de cada página.</summary>
+    public bool HidePageHelp { get; set; }
 
     // Overclock (aba no estilo Afterburner): perfil em edição, 5 perfis salvos e o último aplicado (reaplicado ao abrir o app, se marcado)
     public Modular.OcProfile OcCurrent { get; set; } = new();

@@ -84,7 +84,7 @@ public partial class MainWindow : Window
         SideVersion.Text = "v" + (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.2.5");
         ThemeManager.Apply(_settings.LightTheme);
         UpdateThemeButton();
-        ShowPage("PageDash");
+        ShowPage("PageHome");
 
         // Sensores: a lista começa vazia e é preenchida quando a detecção do hardware termina (LoadHardwareAsync).
         _monitor = new SensorMonitor();
@@ -101,7 +101,8 @@ public partial class MainWindow : Window
         InitBench();
         SnapshotUsb();
         RefreshDrives();
-        TitlePage.Text = "Visão geral";
+        TitlePage.Text = "Início";
+        InitHome();
         UpdateDashboard();
 
         // A janela aparece já; as coletas pesadas (WMI, sensores, GPU) rodam em paralelo fora da thread da janela.
@@ -271,6 +272,7 @@ public partial class MainWindow : Window
             name = $"{group.Content} · {name}";
         }
         TitlePage.Text = name;
+        UpdatePageHelp(item.Name);
 
         if (page != "PageUtil") LeaveFinder();
 
@@ -302,7 +304,7 @@ public partial class MainWindow : Window
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageTweak, PageTweakWin, PageTweakHw, PageTweakAdv, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageTweak, PageTweakWin, PageTweakHw, PageTweakAdv, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 

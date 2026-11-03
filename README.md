@@ -15,6 +15,8 @@ Versão atual: **0.8.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de
 
 ## Navegação
 
+O app abre no **Início** ("O que você quer fazer?"), com as tarefas mais comuns em blocos e uma busca por tudo que ele faz. No topo fica o botão **Modo simples / Modo avançado**: o simples (padrão) mostra só o essencial e seguro; o avançado libera sensores, overclock, stress test, ajustes técnicos e os scripts completos. Cada página tem uma explicação curta no topo.
+
 A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o mouse):
 
 - **Visão geral** — painel inicial: estado do hardware, gráfico de CPU/GPU por faixa de cor, cartão *Saúde do PC* e o botão **OTIMIZAR**.
@@ -22,7 +24,7 @@ A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o 
 - **MANUTENÇÃO → Reparos do Windows** — rotinas oficiais do Windows: SFC, DISM, CHKDSK, redefinir rede / Windows Update / spooler, reiniciar áudio, Bluetooth e o Explorer.
 - **TWEAKING** — quatro sub-abas com desfazer, das pastas do Ultimate:
   - **Iniciar** (o "3 Setup"): apps em segundo plano, bloqueio de drivers e do Windows Update, Edge (segundo plano, uBlock Origin, aceleração de hardware, serviços de atualização) e Store; compressão de memória, BitLocker e atalhos.
-  - **Windows**: ponto de restauração; configurações do Painel de Controle do script, menu de contexto, Widgets, Copilot, energia, timer, barra de tarefas, Game Bar, placas de rede e dispositivos sem economia de energia, tema e tela de bloqueio pretos, cache de gravação e UAC; plano de energia Ultimate, rede só IPv4, limpeza e atalhos.
+  - **Windows**: ponto de restauração; **bloatware escolhido app por app** (nome em português, selo de risco, travados os que o script mantém e "Removidos por aqui" com o caminho de volta); configurações do Painel de Controle do script, menu de contexto, Widgets, Copilot, energia, timer, barra de tarefas, Game Bar, placas de rede e dispositivos sem economia de energia, tema e tela de bloqueio pretos, cache de gravação e UAC; plano de energia Ultimate, rede só IPv4, limpeza e atalhos.
   - **Hardware**: mouse sem limite de 125 Hz em segundo plano, escala maior sem aceleração (100–350%), testes de monitor/rede/controle e dicas.
   - **Avançado** (desligados por padrão): NVMe nativo, MPO, tela cheia exclusiva, pesquisa, atalhos do teclado, Spectre/Meltdown, firewall, WHQL, AMD ULPS, Resizable BAR forçado (NVIDIA), MMAgent, DEP e prioridade/afinidade por jogo.
   - **Scripts completos do Ultimate** no fim de cada sub-aba: todas as opções dos scripts (bloatware, Edge/WebView, Defender, serviços, Autoruns, hidusbf…) com selo de risco, confirmação com avisos e ponto de restauração.

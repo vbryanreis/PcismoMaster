@@ -128,6 +128,8 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                         WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="BtnMode" Style="{StaticResource ModeButton}" Click="Mode_Click" Margin="0,0,10,0" VerticalAlignment="Center"
+                        ToolTip="Simples mostra só o essencial e seguro. Avançado mostra tudo (sensores, overclock, scripts, ajustes técnicos)."/>
                 <Button x:Name="BtnTheme" Style="{StaticResource CaptionButton}" Content="&#xE706;" Click="Theme_Click" ToolTip="Modo claro"/>
                 <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Min_Click" ToolTip="Minimizar"/>
                 <Button x:Name="BtnMax" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="Max_Click" ToolTip="Maximizar"/>
@@ -177,9 +179,15 @@
                     <!-- Navegação por categorias -->
                     <ScrollViewer x:Name="NavScroll" VerticalScrollBarVisibility="Auto" Margin="0,2,0,0">
                         <StackPanel Margin="0,0,0,10">
-                            <RadioButton x:Name="NavDash" Style="{StaticResource NavItem}" Tag="PageDash" Checked="Nav_Checked" IsChecked="True">
+                            <RadioButton x:Name="NavHome" Style="{StaticResource NavItem}" Tag="PageHome" Checked="Nav_Checked" IsChecked="True">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE80F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Início" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavDash" Style="{StaticResource NavItem}" Tag="PageDash" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE9D2;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Visão geral" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
@@ -377,11 +385,26 @@
                 </DockPanel>
             </Border>
 
-            <!-- ===== Conteúdo ===== -->
-            <Grid Grid.Row="1" Grid.Column="1">
+            <!-- ===== Conteúdo (com a explicação curta da página no topo) ===== -->
+            <DockPanel Grid.Row="1" Grid.Column="1">
+            <Border x:Name="PageHelp" DockPanel.Dock="Top" Margin="20,0,24,10" Padding="16,10" CornerRadius="12"
+                    Background="{DynamicResource AccentSoft}" Visibility="Collapsed">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource CaptionButton}" Width="30" Content="&#xE711;" Click="PageHelpHide_Click"
+                            ToolTip="Esconder as explicações (voltam em Início)"/>
+                    <TextBlock Text="&#xE946;" FontFamily="{StaticResource Icons}" FontSize="15" Foreground="{DynamicResource Accent}" Margin="0,1,10,0" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="PageHelpText" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+            <Grid>
+
+                <!-- ===== INÍCIO (tarefas + busca; montado no código) ===== -->
+                <ScrollViewer x:Name="PageHome" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="HomeHost" Margin="24,10,28,24"/>
+                </ScrollViewer>
 
                 <!-- ===== VISÃO GERAL (painel) ===== -->
-                <ScrollViewer x:Name="PageDash" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageDash" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="20,6,24,20">
 
                         <!-- Linha 1: gráfico grande + desempenho -->
@@ -4106,6 +4129,7 @@
                     </Border>
                 </Grid>
             </Grid>
+            </DockPanel>
         </Grid>
     </Border>
 </Window>

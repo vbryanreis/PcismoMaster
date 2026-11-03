@@ -37,7 +37,7 @@ public partial class MainWindow
     private void AddScriptSection(Panel host, string page)
     {
         var cards = ScriptCatalog.For(page).ToList();
-        TweakCard(host, "SCRIPTS COMPLETOS DO ULTIMATE",
+        var sectionCard = TweakCard(host, "SCRIPTS COMPLETOS DO ULTIMATE",
             "Cada script da pasta, do jeito que o autor fez, com todas as opções do menu dele. Diferente dos ajustes acima, a maioria NÃO tem " +
             "desfazer pelo PcismoMaster: para voltar, use o botão de padrão do próprio cartão ou o ponto de restauração. Cada botão mostra " +
             "antes o que vai acontecer. Selos: SEGURO, ATENÇÃO (muda bastante coisa ou baixa programas) e PERIGOSO (tira proteções, apaga coisas ou reinicia o PC).",
@@ -63,6 +63,7 @@ public partial class MainWindow
         body.Children.Add(log);
         body.Children.Add(stop);
         _scriptOutputs.Add((log, stop));
+        AdvancedOnly(sectionCard); // scripts inteiros só no modo avançado
     }
 
     private Border ScriptCardView(ScriptCard c)

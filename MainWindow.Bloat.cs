@@ -216,10 +216,16 @@ public partial class MainWindow
         foreach (var child in _bloatList.Children.OfType<Grid>())
         {
             if (child.Tag is not BloatItem i) continue;
-            bool match = (locked || i.Essential == null) &&
+            // Modo simples: os PERIGOSOS e as bibliotecas não aparecem (e são desmarcados).
+            bool allowed = Advanced || (i.Risk != ScriptRisk.Perigoso && i.Kind != BloatKind.Biblioteca);
+            bool match = allowed && (locked || i.Essential == null) &&
                          (q.Length == 0 || i.Name.Contains(q, StringComparison.CurrentCultureIgnoreCase) || i.Id.Contains(q, StringComparison.OrdinalIgnoreCase));
             child.Visibility = match ? Visibility.Visible : Visibility.Collapsed;
-            if (_bloatChecks.TryGetValue(BloatKey(i), out var c)) c.Visibility = child.Visibility;
+            if (_bloatChecks.TryGetValue(BloatKey(i), out var c))
+            {
+                c.Visibility = child.Visibility;
+                if (!allowed) c.IsChecked = false;
+            }
         }
     }
 

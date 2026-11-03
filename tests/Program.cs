@@ -419,6 +419,25 @@ Test("Bloatware: commands quote ids, run one item at a time and only restore wha
     Assert(Bloatware.Programs.Where(p => p.RestoreOption != null).All(p => ScriptCatalog.All.Any(c => c.Options.Any(o => o.Id == p.RestoreOption))));
     Assert(!Bloatware.ListScript.Contains("Remove-") && !Bloatware.ListScript.Contains("Disable-"));
 });
+Test("Friendly UI: all-caps button text becomes a sentence and keeps acronyms", () => {
+    Assert(FriendlyText.Apply("REMOVER OS MARCADOS") == "Remover os marcados");
+    Assert(FriendlyText.Apply("MOSTRAR OS 12 SCRIPTS") == "Mostrar os 12 scripts");
+    Assert(FriendlyText.Apply("ATUALIZAR DRIVER NVIDIA") == "Atualizar driver NVIDIA");
+    Assert(FriendlyText.Apply("DESINSTALAR APPS (NO APP)") == "Desinstalar apps (no app)");
+    Assert(FriendlyText.Apply("REINSTALAR PELA STORE") == "Reinstalar pela Store" && FriendlyText.Apply("RODAR E REINICIAR") == "Rodar e reiniciar");
+    Assert(FriendlyText.Apply("OK") == "OK" && FriendlyText.Apply("GPU") == "GPU" && FriendlyText.Apply("Já escrito") == "Já escrito" && FriendlyText.Apply("1 MIN") == "1 min");
+    Assert(FriendlyText.Apply("LIMPAR O PC") == "Limpar o PC" && FriendlyText.Apply("ÚLTIMA VERSÃO") == "Última versão");
+});
+Test("Friendly UI: home tasks and search lead to real pages, and simple mode hides the technical ones", () => {
+    string xaml = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "MainWindow.xaml"));
+    foreach (var p in PageCatalog.Pages) Assert(xaml.Contains($"x:Name=\"{p.Nav}\""));
+    Assert(PageCatalog.Pages.Select(p => p.Nav).Distinct().Count() == PageCatalog.Pages.Length);
+    foreach (var t in PageCatalog.Tasks) Assert(PageCatalog.ByNav(t.Nav) is { Advanced: false });
+    Assert(PageCatalog.Search("bloatware", false).First().Nav == "NavTweakWin");
+    Assert(PageCatalog.Search("manutencao", false).Any(p => p.Nav == "NavMaint") && PageCatalog.Search("MANUTENÇÃO", false).Any(p => p.Nav == "NavMaint"));
+    Assert(PageCatalog.Search("overclock", false).Count == 0 && PageCatalog.Search("overclock", true).First().Nav == "NavOc");
+    Assert(PageCatalog.Search("  ", true).Count == 0 && PageCatalog.Search("driver", false).First().Nav == "NavDriver");
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 
