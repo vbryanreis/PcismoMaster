@@ -1694,10 +1694,12 @@
                                 </WrapPanel>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
                                     Na Store, o script também desliga a reprodução automática de vídeos, os avisos de instalação e as
-                                    experiências personalizadas: faça isso nas configurações da Store.
+                                    experiências personalizadas: o script completo da Store, abaixo, faz isso.
                                 </TextBlock>
                             </StackPanel>
                         </Border>
+                        <!-- Scripts completos do 3 Setup (MainWindow.ScriptCards.cs) -->
+                        <StackPanel x:Name="TweakIniHost" Margin="0,22,0,0"/>
                     </StackPanel>
                 </ScrollViewer>
 

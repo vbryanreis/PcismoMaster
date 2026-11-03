@@ -289,6 +289,28 @@ Test("Tweaking: Windows, Hardware e Avançado catalogs are unique, safe and pars
     }
     Assert(TweakCatalog.PowerPlan.All(p => Guid.TryParse(p.Sub, out _) && Guid.TryParse(p.Setting, out _) && int.TryParse(p.Value, out _)));
 });
+Test("Tweaking: full Ultimate scripts are all embedded, flagged and never interactive", () => {
+    var asm = typeof(ScriptCatalog).Assembly;
+    var embedded = asm.GetManifestResourceNames().Where(n => n.StartsWith("Tweaks/Scripts/")).Select(n => n["Tweaks/Scripts/".Length..^4]).ToHashSet();
+    var options = ScriptCatalog.All.SelectMany(c => c.Options.Select(o => (c, o))).ToArray();
+    Assert(embedded.Count > 130 && options.Length == embedded.Count && options.All(x => embedded.Contains(x.o.Id)));
+    Assert(options.Select(x => x.o.Id).Distinct().Count() == options.Length && ScriptCatalog.All.All(c => c.Page is "setup" or "win" or "hw" or "adv"));
+    Assert(!embedded.Contains("setup-4") && !embedded.Contains("setup-12") && !embedded.Any(i => i.StartsWith("adv-8-") || i.StartsWith("adv-9-") || i.StartsWith("adv-10-")));
+    foreach (var (c, o) in options)
+    {
+        string ps = ScriptCatalog.Read(o.Id);
+        Assert(ps.StartsWith("# Ultimate (FR33THY, MIT)"));
+        Assert(!System.Text.RegularExpressions.Regex.IsMatch(ps, @"Read-Host|ReadKey|OpenFileDialog|Out-GridView")); // nada espera digitação
+        bool iwr = System.Text.RegularExpressions.Regex.IsMatch(ps, @"(?m)^\s*(IWR|Invoke-WebRequest)\b");
+        if (iwr != o.Downloads) throw new Exception($"{o.Id}: aviso de download errado");
+        if (ps.Contains("safeboot") != o.SafeMode) throw new Exception($"{o.Id}: aviso de Modo de Segurança errado");
+        if (o.SafeMode && !o.Restarts) throw new Exception($"{o.Id}: Modo de Segurança sem aviso de reinício");
+        Assert(!(o.IsDefault && o.Risk == ScriptRisk.Perigoso) && (o.NeedsUsb == ps.Contains("$env:PM_USB")));
+        var w = ScriptCatalog.Warnings(o, c);
+        if (o.Risk == ScriptRisk.Perigoso) Assert(w.Any(x => x.Contains("ponto de restauração")) && o.Warning != null);
+        if (o.Downloads) Assert(w.Any(x => x.Contains("terceiros")));
+    }
+});
 // ---- Promoções (IsThereAnyDeal): tudo com um handler falso, sem rede e sem chave de verdade ----
 Dictionary<string, string> QueryOf(string query) => query.Split('&').Select(p => p.Split('=', 2))
     .ToDictionary(p => p[0], p => Uri.UnescapeDataString(p.Length > 1 ? p[1] : ""));

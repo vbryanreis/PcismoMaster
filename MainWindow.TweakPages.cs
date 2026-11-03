@@ -257,16 +257,8 @@ public partial class MainWindow
         wrap.Children.Add(TweakButton("INICIALIZAÇÃO (NO APP)", false, (_, _) => NavStartup.IsChecked = true));
         sc.Children.Add(wrap);
 
-        TweakCard(host, "O QUE FICOU DE FORA", null, out var outBody);
-        outBody.Children.Add(new TextBlock
-        {
-            Foreground = (Brush)FindResource("Faint"), FontSize = 11, TextWrapping = TextWrapping.Wrap,
-            Text = "Do script, não entram aqui porque não têm volta ou mexem em proteções do Windows: remover bloatware, apps e recursos " +
-                   "do Windows (use Desinstalar Apps), desinstalar o Edge e o WebView, otimizar o Defender (exige modo de segurança e " +
-                   "TrustedInstaller), apagar tarefas e itens de inicialização pelo Autoruns, trocar as fotos da conta e os atalhos do " +
-                   "Menu Iniciar, mexer no settings.dat do Bloco de Notas, o serviço de resolução do timer e o EQ de volume (é por " +
-                   "dispositivo de som: use Som → Propriedades → Aprimoramentos).",
-        });
+        // Bloatware, Edge/WebView, Defender otimizado, Autoruns, fotos da conta, atalhos do Iniciar, Bloco de Notas, timer, EQ…
+        AddScriptSection(host, "win");
     }
 
     private static SetupTweak[] BuildWindowsTweaks()
@@ -489,8 +481,10 @@ public partial class MainWindow
             Text = "Mouse: use 1000 Hz ou mais no software do mouse e ajuste a sensibilidade pelo DPI, deixando o Windows em 6/11 sem aceleração. " +
                    "Monitor: escolha a maior taxa de atualização em Vídeo avançado, ligue o overdrive no menu do monitor no nível sem rastro " +
                    "(confira no teste UFO) e use cabo DisplayPort. Rede: se o teste de bufferbloat der nota baixa, ligue o SQM/QoS no roteador. " +
-                   "Controle: o overclock de polling do script usa um driver de terceiros (hidusbf) e não é instalado pelo PcismoMaster.",
+                   "Controle: o overclock de polling (hidusbf) está nos scripts completos abaixo.",
         });
+
+        AddScriptSection(host, "hw");
     }
 
     private void BuildScalingCard(Panel host)
@@ -564,13 +558,8 @@ public partial class MainWindow
         BuildDepCard(host);
         BuildPerGameCard(host);
 
-        TweakCard(host, "O QUE FICOU DE FORA", null, out var outBody);
-        outBody.Children.Add(new TextBlock
-        {
-            Foreground = (Brush)FindResource("Faint"), FontSize = 11, TextWrapping = TextWrapping.Wrap,
-            Text = "Do script, não entram aqui: desligar o Defender (exige modo de segurança e deixa o PC sem antivírus) e desligar serviços " +
-                   "do Windows em massa (quebra recursos sem aviso e não tem volta exata). A compressão de memória fica na sub-aba Iniciar.",
-        });
+        // Defender desligado, serviços em massa, Iniciar/Pesquisa/Shell e os outros scripts inteiros.
+        AddScriptSection(host, "adv");
     }
 
     private void BuildRebarCard(Panel host)
@@ -726,8 +715,41 @@ public partial class MainWindow
             p.PriorityClass = ProcessPriorityClass.Normal;
             return $"{p.ProcessName}: todos os núcleos e prioridade normal.";
         })));
+        // "Startup" dos scripts Priority / Smt Ht / Core 1 Thread 1: abre o jogo já com a prioridade e os núcleos escolhidos.
+        var noSmt = new CheckBox { Content = "Sem SMT/HT", Margin = new Thickness(0, 0, 14, 8), VerticalAlignment = VerticalAlignment.Center };
+        var noCore0 = new CheckBox { Content = "Sem núcleo 0", Margin = new Thickness(0, 0, 14, 8), VerticalAlignment = VerticalAlignment.Center };
+        var closeLaunchers = new CheckBox { Content = "Fechar launchers antes (Steam, Epic, Battle.net…)", Margin = new Thickness(0, 0, 14, 8), VerticalAlignment = VerticalAlignment.Center };
+        var row3 = new WrapPanel { Margin = new Thickness(0, 6, 0, 0) };
+        row3.Children.Add(noSmt);
+        row3.Children.Add(noCore0);
+        row3.Children.Add(closeLaunchers);
+        row3.Children.Add(TweakButton("ABRIR UM JOGO ASSIM…", false, (_, _) =>
+        {
+            if (!RequireAdmin()) return;
+            var dlg = new OpenFileDialog { Filter = "Programas (*.exe)|*.exe", Title = "Escolha o .exe do jogo ou do launcher" };
+            if (dlg.ShowDialog(this) != true) return;
+            if (closeLaunchers.IsChecked == true)
+            {
+                if (MessageBox.Show(this, "Fechar à força Steam, Epic, EA, Battle.net, GOG, Riot, Ubisoft, Roblox e Escape from Tarkov (o que estiver aberto)? Downloads em andamento param.",
+                        "Por jogo", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK) return;
+                foreach (var name in new[] { "Battle.net", "BsgLauncher", "EADesktop", "EpicGamesLauncher", "GalaxyClient", "RobloxPlayerBeta", "RiotClientServices", "Launcher", "steam", "upc" })
+                    foreach (var lp in Process.GetProcessesByName(name)) { try { lp.Kill(); } catch { } finally { lp.Dispose(); } }
+            }
+            try
+            {
+                using var p = Process.Start(new ProcessStartInfo(dlg.FileName) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(dlg.FileName)! })!;
+                long mask = all;
+                if (noSmt.IsChecked == true) { mask = 0; for (int i = 0; i < Math.Min(n, 63); i += 2) mask |= 1L << i; }
+                if (noCore0.IsChecked == true && n >= 4) mask &= ~3L;
+                if (mask != all) p.ProcessorAffinity = (IntPtr)mask;
+                p.PriorityClass = prio.SelectedIndex switch { 0 => ProcessPriorityClass.High, 1 => ProcessPriorityClass.AboveNormal, 3 => ProcessPriorityClass.RealTime, _ => ProcessPriorityClass.Normal };
+                status.Text = $"{p.ProcessName} aberto com prioridade {prio.SelectedItem}" + (mask != all ? " e núcleos limitados" : "") + ". Programas que ele abrir herdam os núcleos.";
+            }
+            catch (Exception ex) { status.Text = "Não deu: " + ex.Message; }
+        }));
         body.Children.Add(row1);
         body.Children.Add(row2);
+        body.Children.Add(row3);
         body.Children.Add(status);
     }
 }

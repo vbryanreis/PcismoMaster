@@ -35,6 +35,7 @@ public partial class MainWindow
         if (_tweakInit) return;
         _tweakInit = true;
         BuildTweakRows();
+        AddScriptSection(TweakIniHost, "setup");
         _ = RefreshMemCompressionAsync();
         _ = RefreshBitLockerAsync();
     }
