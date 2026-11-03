@@ -7,7 +7,7 @@ using ResetExplode.Modular;
 namespace ResetExplode;
 public partial class MainWindow
 {
-    // ---------------- OTIMIZAÇÃO · Inicialização do Windows ----------------
+    // ---------------- FERRAMENTAS · Inicialização do Windows ----------------
 
     private readonly ModuleEngine updateEngine = new(new RegistryStore(), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PcismoMaster", "ModuleBackups"));
     private Module UpdateModule()

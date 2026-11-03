@@ -293,10 +293,22 @@
                                     <TextBlock Text="Inicialização" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavWinStartup" Style="{StaticResource NavItem}" Tag="PageUltimate" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Inicialização do Windows" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavApps" Style="{StaticResource NavItem}" Tag="PageApps" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE719;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Instalar apps" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Desinstalar Apps" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
@@ -330,21 +342,6 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Drivers seriais" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <ToggleButton x:Name="GrpOtim" Style="{StaticResource NavGroup}" Content="OTIMIZAÇÃO"/>
-                            <StackPanel x:Name="GrpOtimItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpOtim, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavWinStartup" Style="{StaticResource NavItem}" Tag="PageUltimate" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Inicialização do Windows" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Desinstalar Apps" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -2689,86 +2686,164 @@
                 <!-- ===== INSTALAR APPS (pós-formatação, via winget) ===== -->
                 <ScrollViewer x:Name="PageApps" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
-                        <Grid Margin="0,0,0,20">
-                            <StackPanel Margin="0,0,250,0">
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
                                 <TextBlock Text="INSTALAR APPS" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Os essenciais depois de formatar o PC · versão oficial mais recente, instalação silenciosa" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
-                            <Button x:Name="BtnAppsInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR SELECIONADOS" Padding="20,9"
-                                    HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnAppsInstall_Click"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="16,0,0,0">
+                                <TextBlock x:Name="AppsSelCount" Text="Nenhum selecionado" Foreground="{DynamicResource Muted}" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                <Button x:Name="BtnAppsInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR SELECIONADOS" Padding="20,9"
+                                        Click="BtnAppsInstall_Click"/>
+                            </StackPanel>
                         </Grid>
                         <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                            <Border Background="{DynamicResource AccentGradient}" RenderTransformOrigin="0,0.5">
                                 <Border.RenderTransform><ScaleTransform x:Name="AppsProgress" ScaleX="0"/></Border.RenderTransform>
                             </Border>
                         </Grid>
                         <TextBlock x:Name="AppsStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                        <Border Style="{StaticResource CardBorder}">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="APPS" Style="{StaticResource Label}"/>
-                                    <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-                                        <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODOS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnAppsAll_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnAppsNone_Click"/>
-                                    </WrapPanel>
-                                </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
-                                    Usa o winget, o instalador de pacotes da Microsoft que já vem no Windows 10/11: baixa do site oficial de
-                                    cada fabricante e confere o arquivo antes de instalar. Os apps são instalados um de cada vez, sem janelas.
-                                    O que já está instalado aparece marcado como INSTALADO.
-                                </TextBlock>
-                                <WrapPanel x:Name="AppsCatPanel" Margin="0,0,0,10">
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Todos" Tag="" IsChecked="True" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Navegadores" Tag="Navegadores" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mensagens" Tag="Mensagens" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mídia" Tag="Mídia" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Imagem" Tag="Imagem" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Documentos" Tag="Documentos" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Segurança" Tag="Segurança" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Compactação" Tag="Compactação" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Utilitários" Tag="Utilitários" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Desenvolvimento" Tag="Desenvolvimento" Checked="AppsCat_Checked"/>
-                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Jogos" Tag="Jogos" Checked="AppsCat_Checked"/>
-                                </WrapPanel>
-                                <ItemsControl x:Name="AppsList">
-                                    <ItemsControl.ItemTemplate>
+                        <!-- Busca, filtros e categorias -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="280"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="AppsSearch" Tag="Buscar app…" TextChanged="AppsSearch_TextChanged"/>
+                            <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <CheckBox x:Name="AppsHideInstalled" Content="Esconder instalados" VerticalAlignment="Center" Margin="0,0,16,0"
+                                          Checked="AppsHideInstalled_Changed" Unchecked="AppsHideInstalled_Changed"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODOS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnAppsAll_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnAppsNone_Click"/>
+                            </WrapPanel>
+                        </Grid>
+                        <WrapPanel x:Name="AppsCatPanel" Margin="0,0,0,8">
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Todos" Tag="" IsChecked="True" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Navegadores" Tag="Navegadores" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mensagens" Tag="Mensagens" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Mídia" Tag="Mídia" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Imagem" Tag="Imagem" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Documentos" Tag="Documentos" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Segurança" Tag="Segurança" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Compactação" Tag="Compactação" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Utilitários" Tag="Utilitários" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Desenvolvimento" Tag="Desenvolvimento" Checked="AppsCat_Checked"/>
+                            <RadioButton Style="{StaticResource ChipAccent}" GroupName="AppsCat" Content="Jogos" Tag="Jogos" Checked="AppsCat_Checked"/>
+                        </WrapPanel>
+
+                        <!-- Grade de cartões iguais, agrupada por categoria -->
+                        <ItemsControl x:Name="AppsList" Focusable="False">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
                                         <DataTemplate>
-                                            <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,10">
+                                            <StackPanel Orientation="Horizontal" Margin="2,14,0,10">
+                                                <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource Fg}"/>
+                                                <Border Background="{DynamicResource Hover}" CornerRadius="8" Padding="7,1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding ItemCount}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Muted}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ItemsControl.GroupStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="268" Height="92" Margin="0,0,12,12" CornerRadius="10" BorderThickness="1" Padding="12"
+                                            Cursor="Hand" MouseLeftButtonUp="AppCard_Click" ToolTip="{Binding Description}">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{DynamicResource Card}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Line}"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource Hover}"/>
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding Selected}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Installed}" Value="True">
+                                                        <Setter Property="Cursor" Value="Arrow"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="44"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <!-- Ícone num quadrado claro: todos ficam iguais, mesmo os escuros -->
+                                            <Border Width="44" Height="44" CornerRadius="10" Background="{DynamicResource IconTile}" VerticalAlignment="Top">
                                                 <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <CheckBox IsChecked="{Binding Selected}" IsEnabled="{Binding CanSelect}" VerticalAlignment="Top" Margin="0,1,12,0"/>
-                                                    <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
-                                                        <TextBlock Text="{Binding Status}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,0"/>
-                                                    </StackPanel>
-                                                    <TextBlock Grid.Column="2" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Muted}"
-                                                               VerticalAlignment="Top" Margin="14,3,0,0">
+                                                    <TextBlock Text="{Binding Initial}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Accent}"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
-                                                                <Setter Property="Text" Value=""/>
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Installed}" Value="True">
-                                                                        <Setter Property="Text" Value="INSTALADO"/>
+                                                                    <DataTrigger Binding="{Binding HasIcon}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </TextBlock.Style>
                                                     </TextBlock>
+                                                    <Image Source="{Binding Icon}" Width="30" Height="30" RenderOptions.BitmapScalingMode="HighQuality"/>
                                                 </Grid>
                                             </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <Button x:Name="BtnAppsStore" Style="{StaticResource OutlineButton}" Content="ATUALIZAR O INSTALADOR DE APLICATIVO (MICROSOFT STORE)"
-                                        Padding="14,7" Margin="0,12,0,0" HorizontalAlignment="Left" Visibility="Collapsed" Click="BtnAppsStore_Click"/>
-                            </StackPanel>
-                        </Border>
+                                            <StackPanel Grid.Column="1" Margin="12,0,6,0">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13.5" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="11.5" TextWrapping="Wrap"
+                                                           TextTrimming="CharacterEllipsis" MaxHeight="31" Margin="0,2,0,0"/>
+                                                <TextBlock Text="{Binding Status}" FontSize="10.5" Foreground="{DynamicResource Accent}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                            <!-- Marcação: círculo (selecionável) ou selo INSTALADO -->
+                                            <Grid Grid.Column="2" VerticalAlignment="Top">
+                                                <Border x:Name="tick" Width="20" Height="20" CornerRadius="10" BorderThickness="1.5"
+                                                        BorderBrush="{DynamicResource LineStrong}" Background="Transparent">
+                                                    <TextBlock x:Name="tickGlyph" Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="11" FontWeight="Bold"
+                                                               Foreground="{DynamicResource OnAccent}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                                </Border>
+                                                <Border x:Name="installedChip" Background="#264ED17A" CornerRadius="6" Padding="6,2" Visibility="Collapsed">
+                                                    <TextBlock Text="INSTALADO" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource ChartGpu}"/>
+                                                </Border>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Selected}" Value="True">
+                                            <Setter TargetName="tick" Property="Background" Value="{DynamicResource Accent}"/>
+                                            <Setter TargetName="tick" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                            <Setter TargetName="tickGlyph" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Installed}" Value="True">
+                                            <Setter TargetName="tick" Property="Visibility" Value="Collapsed"/>
+                                            <Setter TargetName="installedChip" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,8,0,0">
+                            Clique num cartão para marcar. Usa o winget, o instalador de pacotes da Microsoft que já vem no Windows 10/11:
+                            baixa do site oficial de cada fabricante e confere o arquivo antes de instalar. Os apps são instalados um de cada
+                            vez, sem janelas. Os ícones vêm do site de cada app e ficam guardados no PC.
+                        </TextBlock>
+                        <Button x:Name="BtnAppsStore" Style="{StaticResource OutlineButton}" Content="ATUALIZAR O INSTALADOR DE APLICATIVO (MICROSOFT STORE)"
+                                Padding="14,7" Margin="0,12,0,0" HorizontalAlignment="Left" Visibility="Collapsed" Click="BtnAppsStore_Click"/>
                     </StackPanel>
                 </ScrollViewer>
 
@@ -2871,49 +2946,125 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== OTIMIZAÇÃO · Desinstalar Apps (desinstalador seguro + varredura de sobras) ===== -->
+                <!-- ===== FERRAMENTAS · Desinstalar Apps (desinstalador seguro + varredura de sobras) ===== -->
                 <ScrollViewer x:Name="PageUninstall" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,16">
                             <StackPanel Margin="0,0,190,0">
                                 <TextBlock Text="DESINSTALAR APPS" Style="{StaticResource H1}"/>
-                                <TextBlock Text="Remove programas pelo desinstalador oficial e procura sobras com segurança" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                                <TextBlock Text="Desinstalador oficial + varredura profunda de sobras (pastas, arquivos ocultos, registro, inicialização e tarefas), com Lixeira e backup" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnUnRefresh" Style="{StaticResource OutlineButton}" Content="ATUALIZAR LISTA" Padding="16,8"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnUnRefresh_Click"/>
                         </Grid>
 
-                        <TextBox x:Name="UnSearch" Tag="Buscar programa…" Margin="0,0,0,10" TextChanged="UnSearch_TextChanged"/>
-                        <TextBlock x:Name="UnStatus" Foreground="{DynamicResource Muted}" Margin="2,0,0,10" FontSize="12"/>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="320"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="UnSearch" Tag="Buscar programa ou fabricante…" TextChanged="UnSearch_TextChanged"/>
+                            <TextBlock x:Name="UnStatus" Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"
+                                       VerticalAlignment="Center" Margin="16,0,0,0"/>
+                        </Grid>
 
                         <Border Style="{StaticResource CardBorder}" Padding="8,6">
                             <ListBox x:Name="UninstallList" MaxHeight="430" ItemContainerStyle="{StaticResource SelectItem}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="Transparent" Padding="10,8" Cursor="Hand">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Muted}" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
-                                            </StackPanel>
+                                        <Border Background="Transparent" Padding="8,6" Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="36"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource IconTile}">
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Initial}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Accent}"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding HasIcon}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <Image Source="{Binding Icon}" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    </Grid>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Muted}" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </Border>
 
-                        <Button x:Name="BtnUninstall" Style="{StaticResource PrimaryButton}" Content="DESINSTALAR SELECIONADO" Padding="24,11"
-                                HorizontalAlignment="Left" Margin="0,14,0,0" Click="BtnUninstall_Click"/>
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,10,0,0"
-                                   Text="Mostramos só programas de verdade (componentes do Windows, drivers e atualizações ficam de fora). A desinstalação usa o próprio desinstalador do programa; depois procuramos sobras para você revisar."/>
+                        <!-- Profundidade da varredura (como o Revo) e ponto de restauração -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,14,0,0">
+                            <StackPanel>
+                                <TextBlock Text="VARREDURA DE SOBRAS" Style="{StaticResource Label}" Margin="0,0,0,8"/>
+                                <WrapPanel>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Seguro" Tag="Seguro" Checked="UnMode_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Moderado" Tag="Moderado" IsChecked="True" Checked="UnMode_Checked"/>
+                                    <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Avançado" Tag="Avancado" Checked="UnMode_Checked"/>
+                                    <CheckBox x:Name="UnRestorePoint" Content="Criar ponto de restauração antes" IsChecked="True" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="UnModeHint" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <WrapPanel Margin="0,14,0,0">
+                            <Button x:Name="BtnUninstall" Style="{StaticResource PrimaryButton}" Content="DESINSTALAR SELECIONADO" Padding="24,11"
+                                    Margin="0,0,10,8" Click="BtnUninstall_Click"/>
+                            <Button x:Name="BtnUnForce" Style="{StaticResource OutlineButton}" Content="REMOÇÃO FORÇADA" Padding="18,11" Margin="0,0,10,8"
+                                    Click="BtnUnForce_Click" ToolTip="Para programas que não desinstalam mais (desinstalador sumiu ou dá erro): não roda o desinstalador e procura tudo o que sobrou, inclusive a entrada em Programas e Recursos."/>
+                            <Button x:Name="BtnUnScanNow" Style="{StaticResource OutlineButton}" Content="JÁ TERMINEI · PROCURAR SOBRAS" Padding="18,11" Margin="0,0,10,8"
+                                    Visibility="Collapsed" Click="BtnUnScanNow_Click"/>
+                            <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR ÚLTIMA LIMPEZA" Padding="18,11" Margin="0,0,10,8" Click="BtnUnRestore_Click"
+                                    ToolTip="Devolve o registro e as tarefas da última remoção de sobras. Pastas e arquivos voltam pela Lixeira."/>
+                            <Button Style="{StaticResource OutlineButton}" Content="ABRIR BACKUPS" Padding="18,11" Margin="0,0,10,8" Click="BtnUnBackups_Click"/>
+                        </WrapPanel>
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,4,0,0"
+                                   Text="Mostramos só programas de verdade (componentes do Windows, drivers e atualizações ficam de fora). A desinstalação usa o próprio desinstalador do programa; depois procuramos sobras para você revisar. Nada sai sem você marcar e confirmar: pastas e arquivos vão para a Lixeira e o registro e as tarefas ganham backup."/>
 
                         <!-- Sobras encontradas após desinstalar -->
                         <Border x:Name="UnLeftoverCard" Style="{StaticResource CardBorder}" Margin="0,16,0,0" Visibility="Collapsed">
                             <StackPanel>
-                                <TextBlock x:Name="UnLeftoverTitle" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                                <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,12"
-                                           Text="Marque o que deseja remover. Só aparecem pastas e chaves ligadas ao programa, sempre fora do Windows e do registro do sistema."/>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock x:Name="UnLeftoverTitle" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <WrapPanel HorizontalAlignment="Right">
+                                        <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODAS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnUnMarkAll_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="SÓ AS CLARAS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnUnMarkStrong_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnUnMarkNone_Click"/>
+                                    </WrapPanel>
+                                </Grid>
+                                <TextBlock x:Name="UnLeftoverSummary" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"
+                                           Text="Marcado = ligação clara com o app. CONFIRA = só bate com o nome do fabricante ou é parecido: abra antes de remover. Pastas do Windows, pastas pessoais e o registro do sistema nunca aparecem."/>
                                 <ItemsControl x:Name="UnLeftoverList">
+                                    <ItemsControl.GroupStyle>
+                                        <GroupStyle>
+                                            <GroupStyle.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+                                                        <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="Bold"/>
+                                                        <Border Background="{DynamicResource Hover}" CornerRadius="8" Padding="7,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding ItemCount}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Muted}"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </GroupStyle.HeaderTemplate>
+                                        </GroupStyle>
+                                    </ItemsControl.GroupStyle>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,8">
@@ -2923,31 +3074,49 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                                    <Border Grid.Column="1" Background="{DynamicResource Hover}" CornerRadius="6" Padding="7,2" VerticalAlignment="Center" Margin="0,0,10,0">
-                                                        <TextBlock Text="{Binding Kind}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
-                                                    </Border>
-                                                    <TextBlock Grid.Column="2" Text="{Binding Display}" FontFamily="{StaticResource Mono}" FontSize="12"
-                                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
+                                                        <Border Background="{DynamicResource Hover}" CornerRadius="6" Padding="7,2">
+                                                            <TextBlock Text="{Binding Kind}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
+                                                        </Border>
+                                                        <Border x:Name="weak" Background="#26FFCF4D" CornerRadius="6" Padding="7,2" Margin="0,4,0,0" Visibility="Collapsed">
+                                                            <TextBlock Text="CONFIRA" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource TempWarn}"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Display}" FontFamily="{StaticResource Mono}" FontSize="12"
+                                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Display}"/>
+                                                        <TextBlock Text="{Binding Info}" Foreground="{DynamicResource Faint}" FontSize="11"
+                                                                   TextTrimming="CharacterEllipsis" Margin="0,2,0,0" ToolTip="{Binding Info}"/>
+                                                    </StackPanel>
                                                     <TextBlock Grid.Column="3" Text="{Binding SizeText}" Foreground="{DynamicResource Muted}" FontSize="11.5"
                                                                VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                                    <Button Grid.Column="4" Style="{StaticResource OutlineButton}" Content="ABRIR" Padding="9,3" FontSize="10.5"
+                                                            Margin="10,0,0,0" VerticalAlignment="Center" Tag="{Binding}" Click="UnLeftoverOpen_Click"
+                                                            ToolTip="Abre no Explorador, no Editor do Registro ou no Agendador de Tarefas para conferir"/>
                                                 </Grid>
                                             </Border>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Strong}" Value="False">
+                                                    <Setter TargetName="weak" Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
-                                    <Button Style="{StaticResource PrimaryButton}" Content="REMOVER MARCADAS" Padding="16,8" Click="BtnUnRemoveLeftovers_Click"/>
+                                    <Button x:Name="BtnUnRemove" Style="{StaticResource PrimaryButton}" Content="REMOVER MARCADAS" Padding="16,8" Click="BtnUnRemoveLeftovers_Click"/>
                                     <Button Style="{StaticResource OutlineButton}" Content="FECHAR" Padding="16,8" Margin="8,0,0,0" Click="BtnUnCloseLeftovers_Click"/>
-                                    <TextBlock x:Name="UnLeftoverStatus" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    <TextBlock x:Name="UnLeftoverStatus" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== OTIMIZAÇÃO · Inicialização do Windows (Windows Update) ===== -->
+                <!-- ===== FERRAMENTAS · Inicialização do Windows (Windows Update) ===== -->
                 <ScrollViewer x:Name="PageUltimate" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">

@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
-  <ItemGroup><Compile Include="..\Modular\*.cs" Link="%(Filename)%(Extension)" /><Compile Include="..\MftIndex.cs" Link="MftIndex.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="..\Modular\*.cs" Link="%(Filename)%(Extension)" /><Compile Include="..\MftIndex.cs" Link="MftIndex.cs" /><Compile Include="..\Uninstaller.cs" Link="Uninstaller.cs" /><Compile Include="..\ProgramInventory.cs" Link="ProgramInventory.cs" /></ItemGroup>
 </Project>

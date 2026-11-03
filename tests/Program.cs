@@ -162,6 +162,71 @@ Test("Finder index: names, paths across volumes, unsorted records and filters", 
     Assert(idx.Search("  ", false, false, 10).Count == 0 && idx.Search("xyz", false, false, 10).Count == 0);
     idx.Release(); Assert(!idx.Ready && idx.Search("Docs", false, false, 10).Count == 0);
 });
+Test("Uninstaller: app name matching (clear, publisher only, unrelated)", () => {
+    var ff = Uninstaller.Matcher.For("Mozilla Firefox (x64 pt-BR) 120.0", "Mozilla", "");
+    Assert(ff.Level("Firefox") == 2 && ff.Level("Mozilla") == 1 && ff.Level("Thunderbird") == 0 && ff.Level("Mozilla Firefox") == 2);
+    var zip = Uninstaller.Matcher.For("7-Zip 23.01 (x64)", "Igor Pavlov", "");
+    Assert(zip.Level("7-Zip") == 2 && zip.Level("WinZip") == 0);
+    var discord = Uninstaller.Matcher.For("Discord", "Discord Inc.", "");
+    Assert(discord.Level("Discord") == 2 && discord.Level("discord-updater") == 2);
+    var git = Uninstaller.Matcher.For("Git", "The Git Development Community", "");
+    Assert(git.Level("Git") == 2 && git.Level("GitHub Desktop") == 0 && git.Level("Digital") == 0);
+    var epic = Uninstaller.Matcher.For("Epic Games Launcher", "Epic Games, Inc.", "");
+    Assert(epic.Level("EpicGamesLauncher") == 2 && epic.Level("My Games") == 0);
+    Assert(Uninstaller.CleanName("Notepad++ (64-bit x64) v8.6.2") == "Notepad++");
+});
+Test("Uninstaller: folder guards never allow Windows, roots or personal folders", () => {
+    string F(Environment.SpecialFolder f) => Environment.GetFolderPath(f);
+    string pf = F(Environment.SpecialFolder.ProgramFiles), prof = F(Environment.SpecialFolder.UserProfile), docs = F(Environment.SpecialFolder.MyDocuments);
+    Assert(!Uninstaller.IsSafeFolder(F(Environment.SpecialFolder.Windows)) && !Uninstaller.IsSafeFolder(Path.Combine(F(Environment.SpecialFolder.Windows), "Foo")));
+    Assert(!Uninstaller.IsSafeFolder(pf) && Uninstaller.IsSafeFolder(Path.Combine(pf, "FooApp")) && !Uninstaller.IsSafeFolder(Path.Combine(pf, "Common Files")));
+    Assert(!Uninstaller.IsSafeFolder(Path.Combine(pf, "Microsoft", "Edge")) && !Uninstaller.IsSafeFolder(@"C:\"));
+    Assert(Uninstaller.IsSafeFolder(Path.Combine(F(Environment.SpecialFolder.ApplicationData), "FooApp")));
+    Assert(!Uninstaller.IsSafeFolder(F(Environment.SpecialFolder.LocalApplicationData)) && !Uninstaller.IsSafeFolder(Path.Combine(F(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Foo")));
+    Assert(!Uninstaller.IsSafeFolder(docs) && Uninstaller.IsSafeFolder(Path.Combine(docs, "FooApp")));
+    Assert(!Uninstaller.IsSafeFolder(Path.Combine(prof, "Downloads", "FooApp")) && !Uninstaller.IsSafeFolder(Path.Combine(prof, ".ssh")));
+    Assert(Uninstaller.IsSafeFolder(Path.Combine(prof, ".fooapp")) && !Uninstaller.IsSafeFolder(prof));
+    Assert(!Uninstaller.IsSafeFolder(F(Environment.SpecialFolder.DesktopDirectory)) && Uninstaller.IsSafeFolder(Path.Combine(Path.GetTempPath(), "FooApp")));
+    Assert(Uninstaller.IsSafeFile(Path.Combine(F(Environment.SpecialFolder.DesktopDirectory), "FooApp.lnk")));
+    Assert(!Uninstaller.IsSafeFile(Path.Combine(F(Environment.SpecialFolder.System), "drivers", "foo.sys")));
+});
+Test("Uninstaller: registry guards (system branches out, exact exceptions in)", () => {
+    Assert(!Uninstaller.IsSafeRegPath("Software") && !Uninstaller.IsSafeRegPath(@"Software\Microsoft") && !Uninstaller.IsSafeRegPath(@"Software\Classes\foo"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\FooApp") && Uninstaller.IsSafeRegPath(@"Software\Contoso\FooApp"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\WOW6432Node\FooApp") && !Uninstaller.IsSafeRegPath(@"Software\WOW6432Node\Microsoft\X") && !Uninstaller.IsSafeRegPath(@"Software\WOW6432Node"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\FooApp") && Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\{1234-ABCD}"));
+    Assert(!Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall") && !Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\Foo\Bar"));
+    Assert(Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\App Paths\fooapp.exe") && !Uninstaller.IsSafeRegPath(@"Software\Microsoft\Windows\CurrentVersion\App Paths"));
+    Assert(!Uninstaller.IsSafeRegPath(@"Software\..\System") && !Uninstaller.IsSafeRegPath(@"System\CurrentControlSet\Services\Foo"));
+    Assert(Uninstaller.IsSafeRegValue(@"Software\Microsoft\Windows\CurrentVersion\Run", "FooApp") && !Uninstaller.IsSafeRegValue(@"Software\Microsoft\Windows\CurrentVersion\Run", ""));
+    Assert(!Uninstaller.IsSafeRegValue(@"Software\Microsoft\Windows\CurrentVersion", "FooApp"));
+    var (exe, args) = Uninstaller.ParseCommand("\"C:\\Program Files\\Foo\\unins000.exe\" /SILENT");
+    Assert(exe == @"C:\Program Files\Foo\unins000.exe" && args == "/SILENT");
+    string reg = Uninstaller.ValueRegFile(Microsoft.Win32.RegistryHive.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "Foo", Microsoft.Win32.RegistryValueKind.String, "\"C:\\Foo\\foo.exe\" -min");
+    Assert(reg.Contains(@"[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]") && reg.Contains("\"Foo\"=\"\\\"C:\\\\Foo\\\\foo.exe\\\" -min\""));
+});
+Test("Uninstaller: deep folder scan finds app and publisher\\app, counts hidden files, removes read-only", () => {
+    string root = Path.Combine(Path.GetTempPath(), "PCMasterTests-" + Guid.NewGuid().ToString("N")[..8]);
+    try {
+        string app = Path.Combine(root, "FooApp"), sub = Path.Combine(app, "cache");
+        Directory.CreateDirectory(sub);
+        File.WriteAllText(Path.Combine(app, "settings.json"), "{}");
+        string hidden = Path.Combine(sub, "state.bin"); File.WriteAllText(hidden, "x");
+        File.SetAttributes(hidden, FileAttributes.Hidden | FileAttributes.ReadOnly);
+        Directory.CreateDirectory(Path.Combine(root, "Contoso", "FooApp")); Directory.CreateDirectory(Path.Combine(root, "Contoso", "OtherApp"));
+        Directory.CreateDirectory(Path.Combine(root, "Contoso Labs", "FooApp Data"));
+        Directory.CreateDirectory(Path.Combine(root, "Unrelated"));
+        var m = Uninstaller.Matcher.For("FooApp 2.0", "Contoso Ltd", "");
+        var found = Uninstaller.ScanFolders(new[] { root }, m, ScanMode.Moderado).ToDictionary(f => Path.GetRelativePath(root, f.FilePath!), f => f);
+        Assert(found.Count == 3 && found.ContainsKey("FooApp") && found.ContainsKey(Path.Combine("Contoso", "FooApp")) && found.ContainsKey("Contoso Labs"));
+        Assert(found.Values.All(f => f.Strong) && found["FooApp"].Detail.Contains("2 arquivo(s)") && found["FooApp"].Detail.Contains("1 oculto(s)") && found["FooApp"].Detail.Contains("1 subpasta(s)"));
+        var adv = Uninstaller.ScanFolders(new[] { root }, m, ScanMode.Avancado);
+        Assert(adv.Count == 3); // "Contoso" com outro app dentro nunca entra inteira
+        var res = Uninstaller.DeleteLeftovers(new[] { found["FooApp"] }, "FooApp", recycle: false, backupRoot: Path.Combine(root, "bk"));
+        Assert(res.Ok == 1 && res.Fail == 0 && !Directory.Exists(app) && !Uninstaller.StillThere(found["FooApp"]));
+        Assert(Directory.Exists(Path.Combine(root, "Contoso", "OtherApp")) && Directory.Exists(Path.Combine(root, "Unrelated")));
+    } finally { foreach (var f in Directory.Exists(root) ? Directory.GetFiles(root, "*", SearchOption.AllDirectories) : Array.Empty<string>()) File.SetAttributes(f, FileAttributes.Normal); if (Directory.Exists(root)) Directory.Delete(root, true); }
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

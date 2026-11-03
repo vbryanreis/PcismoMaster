@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows.Media;
 using Microsoft.Win32;
 
 namespace ResetExplode;
@@ -22,6 +23,17 @@ public sealed class InstallableApp : INotifyPropertyChanged
     public string ProbeExe { get; init; } = "";
     /// <summary>Com o catálogo grande (estilo Ninite) nada vem pré-marcado: o usuário escolhe.</summary>
     public bool PreSelect { get; init; } = false;
+
+    /// <summary>Site do fabricante (só o domínio), de onde vem o ícone do cartão.</summary>
+    public string Site => AppInstaller.Sites.GetValueOrDefault(WingetId, "");
+    /// <summary>Inicial mostrada no quadrado enquanto o ícone não carrega (ou se não houver ícone).</summary>
+    public string Initial => Name.Length > 0 ? Name[..1].ToUpperInvariant() : "?";
+    /// <summary>DisplayIcon do app instalado (plano B do ícone).</summary>
+    public string LocalIcon { get; set; } = "";
+
+    private ImageSource? _icon;
+    public ImageSource? Icon { get => _icon; set { Set(ref _icon, value); OnChanged(nameof(HasIcon)); } }
+    public bool HasIcon => _icon != null;
 
     private bool _selected, _installed;
     private string _status = "";
@@ -129,10 +141,38 @@ public static class AppInstaller
 
     public static bool WingetAvailable => File.Exists(WingetPath);
 
-    /// <summary>Nomes em "Aplicativos instalados" (máquina 64/32 bits e usuário atual).</summary>
-    public static HashSet<string> InstalledNames()
+    /// <summary>Domínio do site de cada app (o ícone do cartão vem dele).</summary>
+    public static readonly Dictionary<string, string> Sites = new()
     {
-        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        ["Google.Chrome"] = "chrome.google.com", ["Mozilla.Firefox"] = "firefox.com", ["Brave.Brave"] = "brave.com", ["Opera.Opera"] = "opera.com",
+        ["Discord.Discord"] = "discord.com", ["Zoom.Zoom"] = "zoom.us", ["Telegram.TelegramDesktop"] = "telegram.org",
+        ["VideoLAN.VLC"] = "videolan.org", ["Spotify.Spotify"] = "spotify.com", ["Audacity.Audacity"] = "audacityteam.org",
+        ["HandBrake.HandBrake"] = "handbrake.fr", ["Apple.iTunes"] = "music.apple.com", ["yt-dlp.yt-dlp"] = "yt-dlp.org", ["Gyan.FFmpeg"] = "ffmpeg.org",
+        ["GIMP.GIMP"] = "gimp.org", ["dotPDN.PaintDotNet"] = "getpaint.net", ["KDE.Krita"] = "krita.org", ["Inkscape.Inkscape"] = "inkscape.org",
+        ["IrfanSkiljan.IrfanView"] = "irfanview.com", ["ShareX.ShareX"] = "getsharex.com", ["Greenshot.Greenshot"] = "getgreenshot.org",
+        ["BlenderFoundation.Blender"] = "blender.org", ["TheDocumentFoundation.LibreOffice"] = "libreoffice.org",
+        ["SumatraPDF.SumatraPDF"] = "sumatrapdfreader.org", ["Foxit.FoxitReader"] = "foxit.com", ["Adobe.Acrobat.Reader.64-bit"] = "acrobat.adobe.com",
+        ["Malwarebytes.Malwarebytes"] = "malwarebytes.com", ["7zip.7zip"] = "7-zip.org", ["Giorgiotani.Peazip"] = "peazip.github.io",
+        ["RARLab.WinRAR"] = "win-rar.com", ["Skillbrains.Lightshot"] = "prnt.sc", ["voidtools.Everything"] = "voidtools.com",
+        ["TeamViewer.TeamViewer"] = "teamviewer.com", ["KeePassXCTeam.KeePassXC"] = "keepassxc.org", ["WinDirStat.WinDirStat"] = "windirstat.net",
+        ["Microsoft.VisualStudioCode"] = "code.visualstudio.com", ["Git.Git"] = "git-scm.com", ["Python.Python.3.12"] = "python.org",
+        ["Notepad++.Notepad++"] = "notepad-plus-plus.org", ["PuTTY.PuTTY"] = "putty.org", ["WinSCP.WinSCP"] = "winscp.net",
+        ["Valve.Steam"] = "store.steampowered.com", ["EpicGames.EpicGamesLauncher"] = "store.epicgames.com",
+    };
+
+    /// <summary>Ícone direto quando o do Google/DuckDuckGo não serve.</summary>
+    public static readonly Dictionary<string, string> IconUrls = new()
+    {
+        ["VideoLAN.VLC"] = "https://www.videolan.org/favicon.ico",
+    };
+
+    /// <summary>Nomes em "Aplicativos instalados" (máquina 64/32 bits e usuário atual).</summary>
+    public static HashSet<string> InstalledNames() => InstalledEntries().Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Nome → DisplayIcon de cada entrada em "Aplicativos instalados".</summary>
+    public static Dictionary<string, string> InstalledEntries()
+    {
+        var names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         const string path = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";
         foreach (var (hive, view) in new[] { (RegistryHive.LocalMachine, RegistryView.Registry64), (RegistryHive.LocalMachine, RegistryView.Registry32),
                                              (RegistryHive.CurrentUser, RegistryView.Default) })
@@ -144,7 +184,8 @@ public static class AppInstaller
                 foreach (var sub in root.GetSubKeyNames())
                 {
                     using var k = root.OpenSubKey(sub);
-                    if (k?.GetValue("DisplayName") is string n && !string.IsNullOrWhiteSpace(n)) names.Add(n.Trim());
+                    if (k?.GetValue("DisplayName") is string n && !string.IsNullOrWhiteSpace(n))
+                        names.TryAdd(n.Trim(), k.GetValue("DisplayIcon") as string ?? "");
                 }
             }
             catch { }
@@ -154,12 +195,14 @@ public static class AppInstaller
 
     public static void RefreshInstalled(IEnumerable<InstallableApp> apps)
     {
-        var names = InstalledNames();
+        var names = InstalledEntries();
         foreach (var a in apps)
         {
-            a.Installed = a.ProbeExe.Length > 0
-                ? ExternalTools.Has(a.ProbeExe)
-                : a.DisplayPrefix.Length > 0 && names.Any(n => n.StartsWith(a.DisplayPrefix, StringComparison.OrdinalIgnoreCase));
+            var entry = a.DisplayPrefix.Length > 0
+                ? names.FirstOrDefault(n => n.Key.StartsWith(a.DisplayPrefix, StringComparison.OrdinalIgnoreCase))
+                : default;
+            a.Installed = a.ProbeExe.Length > 0 ? ExternalTools.Has(a.ProbeExe) : entry.Key != null;
+            a.LocalIcon = entry.Value ?? "";
             if (a.Installed) a.Selected = false;
         }
     }
