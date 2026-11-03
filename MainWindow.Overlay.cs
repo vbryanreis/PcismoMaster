@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using LibreHardwareMonitor.Hardware;
 
 namespace ResetExplode;
@@ -86,52 +87,145 @@ public partial class MainWindow
         return cores.Count > 0 ? (cores.Average(), cores.Max()) : (null, null);
     }
 
-    /// <summary>Monta as linhas GPU / VRAM / CPU / RAM só com o que foi escolhido; linha vazia não aparece.</summary>
-    private List<OverlayLine> BuildOverlayLines(FrameStats? f)
+    /// <summary>Monta os valores escolhidos de GPU / VRAM / CPU / RAM; o overlay junta em linhas (vertical) ou células (barra).</summary>
+    private List<OverlayPart> BuildOverlayParts(FrameStats? f)
     {
         var show = OvShow;
         var s = BottleneckAnalyzer.Sample(_monitor, _gpus.FirstOrDefault(), f);
-        var lines = new List<OverlayLine>();
+        var parts = new List<OverlayPart>();
         string T(float? v) => v is float x ? $"{x:0} °C" : "—";
         string P(double? v) => v is double x ? $"{x:0}%" : "—";
-        void Line(string label, List<string> parts) { if (parts.Count > 0) lines.Add(new OverlayLine(label, string.Join("  ", parts))); }
+        void Add(string key, string group, string shortLabel, string text, string? bare = null, float? temp = null)
+        {
+            if (show.Contains(key)) parts.Add(new OverlayPart(group, shortLabel, text, bare ?? text, temp));
+        }
 
-        var gpu = new List<string>();
-        if (show.Contains("gpu_load")) gpu.Add(P(s.GpuLoad));
-        if (show.Contains("gpu_temp")) gpu.Add(T(s.GpuTemp));
-        if (show.Contains("gpu_hotspot")) gpu.Add("HS " + T(GpuRow(SensorType.Temperature, "GPU Hot Spot")?.RawValue));
-        if (show.Contains("gpu_clock")) gpu.Add(MainGpuClock(Nvml.ClockGraphics, "GPU Core") is uint c ? $"{c} MHz" : "— MHz");
-        if (show.Contains("gpu_memclock")) gpu.Add(MainGpuClock(Nvml.ClockMem, "GPU Memory") is uint mc ? $"mem {mc} MHz" : "mem —");
-        if (show.Contains("gpu_power")) gpu.Add(MainGpuPower() is float w ? $"{w:0} W" : "— W");
-        if (show.Contains("gpu_volt")) gpu.Add(GpuRow(SensorType.Voltage, "GPU Core")?.RawValue is float v ? $"{v:0.000} V" : "— V");
+        Add("gpu_load", "GPU", "GPU", P(s.GpuLoad));
+        Add("gpu_temp", "GPU", "GPU °C", T(s.GpuTemp), temp: s.GpuTemp);
+        if (show.Contains("gpu_hotspot"))
+        {
+            var hs = GpuRow(SensorType.Temperature, "GPU Hot Spot")?.RawValue;
+            Add("gpu_hotspot", "GPU", "HOTSPOT", "HS " + T(hs), T(hs), hs);
+        }
+        if (show.Contains("gpu_clock"))
+        {
+            var c = MainGpuClock(Nvml.ClockGraphics, "GPU Core");
+            Add("gpu_clock", "GPU", "GPU MHz", c is uint a ? $"{a} MHz" : "— MHz", c?.ToString() ?? "—");
+        }
+        if (show.Contains("gpu_memclock"))
+        {
+            var mc = MainGpuClock(Nvml.ClockMem, "GPU Memory");
+            Add("gpu_memclock", "GPU", "MEM MHz", mc is uint a ? $"mem {a} MHz" : "mem —", mc?.ToString() ?? "—");
+        }
+        if (show.Contains("gpu_power")) Add("gpu_power", "GPU", "GPU W", MainGpuPower() is float w ? $"{w:0} W" : "— W");
+        if (show.Contains("gpu_volt")) Add("gpu_volt", "GPU", "GPU V", GpuRow(SensorType.Voltage, "GPU Core")?.RawValue is float v ? $"{v:0.000} V" : "— V");
         if (show.Contains("gpu_fan"))
-            gpu.Add(GpuRow(SensorType.Fan, "GPU Fan", true)?.RawValue is float rpm && rpm > 0 ? $"{rpm:0} RPM"
-                  : GpuRow(SensorType.Control, "GPU Fan", true)?.RawValue is float pct ? $"fan {pct:0}%" : "fan —");
-        if (show.Contains("gpu_perfcap") && MainGpuPerfCap() is { Length: > 0 } cap) gpu.Add(cap);
-        Line("GPU", gpu);
+        {
+            string fan = GpuRow(SensorType.Fan, "GPU Fan", true)?.RawValue is float rpm && rpm > 0 ? $"{rpm:0} RPM"
+                       : GpuRow(SensorType.Control, "GPU Fan", true)?.RawValue is float pct ? $"{pct:0}%" : "—";
+            Add("gpu_fan", "GPU", "FAN", fan.EndsWith('%') || fan == "—" ? "fan " + fan : fan, fan);
+        }
+        if (show.Contains("gpu_perfcap") && MainGpuPerfCap() is { Length: > 0 } cap) Add("gpu_perfcap", "GPU", "LIMITE", cap);
 
-        var vram = new List<string>();
-        var vr = MainGpuVram();
-        if (show.Contains("vram_used")) vram.Add(vr is { } a ? $"{a.Used:0.0} GB" : "—");
-        if (show.Contains("vram_pct")) vram.Add(P(s.VramPct));
-        if (show.Contains("vram_temp")) vram.Add(T(GpuRow(SensorType.Temperature, "GPU Memory")?.RawValue));
-        Line("VRAM", vram);
+        if (show.Contains("vram_used")) Add("vram_used", "VRAM", "VRAM", MainGpuVram() is { } a ? $"{a.Used:0.0} GB" : "—");
+        Add("vram_pct", "VRAM", "VRAM %", P(s.VramPct));
+        if (show.Contains("vram_temp"))
+        {
+            var vt = GpuRow(SensorType.Temperature, "GPU Memory")?.RawValue;
+            Add("vram_temp", "VRAM", "VRAM °C", T(vt), temp: vt);
+        }
 
-        var cpu = new List<string>();
         var (avg, max) = CpuClocks();
-        if (show.Contains("cpu_load")) cpu.Add(P(s.CpuTotal));
-        if (show.Contains("cpu_maxcore")) cpu.Add(s.CpuMaxCore is float mx ? $"núcleo {mx:0}%" : "núcleo —");
-        if (show.Contains("cpu_temp")) cpu.Add(T(s.CpuTemp));
-        if (show.Contains("cpu_clock")) cpu.Add(avg is float ca ? $"{ca / 1000:0.00} GHz" : "— GHz");
-        if (show.Contains("cpu_clockmax")) cpu.Add(max is float cm ? $"pico {cm / 1000:0.00} GHz" : "pico —");
-        if (show.Contains("cpu_power")) cpu.Add(_monitor.CpuPower is float cw && cw > 0 ? $"{cw:0} W" : "— W"); // 0 = sem leitura (precisa de administrador)
-        Line("CPU", cpu);
+        Add("cpu_load", "CPU", "CPU", P(s.CpuTotal));
+        Add("cpu_maxcore", "CPU", "NÚCLEO", s.CpuMaxCore is float mx ? $"núcleo {mx:0}%" : "núcleo —", s.CpuMaxCore is float m2 ? $"{m2:0}%" : "—");
+        Add("cpu_temp", "CPU", "CPU °C", T(s.CpuTemp), temp: s.CpuTemp);
+        Add("cpu_clock", "CPU", "CPU GHz", avg is float ca ? $"{ca / 1000:0.00} GHz" : "— GHz", avg is float c2 ? $"{c2 / 1000:0.00}" : "—");
+        Add("cpu_clockmax", "CPU", "PICO GHz", max is float cm ? $"pico {cm / 1000:0.00} GHz" : "pico —", max is float c3 ? $"{c3 / 1000:0.00}" : "—");
+        Add("cpu_power", "CPU", "CPU W", _monitor.CpuPower is float cw && cw > 0 ? $"{cw:0} W" : "— W"); // 0 = sem leitura (precisa de administrador)
 
-        var ram = new List<string>();
-        var (total, availB) = Optimizer.MemoryStatus();
-        if (show.Contains("ram_used")) ram.Add(total > 0 ? $"{(total - availB) / 1073741824.0:0.0} GB" : "—");
-        if (show.Contains("ram_pct")) ram.Add(P(s.RamPct));
-        Line("RAM", ram);
-        return lines;
+        if (show.Contains("ram_used") || show.Contains("ram_pct"))
+        {
+            var (total, availB) = Optimizer.MemoryStatus();
+            Add("ram_used", "RAM", "RAM", total > 0 ? $"{(total - availB) / 1073741824.0:0.0} GB" : "—");
+            Add("ram_pct", "RAM", "RAM %", P(s.RamPct));
+        }
+        return parts;
+    }
+
+    // ------------------------------------------------------------------ prévia, timer e atalho
+
+    /// <summary>O timer de 500 ms só roda com o overlay ligado ou com a aba Overlay aberta (prévia); fora disso, nada é lido.</summary>
+    private void SyncOverlayTimer()
+    {
+        bool need = ChkOverlay.IsChecked == true || PageOverlay.IsVisible;
+        if (need)
+        {
+            _overlayTimer ??= new System.Windows.Threading.DispatcherTimer(TimeSpan.FromMilliseconds(500),
+                System.Windows.Threading.DispatcherPriority.Normal, (_, _) => UpdateOverlay(), Dispatcher);
+            _overlayTimer.Start();
+            UpdateOverlay();
+        }
+        else _overlayTimer?.Stop();
+    }
+
+    private void OvSlider_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) => OvOption_Changed(sender, e);
+
+    private void PageOverlay_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) => SyncOverlayTimer();
+
+    /// <summary>Prévia na aba com os números reais deste PC, no formato e na opacidade escolhidos.</summary>
+    private void UpdateOverlayPreview(FrameStats? f, IReadOnlyList<OverlayPart> parts, string? hour)
+    {
+        bool h = _settings.OverlayLayout == "H";
+        OvPreview.ItemsSource = OverlayWindow.Cells(f, parts, OvShow, hour);
+        OvPreview.MaxWidth = h ? double.PositiveInfinity : 230;
+        OvPreviewBox.Background = new System.Windows.Media.SolidColorBrush(
+            System.Windows.Media.Color.FromArgb((byte)Math.Round(_settings.OverlayOpacity * 255), 0, 0, 0));
+        OvPreviewBox.HorizontalAlignment = _settings.OverlayCorner.EndsWith("R") ? HorizontalAlignment.Right
+                                         : _settings.OverlayCorner.EndsWith("C") ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+        OvPreviewBox.VerticalAlignment = _settings.OverlayCorner.StartsWith("B") ? VerticalAlignment.Bottom : VerticalAlignment.Top;
+    }
+
+    private bool RegisterOverlayHotkey(uint mods, uint vk)
+    {
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        UnregisterHotKey(hwnd, HotkeyId);
+        return RegisterHotKey(hwnd, HotkeyId, mods | 0x4000, vk); // 0x4000 = sem repetição ao segurar
+    }
+
+    private void ShowOverlayHotkey()
+    {
+        var key = System.Windows.Input.KeyInterop.KeyFromVirtualKey((int)_settings.OverlayHotkeyVk).ToString();
+        OvHotkeyBox.Text = OverlayHotkey.Describe(_settings.OverlayHotkeyMods, key);
+        OvHotkeyHint.Text = $"Atalho ativo: {OvHotkeyBox.Text}";
+    }
+
+    /// <summary>Clique na caixa e aperte a tecla (com ou sem Ctrl/Alt/Shift); Esc cancela.</summary>
+    private void OvHotkey_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        e.Handled = true;
+        var key = e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key;
+        if (key is System.Windows.Input.Key.LeftCtrl or System.Windows.Input.Key.RightCtrl or System.Windows.Input.Key.LeftAlt
+                or System.Windows.Input.Key.RightAlt or System.Windows.Input.Key.LeftShift or System.Windows.Input.Key.RightShift
+                or System.Windows.Input.Key.LWin or System.Windows.Input.Key.RWin) return;
+        if (key == System.Windows.Input.Key.Escape) { ShowOverlayHotkey(); Keyboard.ClearFocus(); return; }
+
+        var m = System.Windows.Input.Keyboard.Modifiers;
+        uint mods = (m.HasFlag(ModifierKeys.Control) ? OverlayHotkey.Ctrl : 0) | (m.HasFlag(ModifierKeys.Alt) ? OverlayHotkey.Alt : 0)
+                  | (m.HasFlag(ModifierKeys.Shift) ? OverlayHotkey.Shift : 0);
+        uint vk = (uint)System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
+        if (RegisterOverlayHotkey(mods, vk))
+        {
+            _settings.OverlayHotkeyMods = mods;
+            _settings.OverlayHotkeyVk = vk;
+            _settings.Save();
+            ShowOverlayHotkey();
+        }
+        else
+        {
+            RegisterOverlayHotkey(_settings.OverlayHotkeyMods, _settings.OverlayHotkeyVk); // volta ao anterior
+            ShowOverlayHotkey();
+            OvHotkeyHint.Text = $"{OverlayHotkey.Describe(mods, key.ToString())} já é usado por outro programa; escolha outra.";
+        }
+        Keyboard.ClearFocus();
     }
 }

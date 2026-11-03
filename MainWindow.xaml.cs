@@ -592,8 +592,11 @@ public partial class MainWindow : Window
         // Preferências do overlay
         foreach (var rb in OvCornerPanel.Children.OfType<RadioButton>())
             rb.IsChecked = (string)rb.Tag == _settings.OverlayCorner;
-        foreach (var rb in OvScalePanel.Children.OfType<RadioButton>())
-            rb.IsChecked = Math.Abs(double.Parse((string)rb.Tag, CultureInfo.InvariantCulture) - _settings.OverlayScale) < 0.01;
+        foreach (var rb in OvLayoutPanel.Children.OfType<RadioButton>())
+            rb.IsChecked = (string)rb.Tag == _settings.OverlayLayout;
+        OvScale.Value = _settings.OverlayScale;
+        OvOpacity.Value = _settings.OverlayOpacity;
+        ShowOverlayHotkey();
         BuildOverlayPicker();
         _overlayReady = true;
         UpdateOverlayStatus(null);
@@ -1299,8 +1302,7 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         System.Windows.Interop.HwndSource.FromHwnd(hwnd)?.AddHook(HotkeyHook);
-        // Ctrl + Shift + O, sem repetição ao segurar
-        RegisterHotKey(hwnd, HotkeyId, 0x0002 | 0x0004 | 0x4000, 0x4F);
+        RegisterOverlayHotkey(_settings.OverlayHotkeyMods, _settings.OverlayHotkeyVk);
     }
 
     private IntPtr HotkeyHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -1322,32 +1324,30 @@ public partial class MainWindow : Window
             _overlay ??= new OverlayWindow();
             ApplyOverlayOptions();
             _overlay.Show();
-            _overlayTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Normal,
-                                                  (_, _) => UpdateOverlay(), Dispatcher);
-            _overlayTimer.Start();
-            UpdateOverlay();
         }
-        else
-        {
-            _overlayTimer?.Stop();
-            _overlay?.Hide();
-        }
+        else _overlay?.Hide();
+        SyncOverlayTimer();
     }
 
     private void OvOption_Changed(object sender, RoutedEventArgs e)
     {
         if (!_overlayReady) return;
         _settings.OverlayCorner = CheckedTag(OvCornerPanel) ?? "TL";
-        _settings.OverlayScale = double.Parse(CheckedTag(OvScalePanel) ?? "1", CultureInfo.InvariantCulture);
+        _settings.OverlayLayout = CheckedTag(OvLayoutPanel) ?? "V";
+        _settings.OverlayScale = Math.Round(OvScale.Value, 2);
+        _settings.OverlayOpacity = Math.Round(OvOpacity.Value, 2);
         _settings.Save();
         ApplyOverlayOptions();
+        UpdateOverlay();
     }
 
     private void ApplyOverlayOptions()
     {
         if (_overlay == null) return;
         _overlay.Corner = _settings.OverlayCorner;
+        _overlay.Horizontal = _settings.OverlayLayout == "H";
         _overlay.SetScale(_settings.OverlayScale);
+        _overlay.SetBackgroundOpacity(_settings.OverlayOpacity);
         _overlay.Reposition();
     }
 
@@ -1355,11 +1355,16 @@ public partial class MainWindow : Window
     {
         _frames.Start(); // liga a escuta de FPS na primeira vez que o overlay precisa dela
         var f = _frames.GetForegroundStats();
+        bool onPage = PageOverlay.IsVisible;
+        if (!onPage && (_overlay == null || !_overlay.IsVisible)) return;
+        var parts = BuildOverlayParts(f);
+        string? hour = OvShow.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null;
         if (_overlay != null && _overlay.IsVisible)
         {
-            _overlay.Update(f, BuildOverlayLines(f), OvShow, OvShow.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null);
+            _overlay.Update(f, parts, OvShow, hour);
             _overlay.KeepOnTop(); // o jogo pode ter passado na frente (janela sem borda "sempre no topo")
         }
+        if (onPage) UpdateOverlayPreview(f, parts, hour);
         UpdateOverlayStatus(f);
     }
 

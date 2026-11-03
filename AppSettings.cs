@@ -105,6 +105,13 @@ public sealed class AppSettings
     // Overlay
     public string OverlayCorner { get; set; } = "TL";
     public double OverlayScale { get; set; } = 1.0;
+    /// <summary>"V" = lista vertical com gráfico; "H" = barra horizontal numa linha.</summary>
+    public string OverlayLayout { get; set; } = "V";
+    /// <summary>Opacidade do fundo do overlay (0 a 1).</summary>
+    public double OverlayOpacity { get; set; } = 0.78;
+    /// <summary>Atalho que liga/desliga o overlay: modificadores de RegisterHotKey e código virtual (padrão Ctrl + Shift + O).</summary>
+    public uint OverlayHotkeyMods { get; set; } = 0x2 | 0x4;
+    public uint OverlayHotkeyVk { get; set; } = 0x4F;
     /// <summary>Itens escolhidos para o overlay (chaves de OverlayMetrics); null = padrão.</summary>
     public List<string>? OverlayItems { get; set; }
 

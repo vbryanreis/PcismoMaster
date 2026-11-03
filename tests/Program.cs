@@ -227,6 +227,13 @@ Test("Uninstaller: deep folder scan finds app and publisher\\app, counts hidden 
         Assert(Directory.Exists(Path.Combine(root, "Contoso", "OtherApp")) && Directory.Exists(Path.Combine(root, "Unrelated")));
     } finally { foreach (var f in Directory.Exists(root) ? Directory.GetFiles(root, "*", SearchOption.AllDirectories) : Array.Empty<string>()) File.SetAttributes(f, FileAttributes.Normal); if (Directory.Exists(root)) Directory.Delete(root, true); }
 });
+Test("Overlay: linhas por componente, cor da temperatura e texto do atalho", () => {
+    var parts = new[] { new OverlayPart("GPU", "GPU", "98%", "98%"), new OverlayPart("GPU", "GPU °C", "66 °C", "66 °C", 66), new OverlayPart("CPU", "CPU °C", "88 °C", "88 °C", 88) };
+    var lines = OverlayMetrics.Lines(parts);
+    Assert(lines.Count == 2 && lines[0] == new OverlayLine("GPU", "98%  66 °C") && lines[1].Label == "CPU");
+    Assert(parts[0].Level == 0 && parts[1].Level == 1 && parts[2].Level == 3 && new OverlayPart("X", "X", "", "", 78).Level == 2);
+    Assert(OverlayHotkey.Describe(OverlayHotkey.Ctrl | OverlayHotkey.Shift, "O") == "Ctrl + Shift + O" && OverlayHotkey.Describe(0, "F5") == "F5" && OverlayHotkey.Describe(OverlayHotkey.Alt, "D5") == "Alt + 5");
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

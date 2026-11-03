@@ -13,7 +13,9 @@ namespace ResetExplode;
 /// </summary>
 public partial class OverlayWindow : Window
 {
-    public string Corner { get; set; } = "TL"; // TL, TR, BL, BR
+    public string Corner { get; set; } = "TL"; // TL, TC, TR, BL, BC, BR
+    /// <summary>true = barra horizontal numa linha só; false = lista vertical com gráfico.</summary>
+    public bool Horizontal { get; set; }
 
     private IntPtr _hwnd, _hook;
     private IntPtr _monitor;                  // monitor do jogo (o da última janela ativa de outro programa)
@@ -46,6 +48,10 @@ public partial class OverlayWindow : Window
 
     public void SetScale(double s) { Scale.ScaleX = Scale.ScaleY = s; }
 
+    /// <summary>Opacidade do fundo (0 = transparente, 1 = preto sólido); o texto continua opaco.</summary>
+    public void SetBackgroundOpacity(double a) =>
+        Box.Background = new SolidColorBrush(Color.FromArgb((byte)Math.Round(Math.Clamp(a, 0, 1) * 255), 0, 0, 0));
+
     public void Reposition() => KeepOnTop();
 
     /// <summary>
@@ -64,7 +70,7 @@ public partial class OverlayWindow : Window
         int w = wr.Right - wr.Left, h = wr.Bottom - wr.Top;
         int m = (int)Math.Round(12 * VisualTreeHelper.GetDpi(this).DpiScaleX);
         var r = mi.rcMonitor;
-        int x = Corner.EndsWith("R") ? r.Right - w - m : r.Left + m;
+        int x = Corner.EndsWith("R") ? r.Right - w - m : Corner.EndsWith("C") ? r.Left + (r.Right - r.Left - w) / 2 : r.Left + m;
         int y = Corner.StartsWith("B") ? r.Bottom - h - m : r.Top + m;
         SetWindowPos(_hwnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
     }
@@ -86,8 +92,12 @@ public partial class OverlayWindow : Window
     }
 
     /// <summary>Atualiza o overlay. <paramref name="show"/> = itens escolhidos (chaves de OverlayMetrics).</summary>
-    public void Update(FrameStats? f, IReadOnlyList<OverlayLine> lines, IReadOnlySet<string> show, string? extra)
+    public void Update(FrameStats? f, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? extra)
     {
+        VPanel.Visibility = Horizontal ? Visibility.Collapsed : Visibility.Visible;
+        HRow.Visibility = Horizontal ? Visibility.Visible : Visibility.Collapsed;
+        if (Horizontal) { HRow.ItemsSource = Cells(f, parts, show, extra); return; }
+        var lines = OverlayMetrics.Lines(parts);
         static Visibility V(bool on) => on ? Visibility.Visible : Visibility.Collapsed;
         bool fps = show.Contains("fps"), ft = show.Contains("frametime");
         OFpsRow.Visibility = V(fps || ft);
@@ -119,6 +129,24 @@ public partial class OverlayWindow : Window
         ORows.ItemsSource = lines;
         ORows.Visibility = V(lines.Count > 0);
         if (OGraph.Visibility == Visibility.Visible) DrawGraph(f?.RecentFrameTimes);
+    }
+
+    private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Accent = Frozen(0xFF, 0x8A, 0x2B),
+        Cool = Frozen(0x4A, 0xDE, 0x80), Warm = Frozen(0xFB, 0xBF, 0x24), Hot = Frozen(0xF8, 0x71, 0x71);
+    private static Brush Frozen(byte r, byte g, byte b) { var x = new SolidColorBrush(Color.FromRgb(r, g, b)); x.Freeze(); return x; }
+
+    /// <summary>Células do formato horizontal (também usadas na prévia da aba Overlay): FPS, frame, 1% low, sensores e jogo.</summary>
+    public static List<OverlayCell> Cells(FrameStats? f, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? extra)
+    {
+        var cells = new List<OverlayCell>();
+        if (show.Contains("fps")) cells.Add(new("FPS", f != null ? $"{f.Fps:0}" : "—", Accent));
+        if (show.Contains("frametime")) cells.Add(new("FRAME", f != null ? $"{f.FrameTimeMs:0.0} ms" : "—", Plain));
+        if (show.Contains("low1")) cells.Add(new("1% LOW", f != null ? $"{f.Low1Fps:0}" : "—", Plain));
+        foreach (var p in parts)
+            cells.Add(new(p.Short, p.Bare, p.Level switch { 1 => Cool, 2 => Warm, 3 => Hot, _ => Plain }));
+        if (show.Contains("game") && f != null) cells.Add(new("JOGO", f.ProcessName, Plain));
+        if (extra != null) cells.Add(new("HORA", extra, Plain));
+        return cells;
     }
 
     /// <summary>Frametimes recentes: picos para cima = engasgos.</summary>
@@ -163,3 +191,6 @@ public partial class OverlayWindow : Window
     [DllImport("user32.dll")] private static extern IntPtr SetWinEventHook(uint min, uint max, IntPtr module, WinEventProc proc, uint pid, uint thread, uint flags);
     [DllImport("user32.dll")] private static extern bool UnhookWinEvent(IntPtr hook);
 }
+
+/// <summary>Célula do overlay em barra: rótulo pequeno, valor e a cor do valor.</summary>
+public sealed record OverlayCell(string Label, string Value, Brush Fg);
