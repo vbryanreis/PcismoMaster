@@ -10,14 +10,23 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.7.0</Version>
-    <!-- Sempre otimizado: o RESET BENCH e os stress tests precisam do JIT otimizado também em Debug -->
+    <Version>0.8.0</Version>
+    <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- Fluidez: código já compilado no .exe publicado (sem engasgo do JIT ao abrir cada aba pela primeira vez) -->
     <PublishReadyToRun>true</PublishReadyToRun>
     <TieredPGO>true</TieredPGO>
+    <!-- Deixa o .exe mais leve: comprime os assemblies dentro do single-file (nada é removido;
+         tudo é descomprimido em memória ao abrir). Só vale no publish single-file (Release). -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
+
+  <!-- JOGOS · Promoções: chave do app na API do IsThereAnyDeal. NUNCA vai para o código: o workflow de Release passa
+       -p:ItadApiKey=… a partir do segredo ITAD_API_KEY do GitHub. Sem ela, o usuário pode colar a própria chave no app. -->
+  <ItemGroup Condition="'$(ItadApiKey)' != ''">
+    <AssemblyMetadata Include="ItadApiKey" Value="$(ItadApiKey)" />
+  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\logo.png" />
@@ -26,7 +35,7 @@
     <Resource Include="Assets\logo-dark.png" />
   </ItemGroup>
 
-  <!-- Drivers seriais oficiais embutidos (RESET MAKER): cada pasta Drivers\<chip> vira recurso e é extraída na hora de instalar.
+  <!-- Drivers seriais oficiais embutidos (MAKER): cada pasta Drivers\<chip> vira recurso e é extraída na hora de instalar.
        Para incluir outro, basta criar a pasta com o .inf/.cat/.sys e ligá-la em MakerDrivers.Chips (Bundle). -->
   <ItemGroup>
     <EmbeddedResource Include="Drivers\**\*" Exclude="Drivers\*.md;Drivers\*.txt" LogicalName="Drivers/%(RecursiveDir)%(Filename)%(Extension)" />
@@ -34,7 +43,7 @@
     <EmbeddedResource Include="Npi\*.xml" LogicalName="Npi/%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <!-- iCUE SDK da Corsair (RESET INTEGRAÇÃO): se a DLL estiver em Native\, ela vai junto do .exe. Não é versionada no git. -->
+  <!-- iCUE SDK da Corsair (INTEGRAÇÃO): se a DLL estiver em Native\, ela vai junto do .exe. Não é versionada no git. -->
   <ItemGroup>
     <None Include="Native\iCUESDK.x64_2019.dll" Condition="Exists('Native\iCUESDK.x64_2019.dll')" Link="iCUESDK.x64_2019.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

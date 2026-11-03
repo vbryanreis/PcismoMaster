@@ -295,7 +295,7 @@ public sealed class RazerChromaBackend : ILightBackend
         {
             title = "PcismoMaster",
             description = "Controle de iluminação do PcismoMaster",
-            author = new { name = "RESET", contact = "https://github.com/GustavoReset/ResetExplode" },
+            author = new { name = "PcismoMaster", contact = "https://github.com/GustavoReset/ResetExplode" },
             device_supported = Kinds.Select(k => k.Key).ToArray(),
             category = "application",
         });

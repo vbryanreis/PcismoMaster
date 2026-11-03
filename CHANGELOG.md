@@ -2,7 +2,9 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
-## Não lançado
+## 0.8.0
+
+Junta a 0.6.3, a 0.6.4 (ArtCraft) e a 0.7.0 (Promoções) do Bryan com as novidades abaixo.
 
 - **Overlay completo** (JOGOS · Overlay):
   - **Prévia ao vivo** na própria aba, com os números reais deste PC, no formato, na posição e na opacidade escolhidos.
@@ -25,8 +27,6 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
   - Guardas reforçadas: nunca o Windows, a raiz dos locais, pastas pessoais (Documentos, Downloads, Desktop…), `.ssh`, Microsoft/Common Files/Packages, nem chaves do sistema; exceções só em formatos exatos (a entrada de desinstalação, App Paths de um .exe e valores das chaves Run). Testes novos com pastas temporárias, sem tocar no PC.
 - **Utilidades · Finder mais leve**: o índice da MFT guarda os nomes num buffer único e liga cada item ao pai por posição (busca binária no número do registro), sem milhões de strings soltas nem dicionário. Num teste com 3,5 milhões de itens, a memória do índice caiu de ~480 MB para ~130 MB (processo: ~530 MB → ~190 MB) e a coleta completa do GC de ~40 ms para menos de 1 ms, com a mesma velocidade de busca.
 - O índice sai da memória **5 minutos depois de sair do Finder** (outra sub-aba ou outra página) e é refeito ao voltar.
-
-## 0.7.0
 
 - **Drivers · nova sub-aba Painel NVIDIA**: o "Gerenciar as configurações em 3D" do Painel de Controle NVIDIA dentro do app, com os mesmos nomes e opções (em português), gravando direto nos perfis do driver.
   - **Configurações globais** e **de programa** (lista com busca); cada linha mostra de onde vem o valor (você, NVIDIA, global ou padrão) e "Usar a configuração global"/"Padrão do driver" tira a alteração.
@@ -78,7 +78,37 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
   - Catálogo de configurações do nvidiaProfileInspector (Orbmu2k, licença MIT, em `licenses/`).
 - Novo ComboBox escuro no tema do app.
 - Fluidez: o .exe publicado já vem compilado (ReadyToRun + TieredPGO), sem engasgo ao abrir cada aba pela primeira vez.
+- Versão atualizada para 0.8.0.
+
+## 0.7.0
+
+- Nova aba **Promoções** em JOGOS (logo abaixo da Biblioteca), com o preço dos jogos agora nas lojas e o **menor preço da história**, usando a API gratuita do [IsThereAnyDeal](https://isthereanydeal.com/). Os preços saem na moeda do país do Windows (no Brasil, em reais). Sub-abas:
+  - **Promoções**: cartões com capa, desconto, preço antigo e atual, loja, prazo e selos de "menor da história" / "menor na loja". Filtros de ordenação (em alta, maior desconto, menor preço, mais recentes, populares, melhor avaliados, acabando logo), desconto mínimo, preço máximo, tipo (jogos/DLCs) e lojas (Steam, Epic, GOG, Nuuvem, Microsoft e outras), além de "só menor preço da história" e CARREGAR MAIS.
+  - **Pesquisar**: busca pelo nome e **compara o preço em cada loja**; o botão "Comparar lojas" dos cartões leva direto para cá.
+  - **Grátis**: jogos grátis por tempo limitado (Epic, GOG, Steam…) com o prazo e o botão PEGAR GRÁTIS.
+  - **Da minha biblioteca**: os jogos instalados no PC que estão em promoção agora (Steam pelo appid, os outros pelo nome).
+- Clicar num jogo abre a oferta direto na loja, no navegador. Os dados vêm como a API entrega e o rodapé credita o IsThereAnyDeal (o PcismoMaster não é afiliado a ele).
+- **Chave da API**: o `.exe` do Release já vem com a chave do app (vinda do segredo `ITAD_API_KEY` do GitHub, nunca do código). Quem quiser pode colar a própria chave grátis, que fica cifrada pelo Windows. As respostas ficam alguns minutos em cache para respeitar o limite de consultas. Espaços, quebras de linha e aspas que vêm junto ao colar a chave são removidos, e se a chave for recusada o app diz o motivo exato (faltando, inválida ou expirada).
+- Testes novos (sem rede e sem chave real) para o cliente da API: filtros, leitura das respostas, moeda, chave só no cabeçalho, limpeza da chave colada, cache e mensagens de erro.
 - Versão atualizada para 0.7.0.
+
+## 0.6.4
+
+- Nova categoria **ArtCraft** na aba **Instalar apps**, ao lado das outras (Navegadores, Mensagens, Mídia…), com os apps de criação da [ArtCraft](https://getartcraft.com/apps): **ArtCraft Launcher** (central oficial que instala e atualiza todos de uma vez — recomendado), **PhotoCraft**, **PdfCraft**, **FigCraft** e **Craft Anything**.
+- Como esses apps **não estão no winget**, eles são baixados direto do **GitHub oficial** (sempre o instalador `.msi` da última versão), têm a **assinatura digital conferida** pelo Windows antes de rodar e são instalados **em silêncio** — igualzinho ao fluxo MARCAR / INSTALAR SELECIONADOS dos demais apps.
+- Os outros apps da ArtCraft ainda estão "in development" (sem instalador publicado); entram aqui assim que tiverem download.
+- Versão atualizada para 0.6.4.
+
+## 0.6.3
+
+- **Limpeza da marca "RESET"** herdada do app-base: nomes de recursos deixam de levar o prefixo (`RESET BENCH` → **BENCH**, `RESET MAKER` → **MAKER**, `RESET DRIVER` → **DRIVER**, `RESET FERRAMENTAS` → **FERRAMENTAS**, `RESET JOGOS` → **JOGOS**, `RESET INTEGRAÇÃO` → **INTEGRAÇÃO**, `RESET OC` → **OC**, `RESET OTIMIZA` → **OTIMIZAÇÃO**) em textos, títulos de janelas, mensagens e comentários.
+- Botão do Overclock que restaura os padrões virou **REDEFINIR** (antes "RESET").
+- Corrigidos textos desatualizados: o tooltip de exportação de drivers agora aponta para `Documentos\PcismoMaster-Drivers` (pasta que o app já usava) e as menções internas à pasta de configurações passam a `%AppData%\PcismoMaster`.
+- **Saúde do PC** (Visão geral): o botão **OTIMIZA** agora é **OTIMIZAR**.
+- **Placa de vídeo**: o nome da fabricante no canto do cartão de destaque aparece colorido como uma logo, dentro da nossa paleta — **NVIDIA** no ciano (azul mais próximo do verde) e **AMD** no vermelho; outras (Intel) seguem discretas.
+- Preservados os créditos ao projeto original (MIT) e o namespace interno do código.
+- **App mais leve**: o `.exe` agora usa compressão no single-file — o tamanho cai bastante sem remover nada (todos os módulos continuam presentes, só são descomprimidos em memória ao abrir; a primeira abertura pode levar uma fração de segundo a mais).
+- Versão atualizada para 0.6.3.
 
 ## 0.6.2
 

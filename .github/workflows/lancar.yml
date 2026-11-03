@@ -14,7 +14,15 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: dotnet run --project tests/ModuleTests.csproj -c Release
-      - run: dotnet publish PcismoMaster.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist --nologo
+      # A chave do app na API do IsThereAnyDeal (JOGOS · Promoções) vem do segredo ITAD_API_KEY do repositório e só existe
+      # dentro do .exe. Sem o segredo, o build sai igual, e o app pede a chave do próprio usuário.
+      - name: Publicar o .exe
+        env:
+          ITAD_API_KEY: ${{ secrets.ITAD_API_KEY }}
+        shell: pwsh
+        run: |
+          if (-not $env:ITAD_API_KEY) { Write-Warning "Segredo ITAD_API_KEY ausente: a aba Promoções vai pedir a chave do usuário." }
+          dotnet publish PcismoMaster.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true "-p:ItadApiKey=$env:ITAD_API_KEY" -o dist --nologo
       - name: Empacotar e extrair notas do CHANGELOG
         shell: pwsh
         run: |
