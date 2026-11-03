@@ -49,18 +49,30 @@ public sealed class SensorMonitor : IDisposable
         finally { Volatile.Write(ref _busy, 0); }
     }
 
+    /// <summary>Com uma página de detalhes aberta (Sensores, Sistema, Discos, Rede) tudo é lido a cada segundo. Fora delas, discos (SMART)
+    /// e rede, que ninguém está vendo, são lidos a cada <see cref="SlowEvery"/> leituras: o painel e a barra lateral só usam CPU, GPU e memória.</summary>
+    public bool FullDetail { get; set; }
+    public const int SlowEvery = 10;
+    private int _tick;
+
+    /// <summary>Se este tipo de hardware é lido nesta passada (ver <see cref="FullDetail"/>).</summary>
+    public static bool ShouldUpdate(HardwareType type, bool fullDetail, int tick) =>
+        fullDetail || tick % SlowEvery == 0 || type is not (HardwareType.Storage or HardwareType.Network);
+
     private List<Reading> Collect()
     {
         var list = new List<Reading>(_bySensor.Count + 32);
-        foreach (var hw in _computer.Hardware) Walk(hw, list);
+        int tick = _tick++;
+        bool full = FullDetail;
+        foreach (var hw in _computer.Hardware) Walk(hw, list, ShouldUpdate(hw.HardwareType, full, tick));
         return list;
     }
 
-    private static void Walk(IHardware hw, List<Reading> list)
+    private static void Walk(IHardware hw, List<Reading> list, bool update)
     {
-        hw.Update();
+        if (update) hw.Update();
         foreach (var s in hw.Sensors) list.Add(new Reading(hw, s, s.Value, s.Min, s.Max));
-        foreach (var sub in hw.SubHardware) Walk(sub, list);
+        foreach (var sub in hw.SubHardware) Walk(sub, list, update);
     }
 
     private void Apply(Reading r)

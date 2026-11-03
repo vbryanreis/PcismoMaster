@@ -260,6 +260,8 @@ public partial class MainWindow : Window
         var item = (FrameworkElement)sender;
         string page = (string)item.Tag;
         ShowPage(page);
+        // Discos e rede em detalhe só quando alguma página mostra esses sensores (ver SensorMonitor.FullDetail).
+        _monitor.FullDetail = page is "PageSensors" or "PageSystem" or "PageDisks" or "PageNet" or "PageGpu" or "PageEnergy";
 
         // Abre a categoria da página (ex.: quando o painel pula direto para o Benchmark)
         // e mostra "CATEGORIA · página" na barra de título.
