@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.6.4</Version>
+    <Version>0.7.0</Version>
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -18,6 +18,12 @@
          tudo é descomprimido em memória ao abrir). Só vale no publish single-file (Release). -->
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
+
+  <!-- JOGOS · Promoções: chave do app na API do IsThereAnyDeal. NUNCA vai para o código: o workflow de Release passa
+       -p:ItadApiKey=… a partir do segredo ITAD_API_KEY do GitHub. Sem ela, o usuário pode colar a própria chave no app. -->
+  <ItemGroup Condition="'$(ItadApiKey)' != ''">
+    <AssemblyMetadata Include="ItadApiKey" Value="$(ItadApiKey)" />
+  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\logo.png" />

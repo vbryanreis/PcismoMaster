@@ -239,6 +239,12 @@
                                     <TextBlock Text="Biblioteca" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavDeals" Style="{StaticResource NavItem}" Tag="PageDeals" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8EC;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Promoções" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavGames" Style="{StaticResource NavItem}" Tag="PageGames" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xEC49;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -1442,6 +1448,147 @@
                         </Border>
                     </Grid>
                 </Grid>
+
+                <!-- ===== JOGOS · Promoções (preços das lojas pela API do IsThereAnyDeal) ===== -->
+                <ScrollViewer x:Name="PageDeals" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <Grid Margin="0,0,0,16">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,170,0">
+                                <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top">
+                                    <TextBlock Text="&#xE7BF;" FontFamily="{StaticResource Icons}" FontSize="22" Foreground="{DynamicResource OnAccent}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel>
+                                    <TextBlock Text="Promoções" Style="{StaticResource H1}"/>
+                                    <TextBlock Text="Preço dos jogos agora nas lojas (Steam, Epic, GOG, Nuuvem e outras), com o menor preço da história. Clique num jogo para abrir a oferta direto na loja."
+                                               Style="{StaticResource Sub}" TextWrapping="Wrap" MaxWidth="640"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Style="{StaticResource OutlineButton}" Content="Chave da API" Padding="14,8" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Click="BtnDealsKeyToggle_Click"/>
+                        </Grid>
+
+                        <!-- Chave da API: aparece sozinha quando não há chave; o botão acima abre/fecha -->
+                        <Border x:Name="DealsKeyCard" Style="{StaticResource CardBorder}" Margin="0,0,0,14" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Chave da API do IsThereAnyDeal" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="DealsKeyText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                    <TextBlock FontSize="12" Margin="0,6,0,0">
+                                        <Hyperlink Foreground="{DynamicResource Accent}" Click="DealsGetKey_Click">Pegar uma chave grátis no IsThereAnyDeal</Hyperlink>
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                                    <Grid Width="260" Margin="0,0,8,0">
+                                        <PasswordBox x:Name="DealsKeyBox" ToolTip="API key do IsThereAnyDeal" PasswordChanged="DealsKeyBox_Changed"/>
+                                        <TextBlock x:Name="DealsKeyHint" Text="Cole aqui a sua API key" Foreground="{DynamicResource Faint}"
+                                                   Margin="11,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                    </Grid>
+                                    <Button Style="{StaticResource OutlineButton}" Content="SALVAR CHAVE" Padding="16,8" Click="BtnDealsKeySave_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Sub-abas -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <RadioButton x:Name="DealsTabDeals" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Promoções" IsChecked="True" Checked="DealsTab_Checked"/>
+                            <RadioButton x:Name="DealsTabSearch" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Pesquisar" Checked="DealsTab_Checked"/>
+                            <RadioButton x:Name="DealsTabFree" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Grátis" Checked="DealsTab_Checked"/>
+                            <RadioButton x:Name="DealsTabLib" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Da minha biblioteca" Checked="DealsTab_Checked"/>
+                        </StackPanel>
+
+                        <!-- ===== Promoções do momento, com filtros ===== -->
+                        <StackPanel x:Name="DealsPanelDeals">
+                            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="ORDENAR" Style="{StaticResource Label}"/>
+                                    <WrapPanel x:Name="DealsSortPanel" Margin="0,6,0,6">
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Em alta" Tag="-hot" IsChecked="True" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Maior desconto" Tag="-cut" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Menor preço" Tag="price" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Mais recentes" Tag="-time" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Mais populares" Tag="rank" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Melhor avaliados na Steam" Tag="-steam-reviews" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsSort" Content="Acabando logo" Tag="expiry" Checked="DealsFilter_Changed"/>
+                                    </WrapPanel>
+                                    <TextBlock Text="DESCONTO MÍNIMO" Style="{StaticResource Label}"/>
+                                    <WrapPanel x:Name="DealsCutPanel" Margin="0,6,0,6">
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsCut" Content="Qualquer" Tag="0" IsChecked="True" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsCut" Content="25% ou mais" Tag="25" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsCut" Content="50% ou mais" Tag="50" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsCut" Content="75% ou mais" Tag="75" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsCut" Content="90% ou mais" Tag="90" Checked="DealsFilter_Changed"/>
+                                    </WrapPanel>
+                                    <TextBlock Text="PREÇO MÁXIMO" Style="{StaticResource Label}"/>
+                                    <!-- Montado no código, com a moeda do país (R$ no Brasil) -->
+                                    <WrapPanel x:Name="DealsPricePanel" Margin="0,6,0,6"/>
+                                    <TextBlock Text="TIPO" Style="{StaticResource Label}"/>
+                                    <WrapPanel x:Name="DealsTypePanel" Margin="0,6,0,6">
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsType" Content="Jogos" Tag="1" IsChecked="True" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsType" Content="DLCs" Tag="2" Checked="DealsFilter_Changed"/>
+                                        <RadioButton Style="{StaticResource ChipAccent}" GroupName="DealsType" Content="Tudo" Tag="" Checked="DealsFilter_Changed"/>
+                                    </WrapPanel>
+                                    <TextBlock Text="LOJAS (NENHUMA MARCADA = TODAS)" Style="{StaticResource Label}"/>
+                                    <!-- Montado no código com as lojas que têm mais promoções no país -->
+                                    <WrapPanel x:Name="DealsShopPanel" Margin="0,6,0,6"/>
+                                    <Grid Margin="0,4,0,0">
+                                        <CheckBox x:Name="DealsHlOnly" Content="Só menor preço da história" Checked="DealsFilter_Changed" Unchecked="DealsFilter_Changed"/>
+                                        <Button x:Name="BtnDealsRefresh" Style="{StaticResource OutlineButton}" Content="Atualizar" Padding="14,6" FontSize="12"
+                                                HorizontalAlignment="Right" Click="BtnDealsRefresh_Click"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock x:Name="DealsStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                            <WrapPanel x:Name="DealsGrid"/>
+                            <Button x:Name="BtnDealsMore" Style="{StaticResource OutlineButton}" Content="CARREGAR MAIS" Padding="18,8" HorizontalAlignment="Center"
+                                    Margin="0,6,0,0" Visibility="Collapsed" Click="BtnDealsMore_Click"/>
+                        </StackPanel>
+
+                        <!-- ===== Pesquisar um jogo e comparar as lojas ===== -->
+                        <StackPanel x:Name="DealsPanelSearch" Visibility="Collapsed">
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="DealsSearchBox" Tag="Nome do jogo (ex.: Elden Ring, Hollow Knight)…" KeyDown="DealsSearchBox_KeyDown"/>
+                                <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="PESQUISAR" Padding="18,8" Margin="8,0,0,0" Click="BtnDealsSearch_Click"/>
+                            </Grid>
+                            <CheckBox x:Name="DealsSearchDlc" Content="Mostrar também DLCs e pacotes" Margin="0,0,0,10"/>
+                            <TextBlock x:Name="DealsSearchStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,10"
+                                       Text="Digite o nome de um jogo para ver o preço em cada loja e o menor preço da história."/>
+                            <StackPanel x:Name="DealsSearchList"/>
+                        </StackPanel>
+
+                        <!-- ===== Jogos grátis por tempo limitado ===== -->
+                        <StackPanel x:Name="DealsPanelFree" Visibility="Collapsed">
+                            <TextBlock x:Name="DealsFreeStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                            <StackPanel x:Name="DealsFreeList"/>
+                        </StackPanel>
+
+                        <!-- ===== Jogos da Biblioteca em promoção ===== -->
+                        <StackPanel x:Name="DealsPanelLib" Visibility="Collapsed">
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="Jogos instalados no seu PC que estão em promoção agora, na loja mais barata. Bom pra presentear ou indicar pros amigos, e pra pegar DLCs."
+                                           Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,120,0" VerticalAlignment="Center"/>
+                                <Button x:Name="BtnDealsLibRefresh" Style="{StaticResource OutlineButton}" Content="Atualizar" Padding="14,6" FontSize="12"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnDealsLibRefresh_Click"/>
+                            </Grid>
+                            <TextBlock x:Name="DealsLibStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                            <WrapPanel x:Name="DealsLibGrid"/>
+                        </StackPanel>
+
+                        <!-- Crédito pedido nos termos de uso da API -->
+                        <TextBlock FontSize="11" Foreground="{DynamicResource Faint}" TextWrapping="Wrap" Margin="0,22,0,0">
+                            Preços e dados por <Hyperlink Foreground="{DynamicResource Muted}" Click="DealsItad_Click">IsThereAnyDeal</Hyperlink>.
+                            Os links levam direto à loja de cada oferta. O PcismoMaster não é afiliado ao IsThereAnyDeal.
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- ===== JOGOS ===== -->
                 <Grid x:Name="PageGames" Margin="36,30,36,30" Visibility="Collapsed">

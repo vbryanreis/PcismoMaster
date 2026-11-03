@@ -1,3 +1,4 @@
+using ResetExplode;
 using ResetExplode.Modular;
 using Microsoft.Win32;
 
@@ -107,8 +108,89 @@ Test("Real registry roundtrip only inside isolated test key", () => {
         }
     } finally { Registry.CurrentUser.DeleteSubKeyTree(path, false); }
 });
+// ---- Promoções (IsThereAnyDeal): tudo com um handler falso, sem rede e sem chave de verdade ----
+Dictionary<string, string> QueryOf(string query) => query.Split('&').Select(p => p.Split('=', 2))
+    .ToDictionary(p => p[0], p => Uri.UnescapeDataString(p.Length > 1 ? p[1] : ""));
+Test("ITAD: deals query sends country, sort, shops and a filter with min and max ranges", () => {
+    var p = QueryOf(ItadClient.BuildDealsQuery(new ItadDealsQuery { Sort = "-cut", CutMin = 50, PriceMax = 25.5, Types = { 1 }, HistoricalLowOnly = true, Shops = { 61, 35 }, Offset = 40 }, "BR"));
+    Assert(p["country"] == "BR" && p["sort"] == "-cut" && p["offset"] == "40" && p["limit"] == "40" && p["mature"] == "false" && p["shops"] == "61,35");
+    using var doc = System.Text.Json.JsonDocument.Parse(p["filter"]); var f = doc.RootElement;
+    Assert(f.GetProperty("cut").GetProperty("min").GetInt32() == 50 && f.GetProperty("cut").GetProperty("max").ValueKind == System.Text.Json.JsonValueKind.Null);
+    Assert(f.GetProperty("price").GetProperty("min").ValueKind == System.Text.Json.JsonValueKind.Null && f.GetProperty("price").GetProperty("max").GetDouble() == 25.5);
+    Assert(f.GetProperty("type")[0].GetInt32() == 1 && f.GetProperty("flag").GetString() == "H");
+    var empty = QueryOf(ItadClient.BuildDealsQuery(new ItadDealsQuery(), "BR"));
+    Assert(empty["country"] == "BR" && empty["sort"] == "-hot" && !empty.ContainsKey("filter") && !empty.ContainsKey("shops"));
+});
+Test("ITAD: deals list goes as GET with the country in the URL; POSTs send exactly application/json", () => {
+    var h = new FakeItadHandler { Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("""{"nextOffset":0,"hasMore":false,"list":[]}""") } };
+    var api = new ItadClient(h) { UserKey = "k" };
+    api.DealsAsync(new ItadDealsQuery { CutMin = 75 }, "BR").GetAwaiter().GetResult();
+    var r = h.Requests[0];
+    Assert(r.Method == HttpMethod.Get && r.Content == null && r.RequestUri!.AbsolutePath == "/deals/v2" && QueryOf(r.RequestUri.Query.TrimStart('?'))["country"] == "BR");
+    h.Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("[]") };
+    api.PricesAsync(new[] { "g1" }, "BR").GetAwaiter().GetResult();
+    Assert(h.Requests[1].Method == HttpMethod.Post && h.Requests[1].Content!.Headers.ContentType!.ToString() == "application/json");
+    Assert(h.Requests[1].RequestUri!.Query.Contains("country=BR"));
+});
+Test("ITAD: deals list parses prices, flags, nulls and expiry", () => {
+    const string json = """
+        {"nextOffset":1,"hasMore":true,"list":[{"id":"g1","slug":"hl2","title":"Half-Life 2","type":"game","mature":false,
+        "assets":{"banner400":"https://img/b400.jpg"},"deal":{"shop":{"id":61,"name":"Steam"},"price":{"amount":4.79,"amountInt":479,"currency":"BRL"},
+        "regular":{"amount":47.99,"amountInt":4799,"currency":"BRL"},"cut":90,"voucher":null,"storeLow":null,"historyLow":null,"historyLow_1y":null,
+        "historyLow_3m":null,"flag":"N","drm":[],"platforms":[],"timestamp":"2026-11-01T10:00:00+00:00","expiry":"2026-11-05T17:00:00+00:00","url":"https://itad.link/x"}}]}
+        """;
+    var page = ItadClient.Parse<ItadDealsPage>(json); var d = page.List[0].Deal;
+    Assert(page.HasMore && page.NextOffset == 1 && page.List[0].Assets!.Banner == "https://img/b400.jpg");
+    Assert(d.Shop.Name == "Steam" && d.Cut == 90 && d.Price.Amount == 4.79 && d.HistoryLow == null && d.Flag == "N" && d.Expiry!.Value.Day == 5);
+    Throws(() => ItadClient.Parse<ItadDealsPage>("<html>"));
+});
+Test("ITAD: prices are shown in the right currency and 0 is free", () => {
+    string Clean(string s) => s.Replace(' ', ' ').Replace(' ', ' ');
+    Assert(Clean(ItadClient.FormatPrice(new ItadPrice { Amount = 49.9, Currency = "BRL" })) == "R$ 49,90");
+    Assert(ItadClient.FormatPrice(new ItadPrice { Amount = 19.99, Currency = "USD" }) == "$19.99");
+    Assert(ItadClient.FormatPrice(new ItadPrice { Amount = 0, Currency = "BRL" }) == "Grátis" && ItadClient.FormatPrice(null) == "—");
+    var now = new DateTimeOffset(2026, 11, 3, 12, 0, 0, TimeSpan.Zero);
+    Assert(ItadClient.FormatExpiry(now.AddDays(3), now) == "Acaba em 3 dias" && ItadClient.FormatExpiry(now.AddHours(5), now) == "Acaba em 5 h");
+    Assert(ItadClient.FormatExpiry(null, now) == null && ItadClient.FormatExpiry(now.AddHours(-1), now) == "Encerrada");
+});
+Test("ITAD: key goes in the header (never in the URL) and answers are cached", () => {
+    var h = new FakeItadHandler(); var api = new ItadClient(h) { UserKey = "test-key" };
+    var a = api.SearchAsync("Half-Life").GetAwaiter().GetResult(); var b = api.SearchAsync("Half-Life").GetAwaiter().GetResult();
+    Assert(h.Requests.Count == 1 && !h.Requests[0].RequestUri!.ToString().Contains("test-key"));
+    Assert(h.Requests[0].Headers.GetValues("ITAD-API-Key").Single() == "test-key");
+    Assert(h.Requests[0].RequestUri!.AbsolutePath == "/games/search/v1" && h.Requests[0].RequestUri!.Query.Contains("title=Half-Life"));
+});
+Test("ITAD: missing key, refused key and rate limit give clear messages", () => {
+    var h = new FakeItadHandler(); var api = new ItadClient(h);
+    try { api.GiveawaysAsync().GetAwaiter().GetResult(); throw new Exception("should fail"); } catch (ItadException e) { Assert(e.Message.Contains("chave")); }
+    Assert(h.Requests.Count == 0); // sem chave nem chega a chamar a API
+    var shops = api.ShopsAsync("BR").GetAwaiter().GetResult(); Assert(h.Requests.Count == 1); // lojas não precisam de chave
+    api.UserKey = "k";
+    h.Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.Forbidden) { Content = new StringContent("{}") };
+    try { api.GiveawaysAsync().GetAwaiter().GetResult(); throw new Exception("should fail"); } catch (ItadException e) { Assert(e.Message.Contains("recusou a chave")); }
+    h.Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.Forbidden) { Content = new StringContent("""{"status_code":403,"reason_phrase":"Invalid or expired api key"}""") };
+    try { api.SearchAsync("y").GetAwaiter().GetResult(); throw new Exception("should fail"); } catch (ItadException e) { Assert(e.Message.Contains("inválida ou expirou") && e.Message.Contains("Client ID")); }
+    h.Reply = _ => { var r = new HttpResponseMessage((System.Net.HttpStatusCode)429) { Content = new StringContent("") }; r.Headers.RetryAfter = new(TimeSpan.FromSeconds(30)); return r; };
+    try { api.SearchAsync("x").GetAwaiter().GetResult(); throw new Exception("should fail"); } catch (ItadException e) { Assert(e.Message.Contains("30 s")); }
+});
+Test("ITAD: pasted key is cleaned of spaces, line breaks and quotes", () => {
+    Assert(ItadClient.CleanKey("  \"abc123def\"\r\n") == "abc123def" && ItadClient.CleanKey("abc 123") == "abc123");
+    Assert(ItadClient.CleanKey("   ") == null && ItadClient.CleanKey(null) == null && ItadClient.CleanKey("“abc”") == "abc");
+});
+Test("ITAD: Steam lookup maps appids and skips games it does not know", () => {
+    var h = new FakeItadHandler { Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("""{"app/220":"g-hl2","app/1":null}""") } };
+    var map = new ItadClient(h) { UserKey = "k" }.LookupSteamAsync(new[] { "220", "1" }).GetAwaiter().GetResult();
+    Assert(map.Count == 1 && map["220"] == "g-hl2" && h.Requests[0].RequestUri!.AbsolutePath == "/lookup/id/shop/61/v1");
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
+
+sealed class FakeItadHandler : HttpMessageHandler
+{
+    public List<HttpRequestMessage> Requests = new();
+    public Func<HttpRequestMessage, HttpResponseMessage> Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("[]") };
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct) { Requests.Add(request); return Task.FromResult(Reply(request)); }
+}
 
 sealed class FakeStore : ISettingsStore
 {

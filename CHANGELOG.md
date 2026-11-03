@@ -2,6 +2,18 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.7.0
+
+- Nova aba **Promoções** em JOGOS (logo abaixo da Biblioteca), com o preço dos jogos agora nas lojas e o **menor preço da história**, usando a API gratuita do [IsThereAnyDeal](https://isthereanydeal.com/). Os preços saem na moeda do país do Windows (no Brasil, em reais). Sub-abas:
+  - **Promoções**: cartões com capa, desconto, preço antigo e atual, loja, prazo e selos de "menor da história" / "menor na loja". Filtros de ordenação (em alta, maior desconto, menor preço, mais recentes, populares, melhor avaliados, acabando logo), desconto mínimo, preço máximo, tipo (jogos/DLCs) e lojas (Steam, Epic, GOG, Nuuvem, Microsoft e outras), além de "só menor preço da história" e CARREGAR MAIS.
+  - **Pesquisar**: busca pelo nome e **compara o preço em cada loja**; o botão "Comparar lojas" dos cartões leva direto para cá.
+  - **Grátis**: jogos grátis por tempo limitado (Epic, GOG, Steam…) com o prazo e o botão PEGAR GRÁTIS.
+  - **Da minha biblioteca**: os jogos instalados no PC que estão em promoção agora (Steam pelo appid, os outros pelo nome).
+- Clicar num jogo abre a oferta direto na loja, no navegador. Os dados vêm como a API entrega e o rodapé credita o IsThereAnyDeal (o PcismoMaster não é afiliado a ele).
+- **Chave da API**: o `.exe` do Release já vem com a chave do app (vinda do segredo `ITAD_API_KEY` do GitHub, nunca do código). Quem quiser pode colar a própria chave grátis, que fica cifrada pelo Windows. As respostas ficam alguns minutos em cache para respeitar o limite de consultas. Espaços, quebras de linha e aspas que vêm junto ao colar a chave são removidos, e se a chave for recusada o app diz o motivo exato (faltando, inválida ou expirada).
+- Testes novos (sem rede e sem chave real) para o cliente da API: filtros, leitura das respostas, moeda, chave só no cabeçalho, limpeza da chave colada, cache e mensagens de erro.
+- Versão atualizada para 0.7.0.
+
 ## 0.6.4
 
 - Nova categoria **ArtCraft** na aba **Instalar apps**, ao lado das outras (Navegadores, Mensagens, Mídia…), com os apps de criação da [ArtCraft](https://getartcraft.com/apps): **ArtCraft Launcher** (central oficial que instala e atualiza todos de uma vez — recomendado), **PhotoCraft**, **PdfCraft**, **FigCraft** e **Craft Anything**.

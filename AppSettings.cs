@@ -64,6 +64,8 @@ public sealed class AppSettings
     private static string FilePath => Path.Combine(Folder, "settings.json");
 
     public string? HowManyFpsKeyProtected { get; set; }
+    /// <summary>JOGOS · Promoções: chave própria da API do IsThereAnyDeal (cifrada com DPAPI). Vazia = usa a do app.</summary>
+    public string? ItadKeyProtected { get; set; }
 
     // BENCH: últimos resultados (mais recente primeiro)
     public List<BenchRun> BenchRuns { get; set; } = new();
@@ -106,23 +108,32 @@ public sealed class AppSettings
     [System.Text.Json.Serialization.JsonIgnore] // nunca gravar a chave em texto puro
     public string? HowManyFpsKey
     {
-        get
-        {
-            if (string.IsNullOrEmpty(HowManyFpsKeyProtected)) return null;
-            try
-            {
-                var bytes = ProtectedData.Unprotect(Convert.FromBase64String(HowManyFpsKeyProtected), null, DataProtectionScope.CurrentUser);
-                return Encoding.UTF8.GetString(bytes);
-            }
-            catch { return null; }
-        }
-        set
-        {
-            HowManyFpsKeyProtected = string.IsNullOrWhiteSpace(value)
-                ? null
-                : Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value.Trim()), null, DataProtectionScope.CurrentUser));
-        }
+        get => Unprotect(HowManyFpsKeyProtected);
+        set => HowManyFpsKeyProtected = Protect(value);
     }
+
+    [System.Text.Json.Serialization.JsonIgnore] // nunca gravar a chave em texto puro
+    public string? ItadKey
+    {
+        get => Unprotect(ItadKeyProtected);
+        set => ItadKeyProtected = Protect(value);
+    }
+
+    private static string? Unprotect(string? protectedValue)
+    {
+        if (string.IsNullOrEmpty(protectedValue)) return null;
+        try
+        {
+            var bytes = ProtectedData.Unprotect(Convert.FromBase64String(protectedValue), null, DataProtectionScope.CurrentUser);
+            return Encoding.UTF8.GetString(bytes);
+        }
+        catch { return null; }
+    }
+
+    private static string? Protect(string? value) =>
+        string.IsNullOrWhiteSpace(value)
+            ? null
+            : Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value.Trim()), null, DataProtectionScope.CurrentUser));
 
     public static AppSettings Load()
     {

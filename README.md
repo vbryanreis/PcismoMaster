@@ -2,7 +2,7 @@
 
 Aplicativo **Windows** (WPF, .NET 8) para **diagnóstico, monitoramento, benchmark e otimização** de PC. Roda **como administrador** para ler sensores de baixo nível e aplicar ajustes somente quando você pede.
 
-Versão atual: **0.6.3** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
+Versão atual: **0.7.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
 
 > Projeto mantido em dupla. Antes de mexer, sincronize com o `origin` (`git fetch` + `git pull --ff-only`) e trabalhe em branch própria, entregando por pull request.
 
@@ -20,7 +20,7 @@ A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o 
 - **Visão geral** — painel inicial: estado do hardware, gráfico de CPU/GPU por faixa de cor, cartão *Saúde do PC* e o botão **OTIMIZAR**.
 - **MASTER** — Sistema, Sensores (no estilo HWiNFO), Placa de vídeo (com a logo da fabricante em destaque: NVIDIA em ciano, AMD em vermelho), Discos, Energia e Rede.
 - **MANUTENÇÃO → Reparos do Windows** — rotinas oficiais do Windows: SFC, DISM, CHKDSK, redefinir rede / Windows Update / spooler, reiniciar áudio, Bluetooth e o Explorer.
-- **JOGOS** — Biblioteca de jogos, FPS estimado, detector de Gargalo e Overlay de FPS sobre o jogo.
+- **JOGOS** — Biblioteca de jogos, **Promoções** (preço dos jogos agora nas lojas, com o menor preço da história, filtros, pesquisa que compara as lojas, jogos grátis e os seus jogos em promoção), FPS estimado, detector de Gargalo e Overlay de FPS sobre o jogo.
 - **DESEMPENHO** — Benchmark (CPU, GPU, memória, disco e ray tracing DXR 1.1), Stress test (CPU / RAM / GPU) e **Overclock** no estilo do MSI Afterburner.
 - **FERRAMENTAS** — Otimização (ajustes do Windows para jogos, guardando o valor original para desfazer), Inicialização (o que abre junto com o Windows), **Instalar apps** (catálogo por categorias no estilo Ninite, via winget), Drivers (NVIDIA / AMD / Windows Update), Integração (RGB: iCUE e OpenRGB) e **Utilidades** — *Baixar vídeos* (YouTube/Instagram em MP4 ou MP3) e o **Finder**, busca instantânea de arquivos e pastas lendo a MFT dos discos NTFS.
 - **MAKER** — Portas COM (resolve portas fantasmas/presas) e Drivers seriais (CH340, CP210x, FTDI, Prolific, Arduino + Arduino IDE).
@@ -33,6 +33,7 @@ A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o 
 - **Baixar vídeos** precisa do **yt-dlp** e do **ffmpeg** (grátis). Se faltarem, a ferramenta avisa e leva até *Instalar apps* para instalá-los uma vez pelo winget.
 - **Finder** depende do modo administrador e de discos **NTFS** (lê a MFT direto).
 - **Pausar o Windows Update** pode adiar também correções de segurança, e às vezes o próprio Windows limita a duração da pausa.
+- **Promoções** usa a API gratuita do [IsThereAnyDeal](https://isthereanydeal.com/) e precisa de internet. O `.exe` do Release já vem com a chave do app; se ela faltar (ou para usar a sua), clique em **Chave da API** na aba e cole uma chave grátis criada em isthereanydeal.com/apps (fica cifrada pelo Windows). Os preços saem na moeda do país configurado no Windows. O PcismoMaster não é afiliado ao IsThereAnyDeal.
 - **Overclock** funciona em placas **NVIDIA**: Core/Memory Clock, Power/Temp Limit, curva V/F com undervolt, curva de fans, 5 perfis e monitoramento ao vivo.
 - **Onde ficam os dados:** configurações em `%AppData%\PcismoMaster`; backups dos ajustes do Ultimate em `%LOCALAPPDATA%\PcismoMaster\ModuleBackups`; capas de jogos em `%LOCALAPPDATA%\PcismoMaster\covers`.
 
@@ -46,6 +47,8 @@ dotnet publish PcismoMaster.csproj -c Release -r win-x64 --self-contained true -
 ```
 
 O `.exe` **não** é versionado no Git; ele sai do workflow de Release (ao criar a tag `vX.Y.Z`) ou do publish local.
+
+A chave do app no IsThereAnyDeal fica no segredo **`ITAD_API_KEY`** do repositório (Settings → Secrets and variables → Actions) e o workflow de Release a injeta com `-p:ItadApiKey=…`. **Nunca** coloque a chave no código. No publish local ela é opcional: sem ela, cole a sua chave na própria aba Promoções.
 
 ## Licenças e créditos
 
