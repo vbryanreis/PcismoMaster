@@ -19,8 +19,8 @@ namespace ResetExplode;
 public partial class MainWindow
 {
     private readonly ItadClient _itad = new();
-    private bool _dealsInited, _dealsFreeLoaded, _dealsLibLoaded;
-    private int _dealsReq, _dealsSearchReq; // descartam respostas velhas quando o filtro/pesquisa muda no meio da consulta
+    private bool _dealsInited, _dealsFreeLoaded, _dealsLibLoaded, _dealsFavLoaded;
+    private int _dealsReq, _dealsSearchReq, _dealsFavReq; // descartam respostas velhas quando o filtro/pesquisa muda no meio da consulta
     private int _dealsNextOffset;
     private readonly Dictionary<string, ImageSource?> _dealImgs = new();
     private readonly SemaphoreSlim _dealImgGate = new(6);
@@ -56,9 +56,19 @@ public partial class MainWindow
             first = false;
         }
 
+        // Onde o jogo roda (DRM): caixinhas, com a escolha salva entre as aberturas do app.
+        foreach (var (id, name) in ItadClient.DrmChoices)
+        {
+            var box = new CheckBox { Content = name, Tag = id, IsChecked = _settings.DealsDrm.Contains(id), Margin = new Thickness(0, 0, 18, 6) };
+            box.Checked += DealsDrm_Changed;
+            box.Unchecked += DealsDrm_Changed;
+            DealsDrmPanel.Children.Add(box);
+        }
+
         _ = LoadDealShopsAsync();
         if (_itad.Configured) _ = LoadDealsAsync(reset: true);
         else ShowDealsNeedKey(DealsStatus);
+        _ = LoadFavoritesAsync(); // já confere os favoritos: a sub-aba mostra quantos estão em promoção
     }
 
     // ---------------- Chave da API ----------------
@@ -93,7 +103,7 @@ public partial class MainWindow
         catch (Exception ex) { DealsKeyText.Text = "Não deu para salvar a chave: " + ex.Message; return; }
         _itad.UserKey = _settings.ItadKey;
         _itad.ClearCache();
-        _dealsFreeLoaded = _dealsLibLoaded = false;
+        _dealsFreeLoaded = _dealsLibLoaded = _dealsFavLoaded = false;
         UpdateDealsKeyUi(showIfMissing: false);
         if (!_itad.Configured) { ShowDealsNeedKey(DealsStatus); return; }
         DealsKeyCard.Visibility = Visibility.Collapsed;
@@ -111,11 +121,13 @@ public partial class MainWindow
         if (DealsPanelDeals == null) return; // disparado durante o InitializeComponent
         static Visibility Vis(RadioButton tab) => tab.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         DealsPanelDeals.Visibility = Vis(DealsTabDeals);
+        DealsPanelFav.Visibility = Vis(DealsTabFav);
         DealsPanelSearch.Visibility = Vis(DealsTabSearch);
         DealsPanelFree.Visibility = Vis(DealsTabFree);
         DealsPanelLib.Visibility = Vis(DealsTabLib);
         if (!_dealsInited) return;
-        if (DealsTabFree.IsChecked == true && !_dealsFreeLoaded) _ = LoadFreeAsync();
+        if (DealsTabFav.IsChecked == true && !_dealsFavLoaded) _ = LoadFavoritesAsync();
+        else if (DealsTabFree.IsChecked == true && !_dealsFreeLoaded) _ = LoadFreeAsync();
         else if (DealsTabLib.IsChecked == true && !_dealsLibLoaded) _ = LoadLibDealsAsync();
         else if (DealsTabSearch.IsChecked == true) DealsSearchBox.Focus();
     }
@@ -123,6 +135,7 @@ public partial class MainWindow
     private void ReloadDealsTab()
     {
         if (DealsTabSearch.IsChecked == true) { if (DealsSearchBox.Text.Trim().Length > 1) _ = SearchDealsAsync(); }
+        else if (DealsTabFav.IsChecked == true) _ = LoadFavoritesAsync();
         else if (DealsTabFree.IsChecked == true) _ = LoadFreeAsync();
         else if (DealsTabLib.IsChecked == true) _ = LoadLibDealsAsync();
         else _ = LoadDealsAsync(reset: true);
@@ -174,7 +187,19 @@ public partial class MainWindow
         Types = int.TryParse(CheckedTag(DealsTypePanel), out int type) ? new List<int> { type } : new List<int>(),
         Shops = DealsShopPanel.Children.OfType<ToggleButton>().Where(b => b.IsChecked == true && b.Tag is int).Select(b => (int)b.Tag).ToList(),
         HistoricalLowOnly = DealsHlOnly.IsChecked == true,
+        Drm = SelectedDrm(),
     };
+
+    private List<int> SelectedDrm() =>
+        DealsDrmPanel.Children.OfType<CheckBox>().Where(c => c.IsChecked == true && c.Tag is int).Select(c => (int)c.Tag).ToList();
+
+    private void DealsDrm_Changed(object sender, RoutedEventArgs e)
+    {
+        _settings.DealsDrm = SelectedDrm();
+        try { _settings.Save(); } catch { }
+        _ = LoadDealsAsync(reset: true);
+        _ = LoadFavoritesAsync(); // os favoritos também mostram só lojas com o DRM marcado
+    }
 
     private void DealsFilter_Changed(object sender, RoutedEventArgs e)
     {
@@ -201,14 +226,25 @@ public partial class MainWindow
         BtnDealsMore.IsEnabled = false;
         try
         {
-            var page = await _itad.DealsAsync(q, DealsCountry);
-            if (req != _dealsReq) return;
-            foreach (var it in page.List)
-                DealsGrid.Children.Add(DealCard(new DealCardData(it.Id, it.Title, it.Slug, it.Deal, it.Deal.HistoryLow, it.Assets?.Banner)));
+            // A API já filtra pelo DRM; aqui fica mais rígido (o jogo tem que rodar só nos DRMs marcados). Se uma página
+            // inteira ficar de fora, busca as próximas (até 3) para não mostrar uma lista vazia à toa.
+            ItadDealsPage page;
+            int added = 0, pages = 0;
+            do
+            {
+                page = await _itad.DealsAsync(q, DealsCountry);
+                if (req != _dealsReq) return;
+                foreach (var it in page.List.Where(it => ItadClient.RunsOn(it.Deal, q.Drm)))
+                {
+                    DealsGrid.Children.Add(DealCard(new DealCardData(it.Id, it.Title, it.Slug, it.Deal, it.Deal.HistoryLow, it.Assets?.Banner)));
+                    added++;
+                }
+                q.Offset = page.NextOffset;
+            } while (added == 0 && page.HasMore && ++pages < 4);
             _dealsNextOffset = page.NextOffset;
             BtnDealsMore.Visibility = page.HasMore ? Visibility.Visible : Visibility.Collapsed;
             DealsStatus.Text = DealsGrid.Children.Count == 0
-                ? "Nenhuma promoção com esses filtros. Tente diminuir o desconto mínimo ou aumentar o preço máximo."
+                ? "Nenhuma promoção com esses filtros. Tente diminuir o desconto mínimo, aumentar o preço máximo ou marcar mais DRMs."
                 : $"{DealsGrid.Children.Count} promoções · preços para {RegionName()}. Clique num jogo para abrir a oferta na loja.";
         }
         catch (ItadException ex) { if (req == _dealsReq) DealsStatus.Text = ex.Message; }
@@ -244,10 +280,18 @@ public partial class MainWindow
                 Padding = new Thickness(7, 2, 7, 2), Margin = new Thickness(8), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top,
                 Child = new TextBlock { Text = flag, FontSize = 9.5, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent") },
             });
+        var heart = FavHeart(d.GameId, d.Title, d.Slug, d.BannerUrl, overlay: true);
+        heart.Margin = new Thickness(8);
+        heart.HorizontalAlignment = HorizontalAlignment.Right;
+        heart.VerticalAlignment = VerticalAlignment.Bottom;
+        top.Children.Add(heart);
 
         var info = new StackPanel { Margin = new Thickness(10, 8, 10, 10) };
         info.Children.Add(new TextBlock { Text = d.Title, FontWeight = FontWeights.SemiBold, FontSize = 12.5, TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = d.Title });
-        info.Children.Add(new TextBlock { Text = deal.Shop.Name.ToUpperInvariant(), FontSize = 10, FontWeight = FontWeights.SemiBold, Foreground = (Brush)FindResource("Accent"), Margin = new Thickness(0, 2, 0, 0) });
+        var shopLine = new TextBlock { FontSize = 10, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 2, 0, 0), TextTrimming = TextTrimming.CharacterEllipsis };
+        shopLine.Inlines.Add(new Run(deal.Shop.Name.ToUpperInvariant()) { Foreground = (Brush)FindResource("Accent") });
+        if (ItadClient.DrmNote(deal) is string drm) shopLine.Inlines.Add(new Run("  ·  " + drm) { Foreground = (Brush)FindResource("Muted"), FontWeight = FontWeights.Normal });
+        info.Children.Add(shopLine);
 
         var prices = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 6, 0, 0) };
         if (deal.Cut > 0)
@@ -326,7 +370,7 @@ public partial class MainWindow
             var prices = (await _itad.PricesAsync(games.Select(g => g.Id), DealsCountry)).ToDictionary(p => p.Id);
             if (req != _dealsSearchReq) return;
             foreach (var g in games)
-                DealsSearchList.Children.Add(GamePricesRow(g.Title, g.Slug, g.Type, g.Assets?.Banner, prices.GetValueOrDefault(g.Id)));
+                DealsSearchList.Children.Add(GamePricesRow(g.Id, g.Title, g.Slug, g.Type, g.Assets?.Banner, prices.GetValueOrDefault(g.Id)));
             DealsSearchStatus.Text = $"{games.Count} resultado(s) para \"{q}\" · preços para {RegionName()}. Clique numa loja para abrir a oferta.";
         }
         catch (ItadException ex) { if (req == _dealsSearchReq) DealsSearchStatus.Text = ex.Message; }
@@ -345,14 +389,14 @@ public partial class MainWindow
         {
             var p = (await _itad.PricesAsync(new[] { d.GameId }, DealsCountry)).FirstOrDefault();
             if (req != _dealsSearchReq) return;
-            DealsSearchList.Children.Add(GamePricesRow(d.Title, d.Slug, null, d.BannerUrl, p, d.Lib));
+            DealsSearchList.Children.Add(GamePricesRow(d.GameId, d.Title, d.Slug, null, d.BannerUrl, p, d.Lib));
             DealsSearchStatus.Text = $"Preço em cada loja agora · preços para {RegionName()}. Clique numa loja para abrir a oferta.";
         }
         catch (ItadException ex) { if (req == _dealsSearchReq) DealsSearchStatus.Text = ex.Message; }
     }
 
     /// <summary>Linha da pesquisa: banner, nome, mais barato agora, menor da história e o preço em cada loja (clicável).</summary>
-    private FrameworkElement GamePricesRow(string title, string slug, string? type, string? bannerUrl, ItadGamePrices? prices, LibGame? lib = null)
+    private FrameworkElement GamePricesRow(string gameId, string title, string slug, string? type, string? bannerUrl, ItadGamePrices? prices, LibGame? lib = null)
     {
         var banner = new Border
         {
@@ -370,6 +414,9 @@ public partial class MainWindow
             head.Children.Add(new Border { Background = (Brush)FindResource("Hover"), CornerRadius = new CornerRadius(5), Padding = new Thickness(6, 1, 6, 1), Margin = new Thickness(8, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Child = new TextBlock { Text = type == "dlc" ? "DLC" : "PACOTE", FontSize = 9.5, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("Muted") } });
+        var heart = FavHeart(gameId, title, slug, bannerUrl, overlay: false);
+        heart.Margin = new Thickness(6, 0, 0, 0);
+        head.Children.Add(heart);
         info.Children.Add(head);
 
         var deals = prices?.Deals.OrderBy(x => x.Price.Amount).ToList() ?? new List<ItadDeal>();
@@ -406,7 +453,8 @@ public partial class MainWindow
         g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) });
 
-        var shop = new TextBlock { Text = x.Shop.Name + (FlagText(x.Flag) is string f ? "  ·  " + f.ToLower(CultureInfo.CurrentCulture) : ""),
+        var shop = new TextBlock { Text = x.Shop.Name + (ItadClient.DrmNote(x) is string drm ? "  ·  " + drm : "")
+                                          + (FlagText(x.Flag) is string f ? "  ·  " + f.ToLower(CultureInfo.CurrentCulture) : ""),
             FontWeight = best ? FontWeights.SemiBold : FontWeights.Normal, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis };
         g.Children.Add(shop);
         if (x.Cut > 0)
@@ -429,6 +477,120 @@ public partial class MainWindow
         line.MouseLeave += (_, _) => line.Background = Brushes.Transparent;
         line.MouseLeftButtonUp += (_, _) => OpenDealUrl(x.Url);
         return line;
+    }
+
+    // ---------------- Favoritos ----------------
+
+    private bool IsFavorite(string gameId) => _settings.DealFavorites.Any(f => f.Id == gameId);
+
+    /// <summary>Coração do favorito: cheio e vermelho quando o jogo está nos favoritos. O clique não abre a loja do cartão.</summary>
+    private Border FavHeart(string gameId, string title, string slug, string? banner, bool overlay)
+    {
+        var glyph = new TextBlock { FontFamily = (FontFamily)FindResource("Icons"), FontSize = overlay ? 15 : 16,
+            HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        // Sobre o banner vai num círculo escuro, para aparecer em qualquer capa.
+        var heart = new Border { Width = 30, Height = 30, CornerRadius = new CornerRadius(15), Child = glyph, Cursor = Cursors.Hand,
+            VerticalAlignment = VerticalAlignment.Center,
+            Background = overlay ? new SolidColorBrush(Color.FromArgb(0xB4, 0x07, 0x06, 0x0D)) : Brushes.Transparent };
+        void Paint()
+        {
+            bool on = IsFavorite(gameId);
+            glyph.Text = on ? "" : "";
+            glyph.Foreground = on ? (Brush)FindResource("TempCrit") : overlay ? Brushes.White : (Brush)FindResource("Muted");
+            heart.ToolTip = on ? "Tirar dos favoritos" : "Favoritar: acompanhar o preço deste jogo em Favoritos";
+        }
+        Paint();
+        heart.MouseEnter += (_, _) => glyph.Opacity = 0.75;
+        heart.MouseLeave += (_, _) => glyph.Opacity = 1;
+        heart.MouseLeftButtonDown += (_, e) => e.Handled = true;
+        heart.MouseLeftButtonUp += (_, e) =>
+        {
+            e.Handled = true;
+            DealFavorite.Toggle(_settings.DealFavorites, gameId, title, slug, banner, DateTime.Now);
+            try { _settings.Save(); } catch { }
+            Paint();
+            _ = LoadFavoritesAsync();
+        };
+        return heart;
+    }
+
+    private void BtnDealsFavRefresh_Click(object sender, RoutedEventArgs e)
+    {
+        _itad.ClearCache();
+        _ = LoadFavoritesAsync();
+    }
+
+    /// <summary>Preço de agora de cada favorito (a loja mais barata com o DRM marcado). Os em promoção vêm primeiro, pelo maior desconto.</summary>
+    private async Task LoadFavoritesAsync()
+    {
+        int req = ++_dealsFavReq;
+        var favs = _settings.DealFavorites.ToList();
+        if (favs.Count == 0)
+        {
+            DealsFavGrid.Children.Clear();
+            DealsTabFav.Content = "Favoritos";
+            DealsFavStatus.Text = "Nenhum favorito ainda. Toque no coração de um jogo (em Promoções, Pesquisar ou Da minha biblioteca) para acompanhar o preço dele aqui.";
+            _dealsFavLoaded = true;
+            return;
+        }
+        if (!_itad.Configured) { ShowDealsNeedKey(DealsFavStatus); return; }
+        DealsFavStatus.Text = $"Conferindo o preço de {favs.Count} favorito(s)…";
+        BtnDealsFavRefresh.IsEnabled = false;
+        try
+        {
+            var prices = (await _itad.PricesAsync(favs.Select(f => f.Id), DealsCountry)).ToDictionary(p => p.Id);
+            if (req != _dealsFavReq) return;
+            var drm = SelectedDrm();
+            var rows = favs.Select(f => (Fav: f, Prices: prices.GetValueOrDefault(f.Id), Best: ItadClient.BestDeal(prices.GetValueOrDefault(f.Id), drm))).ToList();
+            DealsFavGrid.Children.Clear();
+            foreach (var r in rows.OrderByDescending(r => r.Best?.Cut ?? -1).ThenBy(r => r.Fav.Title, StringComparer.CurrentCultureIgnoreCase))
+            {
+                // Favoritado da Biblioteca não tem banner do IsThereAnyDeal: usa a capa do jogo instalado.
+                var lib = r.Fav.Banner == null ? _libGames.FirstOrDefault(g => g.Name == r.Fav.Title) : null;
+                DealsFavGrid.Children.Add(r.Best != null
+                    ? DealCard(new DealCardData(r.Fav.Id, r.Fav.Title, r.Fav.Slug, r.Best, r.Prices?.HistoryLow?.All, r.Fav.Banner, lib))
+                    : NoPriceCard(r.Fav, drm.Count > 0));
+            }
+            int onSale = rows.Count(r => r.Best?.Cut > 0);
+            DealsTabFav.Content = onSale > 0 ? $"Favoritos · {onSale} em promoção" : "Favoritos";
+            _dealsFavLoaded = true;
+            DealsFavStatus.Text = (onSale > 0
+                    ? $"{onSale} dos seus {favs.Count} favoritos estão em promoção agora · preços para {RegionName()}."
+                    : $"Nenhum dos seus {favs.Count} favoritos está em promoção agora. O coração fica de olho: volte depois.")
+                + (drm.Count > 0 ? " Mostrando só lojas que rodam nos DRMs marcados em Promoções." : "");
+        }
+        catch (ItadException ex) { if (req == _dealsFavReq) DealsFavStatus.Text = ex.Message; }
+        finally { if (req == _dealsFavReq) BtnDealsFavRefresh.IsEnabled = true; }
+    }
+
+    /// <summary>Favorito sem preço agora (nenhuma loja coberta, ou nenhuma com o DRM marcado): cartão simples, ainda com o coração.</summary>
+    private FrameworkElement NoPriceCard(DealFavorite f, bool drmFiltered)
+    {
+        var banner = new Border
+        {
+            Height = 110, CornerRadius = new CornerRadius(10, 10, 0, 0), Background = (Brush)FindResource("AccentGradient"),
+            Child = new TextBlock { Text = Initials(f.Title), FontSize = 32, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent"),
+                Opacity = 0.85, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
+        };
+        _ = LoadDealImageAsync(f.Banner, banner, 472);
+        var top = new Grid();
+        top.Children.Add(banner);
+        var heart = FavHeart(f.Id, f.Title, f.Slug, f.Banner, overlay: true);
+        heart.Margin = new Thickness(8);
+        heart.HorizontalAlignment = HorizontalAlignment.Right;
+        heart.VerticalAlignment = VerticalAlignment.Bottom;
+        top.Children.Add(heart);
+
+        var info = new StackPanel { Margin = new Thickness(10, 8, 10, 12) };
+        info.Children.Add(new TextBlock { Text = f.Title, FontWeight = FontWeights.SemiBold, FontSize = 12.5, TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = f.Title });
+        info.Children.Add(new TextBlock { Text = drmFiltered ? "Nenhuma loja com os DRMs marcados vende este jogo agora." : "Sem preço nas lojas cobertas agora.",
+            FontSize = 11, Foreground = (Brush)FindResource("Muted"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
+
+        var body = new StackPanel();
+        body.Children.Add(top);
+        body.Children.Add(info);
+        return new Border { Width = 236, CornerRadius = new CornerRadius(10), Background = (Brush)FindResource("Card"), Margin = new Thickness(0, 0, 14, 14),
+            BorderBrush = (Brush)FindResource("Line"), BorderThickness = new Thickness(1), Child = body };
     }
 
     // ---------------- Grátis ----------------

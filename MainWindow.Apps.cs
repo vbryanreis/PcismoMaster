@@ -79,7 +79,8 @@ public partial class MainWindow
                 await gate.WaitAsync();
                 try
                 {
-                    var icon = await AppIcons.FromWebAsync(a.WingetId, a.Site, AppInstaller.IconUrls.GetValueOrDefault(a.WingetId, ""));
+                    var icon = await AppIcons.FromWebAsync(a.IconKey, a.Site,
+                        a.IconUrl.Length > 0 ? a.IconUrl : AppInstaller.IconUrls.GetValueOrDefault(a.WingetId, ""));
                     if (icon == null && a.LocalIcon.Length > 0) icon = await Task.Run(() => AppIcons.FromFile(a.LocalIcon));
                     if (icon != null) a.Icon = icon; // ImageSource congelado: pode vir de outra thread
                 }

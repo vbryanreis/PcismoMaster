@@ -81,6 +81,10 @@ public sealed class AppSettings
     // JOGOS
     public Dictionary<string, GameProfile> GameProfiles { get; set; } = new();
     public List<CustomGame> CustomGames { get; set; } = new();
+    /// <summary>JOGOS · Promoções: jogos marcados com o coração para acompanhar o preço.</summary>
+    public List<DealFavorite> DealFavorites { get; set; } = new();
+    /// <summary>JOGOS · Promoções: DRMs marcados no filtro "Onde o jogo roda" (vazio = qualquer).</summary>
+    public List<int> DealsDrm { get; set; } = new();
 
     // Aparência
     public bool LightTheme { get; set; }
