@@ -70,6 +70,8 @@ git push origin v0.2.4
 
 Regras: **nunca reutilize nem mova uma tag já publicada.** Se errar, crie a próxima PATCH. Uma tag só é publicada a partir da `main` com a versão do csproj batendo.
 
+**Aviso de colisão (qualquer agente de IA):** antes de fechar uma versão, confira se aquele número já está em uso — commitado na `main` ou em vias de ser publicado pelo outro colaborador. Se já estiver, o agente deve avisar e já alterar automaticamente para o próximo número livre, sem fechar duas versões com o mesmo número.
+
 ## O que o GitHub Actions faz
 
 - **Validar PcismoMaster** (`push`, `pull_request`, manual): roda os testes e publica um pacote portátil nos *artifacts*. É o check que precisa ficar verde antes de integrar um PR.
