@@ -50,6 +50,8 @@
     <!-- Fonte das abas de navegação: clean e bem legível, no estilo de apps de tecnologia.
          Usa Inter quando instalada; cai para Segoe UI Variable Display (padrão do Windows 11) e depois Segoe UI. -->
     <FontFamily x:Key="NavFont">Inter, Segoe UI Variable Display, Segoe UI</FontFamily>
+    <!-- Fonte do botão de modo: Orbitron (futurista, embutida em Assets\Fonts); Bahnschrift como reserva -->
+    <FontFamily x:Key="ModeFont">pack://application:,,,/Assets/Fonts/#Orbitron, Bahnschrift, Segoe UI Variable Display, Segoe UI</FontFamily>
 
     <!-- Ciano iluminado do hover das abas de navegação (a ponta do degradê do ícone) -->
     <SolidColorBrush x:Key="NavHover" Color="#3EC6EA"/>
@@ -149,11 +151,35 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
     </Style>
 
-    <!-- Botão "Modo simples / avançado" da barra de título -->
-    <Style x:Key="ModeButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+    <!-- Botão "Modo simples / avançado" da barra de título: borda e realce na cor do modo atual
+         (azul no simples, roxo no avançado). As cores são trocadas em ApplyMode e ao mudar o tema. -->
+    <SolidColorBrush x:Key="ModeAccent" Color="#4FA3F0"/>
+    <SolidColorBrush x:Key="ModeAccentSoft" Color="#334FA3F0"/>
+    <Style x:Key="ModeButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource ModeAccent}"/>
+        <Setter Property="FontFamily" Value="{StaticResource ModeFont}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="14,5"/>
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="b" Background="Transparent" BorderBrush="{DynamicResource ModeAccent}"
+                            BorderThickness="1.6" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter ContentTemplateSelector="{StaticResource FriendlySelector}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource ModeAccentSoft}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="b" Property="Opacity" Value="0.8"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="CaptionButton" TargetType="Button">
