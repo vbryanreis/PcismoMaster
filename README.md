@@ -2,7 +2,7 @@
 
 Aplicativo **Windows** (WPF, .NET 8) para **diagnóstico, monitoramento, benchmark e otimização** de PC. Roda **como administrador** para ler sensores de baixo nível e aplicar ajustes somente quando você pede.
 
-Versão atual: **0.8.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
+Versão atual: **0.8.1** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
 
 > Projeto mantido em dupla. Antes de mexer, sincronize com o `origin` (`git fetch` + `git pull --ff-only`) e trabalhe em branch própria, entregando por pull request.
 
@@ -15,7 +15,7 @@ Versão atual: **0.8.0** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de
 
 ## Navegação
 
-O app abre no **Início** ("O que você quer fazer?"), com as tarefas mais comuns em blocos e uma busca por tudo que ele faz. No topo fica o botão **Modo simples / Modo avançado**: o simples (padrão) mostra só o essencial e seguro; o avançado libera sensores, overclock, stress test, ajustes técnicos e os scripts completos. Cada página tem uma explicação curta no topo.
+O app abre no **Início** ("O que você quer fazer?"), com as tarefas mais comuns em blocos e uma busca por tudo que ele faz. No topo fica o botão **Modo Simples / Modo Avançado**, destacado em cor para ser fácil de achar (azul no simples, roxo no avançado): o simples (padrão) mostra só o essencial e seguro; o avançado libera sensores, placa de vídeo, overclock, stress test, ajustes técnicos e os scripts completos. Cada página tem uma explicação curta no topo.
 
 A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o mouse):
 
@@ -58,4 +58,4 @@ A chave do app no IsThereAnyDeal fica no segredo **`ITAD_API_KEY`** do repositó
 
 ## Licenças e créditos
 
-Interface e base herdadas do **ResetExplode**; funções do **Ultimate** em FERRAMENTAS. O Profile Inspector e o Painel NVIDIA usam o catálogo do [NVIDIA Profile Inspector](https://github.com/Orbmu2k/nvidiaProfileInspector) (licença em `licenses/nvidiaProfileInspector-LICENSE.txt`); a limpeza do driver usa o DDU da Wagnardsoft (baixado na hora, com a assinatura conferida). A camada NVAPI de overclock/undervolt foi portada do [simple-nvidia-undervolt](https://github.com/vuplea/simple-nvidia-undervolt). Licenças preservadas em [LICENSE](LICENSE), [licenses/Ultimate-LICENSE.txt](licenses/Ultimate-LICENSE.txt) e [licenses/simple-nvidia-undervolt-LICENSE.txt](licenses/simple-nvidia-undervolt-LICENSE.txt).
+Interface e base herdadas do **ResetExplode**; funções do **Ultimate** em FERRAMENTAS. O Profile Inspector e o Painel NVIDIA usam o catálogo do [NVIDIA Profile Inspector](https://github.com/Orbmu2k/nvidiaProfileInspector) (licença em `licenses/nvidiaProfileInspector-LICENSE.txt`); a limpeza do driver usa o DDU da Wagnardsoft (baixado na hora, com a assinatura conferida). A camada NVAPI de overclock/undervolt foi portada do [simple-nvidia-undervolt](https://github.com/vuplea/simple-nvidia-undervolt). A fonte **Orbitron** (botão de modo) é de Matt McInerney / The League of Moveable Type, sob a **SIL Open Font License 1.1** (`licenses/Orbitron-OFL.txt`). Licenças preservadas em [LICENSE](LICENSE), [licenses/Ultimate-LICENSE.txt](licenses/Ultimate-LICENSE.txt) e [licenses/simple-nvidia-undervolt-LICENSE.txt](licenses/simple-nvidia-undervolt-LICENSE.txt).

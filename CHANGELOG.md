@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.8.1
+
+- **Botão de modo mais fácil de achar** (barra de título): agora com borda e realce coloridos — **azul no Modo Simples** e **roxo no Modo Avançado** — e o destaque ao passar o mouse na mesma cor. O azul usa o mesmo tom do indicador de temperatura (mais azul e menos esverdeado que o ciano). O texto ganhou a fonte **Orbitron** (futurista, embutida no app, licença SIL OFL) e a inicial maiúscula na segunda palavra: **Modo Simples** / **Modo Avançado**. A cor acompanha o tema claro/escuro.
+- Versão atualizada para 0.8.1.
+
 ## 0.8.0
 
 Junta a 0.6.3, a 0.6.4 (ArtCraft) e a 0.7.0 (Promoções) do Bryan com as novidades abaixo.
