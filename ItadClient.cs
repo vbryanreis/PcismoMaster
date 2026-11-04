@@ -22,6 +22,13 @@ public sealed class ItadShop
     [JsonPropertyName("name")] public string Name { get; set; } = "";
 }
 
+/// <summary>DRM em que o jogo roda. O id é o da loja dona do DRM (Steam = 61, Epic = 16…); 1000 = sem DRM (é como vêm os jogos da GOG).</summary>
+public sealed class ItadDrm
+{
+    [JsonPropertyName("id")] public int Id { get; set; }
+    [JsonPropertyName("name")] public string Name { get; set; } = "";
+}
+
 public sealed class ItadAssets
 {
     [JsonPropertyName("banner300")] public string? Banner300 { get; set; }
@@ -46,6 +53,8 @@ public sealed class ItadDeal
     [JsonPropertyName("flag")] public string? Flag { get; set; }
     [JsonPropertyName("expiry")] public DateTimeOffset? Expiry { get; set; }
     [JsonPropertyName("url")] public string Url { get; set; } = "";
+    /// <summary>Onde o jogo ativa/roda (pode ser outro que não a loja: a Fanatical vende chave da Steam). Vazio = a loja não informou.</summary>
+    [JsonPropertyName("drm")] public List<ItadDrm> Drm { get; set; } = new();
 }
 
 public sealed class ItadGame
@@ -128,8 +137,29 @@ public sealed class ItadDealsQuery
     /// <summary>1 = jogo, 2 = DLC, 3 = pacote. Vazio = todos.</summary>
     public List<int> Types { get; set; } = new();
     public bool HistoricalLowOnly { get; set; }
+    /// <summary>DRMs aceitos (ids de ItadClient.DrmChoices). Vazio = qualquer.</summary>
+    public List<int> Drm { get; set; } = new();
     public int Offset { get; set; }
     public int Limit { get; set; } = 40;
+}
+
+/// <summary>Jogo favoritado na aba Promoções para acompanhar o preço. Fica nas configurações do app (não precisa de conta no IsThereAnyDeal).</summary>
+public sealed class DealFavorite
+{
+    public string Id { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Slug { get; set; } = "";
+    public string? Banner { get; set; }
+    public DateTime Added { get; set; }
+
+    /// <summary>Põe ou tira o jogo dos favoritos. Devolve true se ficou favoritado.</summary>
+    public static bool Toggle(List<DealFavorite> favs, string id, string title, string slug, string? banner, DateTime now)
+    {
+        int i = favs.FindIndex(f => f.Id == id);
+        if (i >= 0) { favs.RemoveAt(i); return false; }
+        favs.Add(new DealFavorite { Id = id, Title = title, Slug = slug, Banner = banner, Added = now });
+        return true;
+    }
 }
 
 /// <summary>Erro da API já com mensagem para mostrar na tela.</summary>
@@ -144,6 +174,14 @@ public sealed class ItadClient
 {
     public const string BaseUrl = "https://api.isthereanydeal.com";
     public const int SteamShopId = 61;
+    public const int DrmFree = 1000;
+
+    /// <summary>DRMs do filtro "Onde o jogo roda": o id é o da loja dona do DRM, como a API pede. A GOG entra como "sem DRM".</summary>
+    public static readonly (int Id, string Name)[] DrmChoices =
+    {
+        (SteamShopId, "Steam"), (16, "Epic Games"), (48, "Xbox / Microsoft Store"), (52, "EA app"),
+        (62, "Ubisoft Connect"), (4, "Battle.net"), (DrmFree, "Sem DRM (GOG e outros)"),
+    };
     private static readonly TimeSpan DefaultTtl = TimeSpan.FromMinutes(10);
 
     private readonly HttpClient _http;
@@ -322,6 +360,7 @@ public sealed class ItadClient
         if (q.PriceMax is double max) filter["price"] = new Dictionary<string, object?> { ["min"] = null, ["max"] = max };
         if (q.Types.Count > 0) filter["type"] = q.Types;
         if (q.HistoricalLowOnly) filter["flag"] = "H";
+        if (q.Drm.Count > 0) filter["drm"] = q.Drm;
 
         var parts = new List<string>
         {
@@ -334,6 +373,27 @@ public sealed class ItadClient
         if (q.Shops.Count > 0) parts.Add("shops=" + string.Join(",", q.Shops.Select(s => s.ToString(CultureInfo.InvariantCulture))));
         if (filter.Count > 0) parts.Add("filter=" + Uri.EscapeDataString(JsonSerializer.Serialize(filter)));
         return string.Join("&", parts);
+    }
+
+    // ---- DRM ----
+
+    /// <summary>
+    /// A oferta roda só nos DRMs marcados: todos os DRMs dela estão na seleção (um jogo da Steam que pede Ubisoft Connect só passa
+    /// se os dois estiverem marcados). Nada marcado = qualquer. Oferta sem DRM informado fica de fora quando há filtro.
+    /// </summary>
+    public static bool RunsOn(ItadDeal deal, IReadOnlyCollection<int> drms) =>
+        drms.Count == 0 || (deal.Drm.Count > 0 && deal.Drm.All(x => drms.Contains(x.Id)));
+
+    /// <summary>A oferta mais barata entre as lojas que rodam nos DRMs marcados (null se nenhuma).</summary>
+    public static ItadDeal? BestDeal(ItadGamePrices? prices, IReadOnlyCollection<int> drms) =>
+        prices?.Deals.Where(d => RunsOn(d, drms)).MinBy(d => d.Price.Amount);
+
+    /// <summary>Onde o jogo roda quando não é a própria loja: "ativa na Steam", "sem DRM"… (null se for a loja ou não vier).</summary>
+    public static string? DrmNote(ItadDeal deal)
+    {
+        if (deal.Drm.Count == 0 || (deal.Drm.Count == 1 && deal.Drm[0].Id == deal.Shop.Id)) return null;
+        if (deal.Drm.All(x => x.Id == DrmFree)) return "sem DRM";
+        return "ativa na " + string.Join(" + ", deal.Drm.Where(x => x.Id != DrmFree).Select(x => x.Name).Distinct());
     }
 
     // ---- Formatação ----

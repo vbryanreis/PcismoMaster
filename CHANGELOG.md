@@ -2,6 +2,14 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.8.2
+
+- **Favoritos nas Promoções** (JOGOS · Promoções): todo cartão de jogo e todo resultado da Pesquisa ganhou um **coração**. Tocou, o jogo vai para a nova sub-aba **Favoritos**, que mostra o preço mais barato de agora em cada um, com o menor preço da história; os que estão em promoção vêm primeiro, pelo maior desconto. A sub-aba avisa quantos favoritos estão em promoção ("Favoritos · 3 em promoção") assim que a aba abre. Para acompanhar um jogo que ainda não está em promoção, é só procurar por ele em Pesquisar e tocar no coração. Os favoritos ficam salvos no próprio app (não precisa de conta no IsThereAnyDeal).
+- **Filtro "Onde o jogo roda" (DRM)**: caixinhas para Steam, Epic Games, Xbox / Microsoft Store, EA app, Ubisoft Connect, Battle.net e Sem DRM (GOG e outros), em qualquer combinação. O jogo só aparece se rodar apenas nos DRMs marcados — um jogo da Steam que pede Ubisoft Connect só aparece com os dois marcados. Nada marcado = qualquer. A escolha fica salva e vale também para o preço dos Favoritos.
+- Os cartões e a comparação de lojas mostram **onde o jogo ativa** quando não é na própria loja (ex.: "FANATICAL · ativa na Steam", "GOG · sem DRM").
+- **Logos da ArtCraft em Instalar apps**: os cinco apps da ArtCraft (Launcher, PhotoCraft, PdfCraft, FigCraft e Craft Anything) agora mostram o ícone oficial de cada um, baixado do repositório do próprio app no GitHub (antes ficavam só com a inicial).
+- Versão atualizada para 0.8.2.
+
 ## 0.8.1
 
 - **Botão de modo mais fácil de achar** (barra de título): agora com borda e realce coloridos — **azul no Modo Simples** e **roxo no Modo Avançado** — e o destaque ao passar o mouse na mesma cor. O azul usa o mesmo tom do indicador de temperatura (mais azul e menos esverdeado que o ciano). O texto ganhou a fonte **Orbitron** (futurista, embutida no app, licença SIL OFL) e a inicial maiúscula na segunda palavra: **Modo Simples** / **Modo Avançado**. A cor acompanha o tema claro/escuro.

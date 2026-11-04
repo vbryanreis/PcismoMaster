@@ -2,7 +2,7 @@
 
 Aplicativo **Windows** (WPF, .NET 8) para **diagnóstico, monitoramento, benchmark e otimização** de PC. Roda **como administrador** para ler sensores de baixo nível e aplicar ajustes somente quando você pede.
 
-Versão atual: **0.8.1** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
+Versão atual: **0.8.2** — novidades em [CHANGELOG.md](CHANGELOG.md). Fluxo de contribuição em [CONTRIBUTING.md](CONTRIBUTING.md) e diretrizes do projeto em [AGENTS.md](AGENTS.md).
 
 > Projeto mantido em dupla. Antes de mexer, sincronize com o `origin` (`git fetch` + `git pull --ff-only`) e trabalhe em branch própria, entregando por pull request.
 
@@ -28,7 +28,7 @@ A barra lateral agrupa as páginas (os grupos acendem no nosso azul ao passar o 
   - **Hardware**: mouse sem limite de 125 Hz em segundo plano, escala maior sem aceleração (100–350%), testes de monitor/rede/controle e dicas.
   - **Avançado** (desligados por padrão): NVMe nativo, MPO, tela cheia exclusiva, pesquisa, atalhos do teclado, Spectre/Meltdown, firewall, WHQL, AMD ULPS, Resizable BAR forçado (NVIDIA), MMAgent, DEP e prioridade/afinidade por jogo.
   - **Scripts completos do Ultimate** no fim de cada sub-aba: todas as opções dos scripts (bloatware, Edge/WebView, Defender, serviços, Autoruns, hidusbf…) com selo de risco, confirmação com avisos e ponto de restauração.
-- **JOGOS** — Biblioteca de jogos, **Promoções** (preço dos jogos agora nas lojas, com o menor preço da história, filtros, pesquisa que compara as lojas, jogos grátis e os seus jogos em promoção), FPS estimado, detector de Gargalo e **Overlay** sobre o jogo (vertical em tabela ou barra numa linha, prévia ao vivo, posição, opacidade, tamanho e tecla à escolha).
+- **JOGOS** — Biblioteca de jogos, **Promoções** (preço dos jogos agora nas lojas, com o menor preço da história, filtros — inclusive de onde o jogo roda: Steam, Epic, Xbox, EA, Ubisoft, Battle.net ou sem DRM —, **favoritos com coração** para acompanhar o preço, pesquisa que compara as lojas, jogos grátis e os seus jogos em promoção), FPS estimado, detector de Gargalo e **Overlay** sobre o jogo (vertical em tabela ou barra numa linha, prévia ao vivo, posição, opacidade, tamanho e tecla à escolha).
 - **DESEMPENHO** — Benchmark (CPU, GPU, memória, disco e ray tracing DXR 1.1), Stress test (CPU / RAM / GPU) e **Overclock** no estilo do MSI Afterburner.
 - **FERRAMENTAS** — Otimização (ajustes do Windows para jogos, guardando o valor original para desfazer), Inicialização (o que abre junto com o Windows), **Instalar apps** (cartões com o ícone de cada app, por categorias, via winget) e **Desinstalar Apps** (estilo Revo/Geek Uninstaller, com varredura profunda de sobras, Lixeira e backup), **Drivers** (limpeza com o DDU, instalação do driver normal ou enxuta com as configurações ajustadas à placa, Painel NVIDIA, Profile Inspector e verificação do Visual C++/DirectX), Integração (RGB: iCUE e OpenRGB) e **Utilidades** — *Baixar vídeos* (YouTube/Instagram em MP4 ou MP3) e o **Finder**, busca instantânea de arquivos e pastas lendo a MFT dos discos NTFS.
 - **MAKER** — Portas COM (resolve portas fantasmas/presas) e Drivers seriais (CH340, CP210x, FTDI, Prolific, Arduino + Arduino IDE).

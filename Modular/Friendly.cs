@@ -88,7 +88,7 @@ public static class PageCatalog
         new("NavTweakHw", "Otimizar: Hardware", "TWEAKING", "Mouse, escala da tela, energia das peças e ReBAR.", "mouse escala rebar hardware ventoinha", true, ""),
         new("NavTweakAdv", "Otimizar: Avançado", "TWEAKING", "Ajustes que mexem fundo no Windows (desligados por padrão).", "avancado nvme mpo dep scripts perigoso", true, ""),
         new("NavLauncher", "Meus jogos", "JOGOS", "Todos os seus jogos num lugar só, com perfil de abertura.", "jogos biblioteca steam epic launcher abrir", false, ""),
-        new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja", false, ""),
+        new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja favorito favoritos coracao drm steam epic xbox gog", false, ""),
         new("NavGames", "FPS estimado", "JOGOS", "Quanto FPS os jogos devem rodar no seu PC.", "fps jogos rodar requisitos", false, ""),
         new("NavBottleneck", "Gargalo", "JOGOS", "Se a CPU ou a placa de vídeo está segurando o desempenho.", "gargalo bottleneck", true, ""),
         new("NavOverlay", "Overlay", "JOGOS", "Mostrar FPS e temperatura por cima dos jogos.", "overlay fps tela jogo", false, ""),
