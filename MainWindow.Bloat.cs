@@ -182,7 +182,7 @@ public partial class MainWindow
     {
         var row = new WrapPanel { Margin = new Thickness(0, 0, 0, 6) };
         row.Children.Add(new TextBlock { Text = $"{r.Name}  ·  {r.When:dd/MM HH:mm}", VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 12, 8), MinWidth = 280 });
-        string? reinstallScript = r.Kind == BloatKind.Programa ? Bloatware.Programs.FirstOrDefault(p => p.Id == r.Id).RestoreOption : null;
+        string? reinstallScript = r.Kind == BloatKind.Programa ? Bloatware.ProgramReinstall(r.Id) : null;
         if (r.Kind is BloatKind.App or BloatKind.Biblioteca)
             row.Children.Add(TweakButton("REINSTALAR PELA STORE", false, (_, _) =>
             {
@@ -193,10 +193,7 @@ public partial class MainWindow
             row.Children.Add(TweakButton("VOLTAR", false, async (_, _) => await RestoreBloatAsync(r)));
         else if (reinstallScript != null)
             row.Children.Add(TweakButton("REINSTALAR", false, (_, _) =>
-            {
-                var card = ScriptCatalog.All.First(c => c.Options.Any(o => o.Id == reinstallScript));
-                _ = RunScriptOptionAsync(card, card.Options.First(o => o.Id == reinstallScript));
-            }));
+            { if (RequireAdmin()) _ = RunPowerShellTextAsync("Bloatware · reinstalar " + r.Name, "bloat-reinstalar", reinstallScript, false); }));
         else row.Children.Add(new TextBlock { Text = "sem volta automática (o próprio programa reinstala quando precisar)", Foreground = (Brush)FindResource("Faint"), FontSize = 11, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 8) });
         row.Children.Add(TweakButton("TIRAR DA LISTA", false, (_, _) =>
         {
@@ -249,7 +246,7 @@ public partial class MainWindow
         foreach (var i in items.Where(i => i.Risk == ScriptRisk.Atencao).Take(12)) warnings.Add($"{i.Name}: {(i.Description.Length > 0 ? i.Description : "algum recurso pode depender dele.")}");
         if (items.Any(i => i.Kind is BloatKind.App or BloatKind.Biblioteca)) warnings.Add("Apps removidos voltam pela Microsoft Store (botão REINSTALAR PELA STORE em Removidos por aqui).");
         if (items.Any(i => i.Kind is BloatKind.Recurso or BloatKind.RecursoAntigo)) warnings.Add("Recursos voltam pelo botão VOLTAR; os opcionais são baixados de novo do Windows Update. Alguns só valem depois de reiniciar.");
-        if (items.Any(i => i.Kind == BloatKind.Programa && Bloatware.Programs.First(p => p.Id == i.Id).RestoreOption == null))
+        if (items.Any(i => i.Kind == BloatKind.Programa && !Bloatware.Programs.First(p => p.Id == i.Id).CanReinstall))
             warnings.Add("GameInput, BRLTTY e as ferramentas de atualização não têm volta automática.");
 
         bool? rp = ConfirmRisk($"Remover {items.Count} item(ns)", string.Join(", ", items.Take(25).Select(i => i.Name)) + (items.Count > 25 ? $" e mais {items.Count - 25}." : "."),

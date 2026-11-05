@@ -297,16 +297,13 @@ public partial class MainWindow : Window
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
             case "PageMaint": InitMaint(); break;
-            case "PageTweak": InitTweak(); break;
-            case "PageTweakWin": InitTweakWin(); break;
-            case "PageTweakHw": InitTweakHw(); break;
-            case "PageTweakAdv": InitTweakAdv(); break;
+            case "PageOptFormat" or "PageOptDebloat" or "PageOptWindows" or "PageOptInput" or "PageOptGpu" or "PageOptProfiles" or "PageOptClean": InitOpt(page); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageHome, PageTweak, PageTweakWin, PageTweakHw, PageTweakAdv, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageOptFormat, PageOptDebloat, PageOptWindows, PageOptInput, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 

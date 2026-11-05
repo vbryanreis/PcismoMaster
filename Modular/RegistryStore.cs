@@ -5,7 +5,7 @@ namespace ResetExplode.Modular;
 
 public sealed class RegistryStore : ISettingsStore
 {
-    private static RegistryKey Root(Setting s) => RegistryKey.OpenBaseKey(s.Hive == "HKCU" ? RegistryHive.CurrentUser : RegistryHive.LocalMachine, RegistryView.Registry64);
+    private static RegistryKey Root(Setting s) => RegistryKey.OpenBaseKey(s.Hive switch { "HKCU" => RegistryHive.CurrentUser, "HKU" => RegistryHive.Users, _ => RegistryHive.LocalMachine }, RegistryView.Registry64);
     public SavedValue Read(Setting s)
     {
         using var root = Root(s);

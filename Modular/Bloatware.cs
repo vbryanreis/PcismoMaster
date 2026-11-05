@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace ResetExplode.Modular;
 
+/// <summary>Selo de risco: SEGURO, ATENÇÃO (algo pode depender dele) ou PERIGOSO (pode quebrar o Windows).</summary>
+public enum ScriptRisk { Seguro, Atencao, Perigoso }
+
 public enum BloatKind { App, Biblioteca, Recurso, RecursoAntigo, Programa }
 
 /// <summary>Um item que o "13 Bloatware" do Ultimate removeria, para escolher um a um.</summary>
@@ -221,15 +224,15 @@ public static class Bloatware
         ("SearchEngine-Client", "Pesquisa do Windows", "", ScriptRisk.Perigoso),
     };
 
-    public static readonly (string Id, string Name, string Desc, ScriptRisk Risk, string? RestoreOption)[] Programs =
+    public static readonly (string Id, string Name, string Desc, ScriptRisk Risk, bool CanReinstall)[] Programs =
     {
-        ("onedrive", "OneDrive", "Desinstala o OneDrive e as tarefas dele. Seus arquivos na nuvem continuam online.", ScriptRisk.Seguro, "win-13-7"),
-        ("rdp", "Conexão de Área de Trabalho Remota", "O mstsc, para acessar outro PC.", ScriptRisk.Seguro, "win-13-8"),
-        ("snip", "Ferramenta de Captura antiga", "A versão clássica (Windows 10).", ScriptRisk.Seguro, "win-13-9"),
-        ("gameinput", "Microsoft GameInput", "Biblioteca de controles usada por alguns jogos novos; eles podem pedir para instalar de novo.", ScriptRisk.Atencao, null),
-        ("brltty", "BRLTTY (Braille)", "Serviço de linha braille do Narrador.", ScriptRisk.Seguro, null),
-        ("kb", "Update for x64-based Windows Systems", "Atualização de instalação do Windows 10.", ScriptRisk.Seguro, null),
-        ("uhs", "Microsoft Update Health Tools", "Ferramenta que força atualizações do Windows 10.", ScriptRisk.Seguro, null),
+        ("onedrive", "OneDrive", "Desinstala o OneDrive e as tarefas dele. Seus arquivos na nuvem continuam online.", ScriptRisk.Seguro, true),
+        ("rdp", "Conexão de Área de Trabalho Remota", "O mstsc, para acessar outro PC.", ScriptRisk.Seguro, true),
+        ("snip", "Ferramenta de Captura antiga", "A versão clássica (Windows 10).", ScriptRisk.Seguro, true),
+        ("gameinput", "Microsoft GameInput", "Biblioteca de controles usada por alguns jogos novos; eles podem pedir para instalar de novo.", ScriptRisk.Atencao, false),
+        ("brltty", "BRLTTY (Braille)", "Serviço de linha braille do Narrador.", ScriptRisk.Seguro, false),
+        ("kb", "Update for x64-based Windows Systems", "Atualização de instalação do Windows 10.", ScriptRisk.Seguro, false),
+        ("uhs", "Microsoft Update Health Tools", "Ferramenta que força atualizações do Windows 10.", ScriptRisk.Seguro, false),
     };
 
     // -------- Montagem da lista a partir do que o PowerShell leu --------
@@ -349,7 +352,7 @@ public static class Bloatware
         _ => null,
     };
 
-    private static string ProgramRemove(string id) => id switch
+    public static string ProgramRemove(string id) => id switch
     {
         "onedrive" => """
             Stop-Process -Force -Name OneDrive -ErrorAction SilentlyContinue | Out-Null
@@ -381,6 +384,30 @@ public static class Bloatware
             """,
         _ => throw new ArgumentException("programa desconhecido: " + id),
     };
+
+    /// <summary>Reinstalar um programa removido (OneDrive pelo instalador do Windows; mstsc e Ferramenta de Captura pelos
+    /// instaladores que o Ultimate, MIT, publica). null = sem volta automática.</summary>
+    public static string? ProgramReinstall(string id) => id switch
+    {
+        "onedrive" => """
+            Write-Output "Reinstalando o OneDrive..."
+            if (Test-Path "$env:SystemRoot\System32\OneDriveSetup.exe") { Start-Process -Wait "$env:SystemRoot\System32\OneDriveSetup.exe" }
+            elseif (Test-Path "$env:SystemRoot\SysWOW64\OneDriveSetup.exe") { Start-Process -Wait "$env:SystemRoot\SysWOW64\OneDriveSetup.exe" }
+            else { winget install --id Microsoft.OneDrive -e --accept-package-agreements --accept-source-agreements --silent }
+            """,
+        "rdp" => Download("remotedesktopconnection.exe", "Conexão de Área de Trabalho Remota"),
+        "snip" => Download("snippingtool.exe", "Ferramenta de Captura") +
+            "\r\nGet-AppxPackage -AllUsers *Microsoft.ScreenSketch* | ForEach-Object { Add-AppxPackage -DisableDevelopmentMode -Register \"$($_.InstallLocation)\\AppXManifest.xml\" -ErrorAction SilentlyContinue }",
+        _ => null,
+    };
+
+    private static string Download(string file, string name) => $$"""
+        Write-Output "Baixando {{name}}..."
+        $f = "$env:SystemRoot\Temp\{{file}}"
+        Invoke-WebRequest "https://github.com/FR33THYFR33THY/Ultimate/releases/download/Files/{{file}}" -OutFile $f -UseBasicParsing -ErrorAction Stop
+        Start-Process -Wait $f
+        Remove-Item $f -Force -ErrorAction SilentlyContinue
+        """;
 
     private static string MsiUninstall(string like) => $$"""
         $u = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like '{{like}}' }

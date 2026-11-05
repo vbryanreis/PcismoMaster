@@ -234,20 +234,6 @@ Test("Overlay: linhas por componente, cor da temperatura e texto do atalho", () 
     Assert(parts[0].Level == 0 && parts[1].Level == 1 && parts[2].Level == 3 && new OverlayPart("X", "X", "", "", 78).Level == 2);
     Assert(OverlayHotkey.Describe(OverlayHotkey.Ctrl | OverlayHotkey.Shift, "O") == "Ctrl + Shift + O" && OverlayHotkey.Describe(0, "F5") == "F5" && OverlayHotkey.Describe(OverlayHotkey.Alt, "D5") == "Alt + 5");
 });
-Test("Tweaking: setup tweaks are unique, safe and undo exactly", () => {
-    var all = SetupTweaks.Static.Append(SetupTweaks.EdgeUpdate(_ => true)).ToArray();
-    Assert(all.Select(t => t.Id).Distinct().Count() == all.Length && all.All(t => t.Id.StartsWith("tw-") && t.Settings.Length > 0));
-    var keys = all.SelectMany(t => t.Settings).Select(s => s.Hive + s.Path + s.Name).ToArray();
-    Assert(keys.Distinct(StringComparer.OrdinalIgnoreCase).Count() == keys.Length);
-    Assert(all.Where(t => t.Advanced).All(t => !t.DefaultOn)); // avançados nunca vêm marcados
-    Assert(all.SelectMany(t => t.Settings).Where(s => s.Text?.StartsWith("http") == true && s.Name != "1").All(s => s.Text == SetupTweaks.NoUpdateServer));
-    Assert(SetupTweaks.EdgeUpdate(n => n == "edgeupdate").Settings.Single().Path.EndsWith(@"Services\edgeupdate") && SetupTweaks.EdgeUpdate(_ => false).Settings.Length == 0);
-    var store = new FakeStore(); var eng = new ModuleEngine(store, Path.Combine(temp, "tweak"));
-    var block = SetupTweaks.Static.Single(t => t.Id == "tw-block-updates").Module;
-    store.Values[block.Settings[0]] = new(true, 4, "0");
-    eng.Enable(block); Assert(eng.Matches(block) && eng.HasBackup(block));
-    eng.Restore(block); Assert(!eng.HasBackup(block) && store.Read(block.Settings[0]) == new SavedValue(true, 4, "0") && !store.Read(block.Settings[1]).Exists);
-});
 Test("Tweaking: .reg parser reads every value type, deletes and continuation lines", () => {
     var r = RegFile.Parse("Windows Registry Editor Version 5.00\r\n\r\n[HKEY_CURRENT_USER\\Software\\T]\r\n\"S\"=\"a \\\"b\\\" c\\\\d\"\r\n\"D\"=dword:ffffffff\r\n" +
         "\"B\"=hex:01,02,\\\r\n  03\r\n\"E\"=hex(2):25,00,41,00,25,00,00,00\r\n\"M\"=hex(7):61,00,00,00,62,00,00,00,00,00\r\n\"Q\"=hex(b):01,00,00,00,00,00,00,00\r\n" +
@@ -265,51 +251,123 @@ Test("Tweaking: .reg parser reads every value type, deletes and continuation lin
     eng.Enable(m); Assert(eng.Matches(m) && !store.Read(v["X"]).Exists);
     eng.Restore(m); Assert(store.Read(v["X"]) == new SavedValue(true, 4, "7") && !store.Read(v["S"]).Exists);
 });
-Test("Tweaking: Windows, Hardware e Avançado catalogs are unique, safe and parse", () => {
-    var reg = TweakCatalog.WindowsRegTweaks().ToArray();
-    Assert(reg.Length == TweakCatalog.WindowsReg.Length && reg.All(t => t.Settings.Length > 0));
-    var cp = reg.Single(t => t.Id == "tw-win-control-panel");
-    Assert(cp.Settings.Length > 450 && cp.DeleteKeys!.Length == 2 && cp.Settings.Any(TweakCatalog.IsDisplayScale));
-    var all = SetupTweaks.Static.Concat(TweakCatalog.Windows).Concat(reg).Concat(TweakCatalog.Hardware).Concat(TweakCatalog.Advanced).ToArray();
-    Assert(all.Select(t => t.Id).Distinct().Count() == all.Length && all.All(t => t.Id.StartsWith("tw-")));
-    Assert(all.Where(t => t.Advanced).All(t => !t.DefaultOn) && TweakCatalog.Advanced.All(t => t.Advanced));
-    Assert(all.SelectMany(t => t.Settings).All(s => s.Hive is "HKCU" or "HKLM" && s.Path.Length > 0 && !s.Path.StartsWith('\\')));
-    // Depois do Dedupe nenhum valor fica em dois ajustes (desfazer fora de ordem não deixa valor errado).
-    var dedup = TweakCatalog.Dedupe(all);
-    var keys = dedup.SelectMany(t => t.Settings).Select(s => (s.Hive, s.Path.ToLowerInvariant(), s.Name.ToLowerInvariant())).ToArray();
-    Assert(keys.Distinct().Count() == keys.Length && dedup.Take(SetupTweaks.Static.Length).Zip(SetupTweaks.Static).All(p => p.First.Settings.Length == p.Second.Settings.Length));
-    Assert(TweakCatalog.Windows.Single(t => t.Id == "tw-win-context-menu").DeleteKeys!.All(k => k.StartsWith(@"HKLM\SOFTWARE\Classes\")));
-    // Escala: curvas de 40 bytes que crescem (o script tinha duas deslocadas) e LogPixels = 96 × escala.
-    foreach (var (pct, set) in TweakCatalog.Scaling)
-    {
-        var x = Convert.FromHexString(set.Single(s => s.Name == "SmoothMouseXCurve").Hex!);
-        var pts = Enumerable.Range(0, 5).Select(i => BitConverter.ToInt64(x, i * 8)).ToArray();
-        Assert(x.Length == 40 && pts[0] == 0 && pts.Zip(pts.Skip(1)).All(p => p.Second > p.First) && Math.Abs(pts[4] - 4 * pts[1]) < 0x100);
-        Assert(set.Single(s => s.Name == "LogPixels").Value == pct * 96 / 100);
-    }
-    Assert(TweakCatalog.PowerPlan.All(p => Guid.TryParse(p.Sub, out _) && Guid.TryParse(p.Setting, out _) && int.TryParse(p.Value, out _)));
+Test("Otimizar: catálogo com ids únicos, valores sem conflito e sem desligar proteções", () => {
+    var all = OptCatalog.All;
+    Assert(all.Length > 140 && all.Select(t => t.Id).Distinct().Count() == all.Length);
+    Assert(all.All(t => t.Settings.Length > 0 || t.Extras.Length > 0) && all.All(t => t.Title.Length > 0 && t.Description.Length > 0));
+    Assert(all.All(t => (t.Page == OptPage.Debloat) == (t.Level != OptLevel.Normal)) && all.Where(t => t.Level == OptLevel.Avancado).All(t => !t.DefaultOn && t.Warning != null));
+    Assert(all.All(t => OptCatalog.Categories.Contains(t.Category)));
+    var sets = all.SelectMany(t => t.Settings.Select(s => (t, s))).ToArray();
+    Assert(sets.All(x => x.s.Hive is "HKCU" or "HKLM" or "HKU" && x.s.Path.Length > 0 && !x.s.Path.StartsWith('\\')));
+    // Um valor só pode estar em dois ajustes do mesmo grupo exclusivo (ex.: IPv6): desfazer fora de ordem não deixa valor errado.
+    foreach (var g in sets.GroupBy(x => (x.s.Hive, x.s.Path.ToLowerInvariant(), x.s.Name.ToLowerInvariant())).Where(g => g.Select(x => x.t.Id).Distinct().Count() > 1))
+        if (g.Select(x => x.t.Group).Distinct().Count() != 1 || g.First().t.Group == null) throw new Exception("valor repetido: " + g.Key);
+    Assert(all.Count(t => t.Group == "ipv6") == 3);
+    string[] forbidden = { "Windows Defender", "EnableLUA", "HypervisorEnforcedCodeIntegrity", "DeviceGuard", "SmartScreen", "Windows Firewall" };
+    Assert(!sets.Any(x => forbidden.Any(f => x.s.Path.Contains(f, StringComparison.OrdinalIgnoreCase) || x.s.Name.Contains(f, StringComparison.OrdinalIgnoreCase))));
+    Assert(OptCatalog.Profiles.All(p => p.Tweaks.All(id => OptCatalog.ById(id) != null)));
+    foreach (var x in all.SelectMany(t => t.Extras).Where(x => x.Kind == ExtraKind.Power))
+        Assert(Guid.TryParse(x.Args[0], out _) && Guid.TryParse(x.Args[1], out _) && int.TryParse(x.Args[2], out _));
+    foreach (var x in all.SelectMany(t => t.Extras).Where(x => x.Kind == ExtraKind.DeleteKeys)) Assert(x.Args.All(k => k.StartsWith(@"HKLM\")));
+    Assert(OptCatalog.SvcHostThresholdKb() >= 3_670_016);
 });
-Test("Tweaking: full Ultimate scripts are all embedded, flagged and never interactive", () => {
-    var asm = typeof(ScriptCatalog).Assembly;
-    var embedded = asm.GetManifestResourceNames().Where(n => n.StartsWith("Tweaks/Scripts/")).Select(n => n["Tweaks/Scripts/".Length..^4]).ToHashSet();
-    var options = ScriptCatalog.All.SelectMany(c => c.Options.Select(o => (c, o))).ToArray();
-    Assert(embedded.Count > 130 && options.Length == embedded.Count && options.All(x => embedded.Contains(x.o.Id)));
-    Assert(options.Select(x => x.o.Id).Distinct().Count() == options.Length && ScriptCatalog.All.All(c => c.Page is "setup" or "win" or "hw" or "adv"));
-    Assert(!embedded.Contains("setup-4") && !embedded.Contains("setup-12") && !embedded.Any(i => i.StartsWith("adv-8-") || i.StartsWith("adv-9-") || i.StartsWith("adv-10-")));
-    foreach (var (c, o) in options)
-    {
-        string ps = ScriptCatalog.Read(o.Id);
-        Assert(ps.StartsWith("# Ultimate (FR33THY, MIT)"));
-        Assert(!System.Text.RegularExpressions.Regex.IsMatch(ps, @"Read-Host|ReadKey|OpenFileDialog|Out-GridView")); // nada espera digitação
-        bool iwr = System.Text.RegularExpressions.Regex.IsMatch(ps, @"(?m)^\s*(IWR|Invoke-WebRequest)\b");
-        if (iwr != o.Downloads) throw new Exception($"{o.Id}: aviso de download errado");
-        if (ps.Contains("safeboot") != o.SafeMode) throw new Exception($"{o.Id}: aviso de Modo de Segurança errado");
-        if (o.SafeMode && !o.Restarts) throw new Exception($"{o.Id}: Modo de Segurança sem aviso de reinício");
-        Assert(!(o.IsDefault && o.Risk == ScriptRisk.Perigoso) && (o.NeedsUsb == ps.Contains("$env:PM_USB")));
-        var w = ScriptCatalog.Warnings(o, c);
-        if (o.Risk == ScriptRisk.Perigoso) Assert(w.Any(x => x.Contains("ponto de restauração")) && o.Warning != null);
-        if (o.Downloads) Assert(w.Any(x => x.Contains("terceiros")));
-    }
+Test("Otimizar: aplicar e desfazer voltam exatamente o valor de antes (registro, serviços, extras, grupo, monitor)", () => Task.Run(async () => {
+    var store = new FakeStore(); var ps = new FakePs(); var disp = new FakeDisplay();
+    var eng = new OptEngine(store, Path.Combine(temp, "opt"), ps, disp, svc => svc != "DiagTrack");
+    var tel = OptCatalog.ById("telemetry")!;
+    var failed = await eng.ApplyAsync(new[] { tel }, null);
+    Assert(failed.Count == 0 && eng.Ours(tel) && store.Read(tel.Settings[0]) == new SavedValue(true, 4, "0") && ps.Scripts.Count == 0);
+    Assert((await eng.StatesAsync(new[] { tel }))["telemetry"] == new OptState(true, true));
+    await eng.UndoAsync(new[] { tel }, null);
+    Assert(!eng.Ours(tel) && !store.Read(tel.Settings[0]).Exists);
+    // Serviço que não existe neste PC: não cria a chave e aparece como "não se aplica".
+    var dt = OptCatalog.ById("diagtrack")!;
+    Assert(eng.SettingsFor(dt).Length == 0 && (await eng.StatesAsync(new[] { dt }))["diagtrack"].On == null);
+    // Extra: lê o estado antes, grava o diário e desfaz com o valor lido.
+    var hib = OptCatalog.ById("hibernation")!;
+    ps.Read = "@@{\"hibernation#0\":\"1\"}";
+    Assert((await eng.ApplyAsync(new[] { hib }, null)).Count == 0 && eng.Ours(hib) && ps.Scripts.Last().Contains("powercfg /hibernate off"));
+    await eng.UndoAsync(new[] { hib }, null);
+    Assert(!eng.Ours(hib) && ps.Scripts.Last().Contains("powercfg /hibernate on"));
+    // Falha num bloco: o ajuste aparece como falho e o diário fica para tentar de novo.
+    ps.Fail = "hibernation";
+    Assert((await eng.ApplyAsync(new[] { hib }, null)).ContainsKey("hibernation") && eng.Ours(hib));
+    ps.Fail = null;
+    await eng.UndoAsync(new[] { hib }, null);
+    Assert(!eng.Ours(hib));
+    // Grupo exclusivo: ligar um desfaz o outro.
+    var v4 = OptCatalog.ById("ipv4_prefer")!; var teredo = OptCatalog.ById("teredo_off")!;
+    store.Values[v4.Settings[0]] = new(true, 4, "0");
+    await eng.ApplyAsync(new[] { v4 }, null);
+    await eng.ApplyAsync(new[] { teredo }, null);
+    Assert(!eng.Ours(v4) && eng.Ours(teredo) && store.Read(teredo.Settings[0]) == new SavedValue(true, 4, "8"));
+    await eng.UndoAsync(new[] { teredo }, null);
+    Assert(store.Read(v4.Settings[0]) == new SavedValue(true, 4, "0"));
+    // Taxa de atualização: vai ao máximo e volta.
+    var hz = OptCatalog.ById("refresh_rate")!;
+    Assert((await eng.StatesAsync(new[] { hz }))["refresh_rate"].On == false);
+    await eng.ApplyAsync(new[] { hz }, null);
+    Assert(disp.Hz[@"\\.\DISPLAY1"] == 144 && (await eng.StatesAsync(new[] { hz }))["refresh_rate"].On == true);
+    await eng.UndoAsync(new[] { hz }, null);
+    Assert(disp.Hz[@"\\.\DISPLAY1"] == 60);
+    // Contas novas: só os valores de usuário dos ajustes aplicados, no perfil padrão carregado.
+    var dark = OptCatalog.ById("dark_mode")!;
+    await eng.ApplyAsync(new[] { dark }, null);
+    var nu = eng.NewUserSettings();
+    Assert(nu.Length == 2 && nu.All(s => s.Hive == "HKU" && s.Path.StartsWith(@"PM_Default\Software\Microsoft")));
+}).GetAwaiter().GetResult());
+Test("Otimizar: leitura dos extras entende cada estado e o desfazer só volta o que mudou", () => {
+    var power = new OptExtra(ExtraKind.Power, "a", "b", "100");
+    Assert(OptEngine.IsOn(power, "100,100") == true && OptEngine.IsOn(power, "100,0") == false && OptEngine.IsOn(power, "") == null && OptEngine.IsOn(power, "?") == null);
+    var tasks = new OptExtra(ExtraKind.Tasks, @"\A\x", @"\A\y");
+    Assert(OptEngine.IsOn(tasks, "Disabled|") == true && OptEngine.IsOn(tasks, "Ready|Disabled") == false && OptEngine.IsOn(tasks, "|") == null);
+    Assert(OptEngine.IsOn(new OptExtra(ExtraKind.FeatureOff, "Recall"), "") == null && OptEngine.IsOn(new OptExtra(ExtraKind.FeatureOff, "Recall"), "Disabled") == true);
+    Assert(OptEngine.IsOn(new OptExtra(ExtraKind.Capabilities, "x*"), "") == true && OptEngine.IsOn(new OptExtra(ExtraKind.Discord, "A", "true"), "-") == null);
+    var eng = new OptEngine(new FakeStore(), Path.Combine(temp, "opt2"), new FakePs(), new FakeDisplay(), _ => true);
+    var t = OptCatalog.ById("telemetry_tasks")!;
+    string undo = eng.UndoScript(t, t.Extras[0], "Ready|Disabled||Ready|||")!;
+    Assert(undo.Split("Enable-ScheduledTask").Length == 3 && !undo.Contains("Disable-"));
+    var appx = OptCatalog.ById("ai_remove")!;
+    Assert(eng.UndoScript(appx, appx.Extras[0], "Microsoft.Copilot") == null && eng.ApplyScript(appx, appx.Extras[0], 0, "")!.Contains("Remove-AppxProvisionedPackage"));
+});
+Test("Otimizar: todo PowerShell gerado tem sintaxe válida (só analisa, não roda)", () => Task.Run(async () => {
+    string ps = Path.Combine(Environment.SystemDirectory, @"WindowsPowerShell\v1.0\powershell.exe");
+    if (!File.Exists(ps)) return;
+    var fake = new FakePs();
+    var eng = new OptEngine(new FakeStore(), Path.Combine(temp, "opt3"), fake, new FakeDisplay(), _ => true);
+    await eng.StatesAsync(OptCatalog.All);
+    var scripts = new List<string>(fake.Scripts);
+    if (Environment.GetEnvironmentVariable("PM_DUMP_READ") is { Length: > 0 } dump) File.WriteAllText(dump, fake.Scripts[0]); // diagnóstico manual (só leitura)
+    foreach (var t in OptCatalog.All)
+        for (int i = 0; i < t.Extras.Length; i++)
+            foreach (var before in new[] { "", "1", "Enabled", "True", "100,0", "Ready|Ready|Ready|Ready|Ready|Ready|Ready", "a,b", "\"x\"" })
+            {
+                if (eng.ApplyScript(t, t.Extras[i], i, before) is { } a) scripts.Add(a);
+                if (eng.UndoScript(t, t.Extras[i], before) is { } u) scripts.Add(u);
+            }
+    foreach (var p in Bloatware.Programs) if (Bloatware.ProgramReinstall(p.Id) is { } r) scripts.Add(r);
+    string dir = Path.Combine(temp, "ps-parse"); Directory.CreateDirectory(dir);
+    for (int i = 0; i < scripts.Count; i++) File.WriteAllText(Path.Combine(dir, i + ".ps1"), scripts[i]);
+    var psi = new System.Diagnostics.ProcessStartInfo(ps, "-NoProfile -NonInteractive -Command \"Get-ChildItem '" + dir + "' -Filter *.ps1 | ForEach-Object { $e = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$e); foreach ($x in $e) { 'ERR ' + $_.Name + ': ' + $x.Message } }\"")
+        { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+    using var proc = System.Diagnostics.Process.Start(psi)!;
+    string output = proc.StandardOutput.ReadToEnd(); proc.WaitForExit();
+    if (output.Contains("ERR ")) throw new Exception(output);
+    Assert(scripts.Count > 50);
+}).GetAwaiter().GetResult());
+Test("Limpeza: respeita idade e máscara, expande perfis e não sai da pasta", () => {
+    string root = Path.Combine(temp, "clean");
+    Directory.CreateDirectory(Path.Combine(root, "P1", "Cache", "sub")); Directory.CreateDirectory(Path.Combine(root, "P2", "Cache")); Directory.CreateDirectory(Path.Combine(root, "P3"));
+    string old = Path.Combine(root, "P1", "Cache", "sub", "old.bin");
+    File.WriteAllText(old, "123456"); File.SetLastWriteTimeUtc(old, DateTime.UtcNow.AddHours(-5));
+    File.WriteAllText(Path.Combine(root, "P1", "Cache", "new.bin"), "12"); File.WriteAllText(Path.Combine(root, "P2", "Cache", "a.db"), "1"); File.WriteAllText(Path.Combine(root, "P3", "keep.txt"), "k");
+    Assert(Cleanup.Expand(Path.Combine(root, "*", "Cache")).Count() == 2);
+    var cat = new CleanCategory("t", "t", "", true, new[] { Path.Combine(root, "*", "Cache") }, 2);
+    Assert(Cleanup.Measure(cat) == (6, 1));
+    var (freed, skipped) = Cleanup.Clean(cat);
+    Assert(freed == 6 && skipped == 0 && !Directory.Exists(Path.Combine(root, "P1", "Cache", "sub")) && File.Exists(Path.Combine(root, "P1", "Cache", "new.bin")) && File.Exists(Path.Combine(root, "P3", "keep.txt")));
+    Assert(Cleanup.Files(Path.Combine(root, "P2", "Cache"), 0, "*.db").Count() == 1 && !Cleanup.Files(Path.Combine(root, "P2", "Cache"), 0, "*.pf").Any());
+    Assert(Cleanup.Categories.Select(c => c.Id).Distinct().Count() == Cleanup.Categories.Length && Cleanup.Size(1536) == "2 KB");
 });
 // ---- Promoções (IsThereAnyDeal): tudo com um handler falso, sem rede e sem chave de verdade ----
 Dictionary<string, string> QueryOf(string query) => query.Split('&').Select(p => p.Split('=', 2))
@@ -416,7 +474,7 @@ Test("Bloatware: commands quote ids, run one item at a time and only restore wha
     var batch = Bloatware.BatchScript(new[] { weird, cap, feat }, restore: false);
     Assert(batch.Split("try {").Length == 4 && batch.Contains("Removendo: Internet Explorer") && !batch.Contains("Read-Host"));
     foreach (var p in Bloatware.Programs) Assert(Bloatware.RemoveCommand(new BloatItem(BloatKind.Programa, p.Id, p.Name, "", p.Risk, null)).Length > 20);
-    Assert(Bloatware.Programs.Where(p => p.RestoreOption != null).All(p => ScriptCatalog.All.Any(c => c.Options.Any(o => o.Id == p.RestoreOption))));
+    Assert(Bloatware.Programs.All(p => (Bloatware.ProgramReinstall(p.Id) != null) == p.CanReinstall));
     Assert(!Bloatware.ListScript.Contains("Remove-") && !Bloatware.ListScript.Contains("Disable-"));
 });
 Test("Friendly UI: all-caps button text becomes a sentence and keeps acronyms", () => {
@@ -433,7 +491,7 @@ Test("Friendly UI: home tasks and search lead to real pages, and simple mode hid
     foreach (var p in PageCatalog.Pages) Assert(xaml.Contains($"x:Name=\"{p.Nav}\""));
     Assert(PageCatalog.Pages.Select(p => p.Nav).Distinct().Count() == PageCatalog.Pages.Length);
     foreach (var t in PageCatalog.Tasks) Assert(PageCatalog.ByNav(t.Nav) is { Advanced: false });
-    Assert(PageCatalog.Search("bloatware", false).First().Nav == "NavTweakWin");
+    Assert(PageCatalog.Search("bloatware", false).First().Nav == "NavOptDebloat");
     Assert(PageCatalog.Search("manutencao", false).Any(p => p.Nav == "NavMaint") && PageCatalog.Search("MANUTENÇÃO", false).Any(p => p.Nav == "NavMaint"));
     Assert(PageCatalog.Search("overclock", false).Count == 0 && PageCatalog.Search("overclock", true).First().Nav == "NavOc");
     Assert(PageCatalog.Search("  ", true).Count == 0 && PageCatalog.Search("driver", false).First().Nav == "NavDriver");
@@ -453,4 +511,22 @@ sealed class FakeStore : ISettingsStore
     public Dictionary<Setting, SavedValue> Values = new(); public int Writes; public int FailAt = -1; public bool AlwaysFail;
     public SavedValue Read(Setting s) => Values.GetValueOrDefault(s, new(false, 0, ""));
     public void Write(Setting s, SavedValue value) { Writes++; if (AlwaysFail || Writes == FailAt) throw new IOException("Injected failure"); Values[s] = value; }
+}
+
+sealed class FakePs : IPsRunner
+{
+    public List<string> Scripts = new(); public string Read = "@@{}"; public string? Fail;
+    public Task<string> RunAsync(string script, IProgress<string>? log, CancellationToken ct)
+    {
+        Scripts.Add(script);
+        if (script.Contains("$r = @{}")) return Task.FromResult(Read);
+        return Task.FromResult(Fail != null && script.Contains("@@FAIL " + Fail) ? $"@@FAIL {Fail} injetado" : "");
+    }
+}
+
+sealed class FakeDisplay : IDisplayRefresh
+{
+    public Dictionary<string, int> Hz = new() { [@"\\.\DISPLAY1"] = 60 };
+    public Dictionary<string, (int Current, int Max)> Read() => Hz.ToDictionary(kv => kv.Key, kv => (kv.Value, 144));
+    public bool Set(string device, int hz) { Hz[device] = hz; return true; }
 }

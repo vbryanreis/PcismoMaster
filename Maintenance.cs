@@ -231,7 +231,7 @@ public static class Maintenance
     }
 
     /// <summary>Encerra o Explorer (o Windows o abre de novo sozinho) e, se ele não voltar em alguns segundos, abre.</summary>
-    private static async Task RestartExplorer(Ctx c, Action? whileStopped)
+    internal static async Task RestartExplorer(Ctx c, Action? whileStopped)
     {
         c.Line("Encerrando o Windows Explorer…");
         foreach (var p in Process.GetProcessesByName("explorer")) { using (p) try { p.Kill(); p.WaitForExit(5000); } catch { } }

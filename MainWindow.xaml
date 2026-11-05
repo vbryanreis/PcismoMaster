@@ -241,28 +241,46 @@
                             </StackPanel>
                             <ToggleButton x:Name="GrpTweak" Style="{StaticResource NavGroup}" Content="TWEAKING"/>
                             <StackPanel x:Name="GrpTweakItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpTweak, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavTweak" Style="{StaticResource NavItem}" Tag="PageTweak" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptFormat" Style="{StaticResource NavItem}" Tag="PageOptFormat" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE9E9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Iniciar" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Formatação" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavTweakWin" Style="{StaticResource NavItem}" Tag="PageTweakWin" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptDebloat" Style="{StaticResource NavItem}" Tag="PageOptDebloat" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Debloat" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptWindows" Style="{StaticResource NavItem}" Tag="PageOptWindows" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE770;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Windows" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavTweakHw" Style="{StaticResource NavItem}" Tag="PageTweakHw" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptInput" Style="{StaticResource NavItem}" Tag="PageOptInput" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Hardware" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE962;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Mouse e teclado" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavTweakAdv" Style="{StaticResource NavItem}" Tag="PageTweakAdv" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptGpu" Style="{StaticResource NavItem}" Tag="PageOptGpu" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE713;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Avançado" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="GPU" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptProfiles" Style="{StaticResource NavItem}" Tag="PageOptProfiles" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Perfis" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptClean" Style="{StaticResource NavItem}" Tag="PageOptClean" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE894;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Limpeza" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -1646,112 +1664,68 @@
                     </Border>
                 </Grid>
 
-                <!-- ===== TWEAKING · Iniciar (3 Setup do Ultimate) ===== -->
-                <ScrollViewer x:Name="PageTweak" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <!-- ===== TWEAKING (páginas montadas em MainWindow.Opt.cs a partir do OptCatalog) ===== -->
+                <ScrollViewer x:Name="PageOptFormat" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="INICIAR" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Ajustes do Windows do 3 Setup do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="FORMATAÇÃO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Depois de instalar o Windows: tudo de uma vez, com ponto de restauração · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
-                            <StackPanel>
-                                <TextBlock Text="AJUSTES COM DESFAZER" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14">
-                                    Do "3 Setup" do Ultimate. Marque o que quer, clique em APLICAR; o valor anterior de cada um fica guardado e
-                                    desmarcar + APLICAR devolve. Os AVANÇADOS vêm desligados. Alguns só valem depois de reiniciar.
-                                </TextBlock>
-                                <StackPanel x:Name="TweakRows"/>
-                                <WrapPanel Margin="0,6,0,0">
-                                    <Button x:Name="BtnTweakApply" Style="{StaticResource PrimaryButton}" Content="APLICAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakApply_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="MARCAR RECOMENDADOS" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakDefaults_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="DESFAZER TUDO" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakUndoAll_Click"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="TweakStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
-                            <StackPanel>
-                                <TextBlock Text="COMPRESSÃO DE MEMÓRIA" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
-                                    O Windows comprime parte da RAM para caber mais coisa, gastando um pouco de CPU. Desligar é o recomendado
-                                    do script para PCs com bastante RAM (16 GB ou mais); com pouca RAM, deixe ligada. Vale depois de reiniciar.
-                                </TextBlock>
-                                <TextBlock x:Name="TweakMemStatus" Text="Verificando…" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                <WrapPanel>
-                                    <Button x:Name="BtnTweakMemOff" Style="{StaticResource PrimaryButton}" Content="DESLIGAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakMemOff_Click"/>
-                                    <Button x:Name="BtnTweakMemOn" Style="{StaticResource OutlineButton}" Content="LIGAR" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakMemOn_Click"/>
-                                </WrapPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,22">
-                            <StackPanel>
-                                <TextBlock Text="BITLOCKER" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
-                                    A criptografia dos discos gasta um pouco de desempenho no SSD. Desligar descriptografa os discos
-                                    (demora, o PC pode ser usado enquanto isso) e deixa os dados legíveis se o disco ou o PC for roubado.
-                                    Para ligar de novo, use as configurações do BitLocker.
-                                </TextBlock>
-                                <TextBlock x:Name="TweakBitStatus" Text="Verificando…" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                <WrapPanel>
-                                    <Button x:Name="BtnTweakBitOff" Style="{StaticResource PrimaryButton}" Content="DESLIGAR BITLOCKER" Padding="18,9" Margin="0,0,10,8" Click="BtnTweakBitOff_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="ABRIR CONFIGURAÇÕES DO BITLOCKER" Padding="18,9" Margin="0,0,10,8" Tag="control.exe|/name microsoft.bitlockerdriveencryption" Click="BtnTweakOpen_Click"/>
-                                </WrapPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}">
-                            <StackPanel>
-                                <TextBlock Text="ATALHOS DO WINDOWS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12">
-                                    O que o script só abre para você conferir e ajustar à mão.
-                                </TextBlock>
-                                <WrapPanel>
-                                    <Button Style="{StaticResource OutlineButton}" Content="DATA, HORA E REGIÃO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:dateandtime" Click="BtnTweakOpen_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="IDIOMA" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:regionlanguage" Click="BtnTweakOpen_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="APPS DE INICIALIZAÇÃO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:startupapps" Click="BtnTweakOpen_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="GERENCIADOR DE TAREFAS · INICIALIZAÇÃO" Padding="16,8" Margin="0,0,10,8" Tag="taskmgr.exe|/0 /startup" Click="BtnTweakOpen_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="APPS EM SEGUNDO PLANO" Padding="16,8" Margin="0,0,10,8" Tag="ms-settings:privacy-backgroundapps" Click="BtnTweakOpen_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="CONFIGURAÇÕES DA STORE" Padding="16,8" Margin="0,0,10,8" Tag="ms-windows-store:settings" Click="BtnTweakOpen_Click"/>
-                                </WrapPanel>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
-                                    Na Store, o script também desliga a reprodução automática de vídeos, os avisos de instalação e as
-                                    experiências personalizadas: o script completo da Store, abaixo, faz isso.
-                                </TextBlock>
-                            </StackPanel>
-                        </Border>
-                        <!-- Scripts completos do 3 Setup (MainWindow.ScriptCards.cs) -->
-                        <StackPanel x:Name="TweakIniHost" Margin="0,22,0,0"/>
+                        <StackPanel x:Name="OptFormatHost"/>
                     </StackPanel>
                 </ScrollViewer>
-
-                <!-- ===== TWEAKING · Windows, Hardware e Avançado (pastas do Ultimate; cartões montados em MainWindow.TweakPages.cs) ===== -->
-                <ScrollViewer x:Name="PageTweakWin" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageOptDebloat" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="DEBLOAT" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Tirar do Windows o que pesa e espiona, em três níveis · cada item tem desfazer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptDebloatHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptWindows" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
                             <TextBlock Text="WINDOWS" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Ajustes do Windows da pasta Windows do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="Desempenho, privacidade, aparência, rede e IA · ligue e desligue cada ajuste" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel x:Name="TweakWinHost"/>
+                        <StackPanel x:Name="OptWindowsHost"/>
                     </StackPanel>
                 </ScrollViewer>
-                <ScrollViewer x:Name="PageTweakHw" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageOptInput" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="HARDWARE" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Mouse, escala, monitor, controle e rede da pasta Hardware do Ultimate · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="MOUSE E TECLADO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Menos atraso e sem atalhos que atrapalham no jogo" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel x:Name="TweakHwHost"/>
+                        <StackPanel x:Name="OptInputHost"/>
                     </StackPanel>
                 </ScrollViewer>
-                <ScrollViewer x:Name="PageTweakAdv" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageOptGpu" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="AVANÇADO" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Ajustes da pasta Advanced do Ultimate · todos vêm desligados e trocam segurança ou estabilidade por desempenho" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="GPU" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Monitor, agendamento da placa de vídeo e energia do PCI Express" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel x:Name="TweakAdvHost"/>
+                        <StackPanel x:Name="OptGpuHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptProfiles" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="PERFIS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Pacotes prontos e os seus perfis salvos · aplicar, voltar ao padrão, exportar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptProfilesHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptClean" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="LIMPEZA" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ver quanto espaço cada tipo de lixo ocupa e limpar o que quiser" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptCleanHost"/>
                     </StackPanel>
                 </ScrollViewer>
 

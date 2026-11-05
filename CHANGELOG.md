@@ -2,6 +2,15 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## Em desenvolvimento
+
+- **TWEAKING refeito do zero** no estilo da aba Otimizar do Galdino Control (escrito do zero: as funções vêm das configurações documentadas do Windows, sem copiar código). As sub-abas antigas (Iniciar, Windows, Hardware, Avançado) e os scripts completos do Ultimate saíram; ficou o bloatware app por app, agora dentro de Debloat.
+  - Páginas novas: **Formatação**, **Debloat** (Essencial, Recomendado e Avançado), **Windows**, **Mouse e teclado**, **GPU**, **Perfis** e **Limpeza**.
+  - Cerca de 150 ajustes. Registro pelo mesmo motor de antes (guarda o valor exato e desfaz); o que não é registro (tarefas agendadas, recursos opcionais, plano de energia, hibernação, compressão de memória, bcdedit, taxa do monitor, Discord, chaves apagadas com cópia .reg) guarda o estado lido antes de mudar e desfaz com ele. Apps removidos voltam pela Microsoft Store.
+  - O estado de cada ajuste é lido em segundo plano, num PowerShell só para tudo que não é registro. Serviços que não existem no PC aparecem como "não se aplica" em vez de criar chave falsa.
+  - Não repete o que já existe em outras abas (Game DVR, aceleração do mouse e plano de energia em Ferramentas › Otimização; limpar RAM e DNS; Inicialização; Instalar apps) e não desliga proteções do Windows (Defender, UAC, Isolamento de Núcleo, firewall).
+  - Ponto de restauração uma vez por sessão, antes da primeira mudança. O Explorer reinicia sozinho quando algum ajuste precisa.
+
 ## 0.8.0
 
 Junta a 0.6.3, a 0.6.4 (ArtCraft) e a 0.7.0 (Promoções) do Bryan com as novidades abaixo.
