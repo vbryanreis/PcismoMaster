@@ -224,7 +224,7 @@ public partial class MainWindow
         var view = new ListCollectionView(_leftovers);
         view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LeftoverRow.Group)));
         UnLeftoverList.ItemsSource = view;
-        UnLeftoverTitle.Text = $"Sobras de {_unApp?.Name}";
+        UnLeftoverTitle.Title = $"Sobras de {_unApp?.Name}";
         long size = _leftovers.Where(l => l.Item.Kind == "Pasta" || l.Item.Kind == "Arquivo").Sum(l => l.Item.SizeBytes);
         int Count(string g) => _leftovers.Count(l => l.Group == g);
         UnLeftoverSummary.Text = $"{Count("Pastas e arquivos")} pasta(s)/arquivo(s)" +

@@ -925,6 +925,51 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- ===== Limpeza completa do driver de vídeo com o DDU (Ultimate · 5 Graphics · 1 Driver Clean) ===== -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,8">
+                                    <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
+                                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Limpeza completa do driver de vídeo (DDU)" FontSize="17" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Remove o driver de vídeo por inteiro no modo de segurança, para reinstalar do zero" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,12">
+                                    Use quando o driver der problema (tela preta, travamentos, erro na instalação) ou ao trocar de placa. O PC reinicia no modo de
+                                    segurança, o Display Driver Uninstaller (Wagnardsoft) remove driver, painel, PhysX, GeForce Experience e Vulkan, e o PC volta
+                                    ao normal sem driver de vídeo: depois é só instalar o driver de novo.
+                                </TextBlock>
+                                <WrapPanel Margin="0,0,0,6">
+                                    <TextBlock Text="MODO" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
+                                    <RadioButton x:Name="DduAuto" Style="{StaticResource Chip}" GroupName="DduMode" Content="Automático (limpa e reinicia sozinho)" IsChecked="True"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduMode" Content="Manual (abre o DDU no modo de segurança)"/>
+                                </WrapPanel>
+                                <WrapPanel x:Name="DduGpuPanel" Margin="0,0,0,8">
+                                    <TextBlock Text="LIMPAR" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="NVIDIA" Tag="nvidia"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="AMD" Tag="amd"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="Intel" Tag="intel"/>
+                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="Todas as placas" Tag="all"/>
+                                </WrapPanel>
+                                <CheckBox x:Name="DduBlockWu" Content="Impedir o Windows Update de instalar um driver de vídeo sozinho (dá para desfazer)" IsChecked="True" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="DduAudio" Content="Também remover drivers de áudio Realtek e Sound Blaster (o PC fica sem som até reinstalar)" Margin="0,0,0,12"/>
+                                <WrapPanel>
+                                    <Button x:Name="BtnDduRun" Style="{StaticResource PrimaryButton}" Content="Preparar e reiniciar no modo de segurança" Padding="18,9" Margin="0,0,10,8" Click="BtnDduRun_Click"/>
+                                    <Button x:Name="BtnDduCancel" Style="{StaticResource OutlineButton}" Content="Cancelar reinício" Padding="16,9" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnDduCancel_Click"/>
+                                    <Button x:Name="BtnDduLocal" Style="{StaticResource OutlineButton}" Content="Usar um DDU que eu baixei…" Padding="14,9" Margin="0,0,10,8" Click="BtnDduLocal_Click"
+                                            ToolTip="Escolha o instalador oficial do DDU baixado do site da Wagnardsoft"/>
+                                    <Button x:Name="BtnDduWuRestore" Style="{StaticResource OutlineButton}" Content="Liberar drivers pelo Windows Update" Padding="14,9" Margin="0,0,10,8"
+                                            Visibility="Collapsed" Click="BtnDduWuRestore_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="DduStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DduLog" Foreground="{DynamicResource Muted}" FontSize="11.5" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- ===== Placa de vídeo: versão, o que mudou, instalação e ajustes ===== -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
@@ -1117,51 +1162,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- ===== Limpeza completa do driver de vídeo com o DDU (Ultimate · 5 Graphics · 1 Driver Clean) ===== -->
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <StackPanel>
-                                <DockPanel Margin="0,0,0,8">
-                                    <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
-                                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Limpeza completa do driver de vídeo (DDU)" FontSize="17" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Remove o driver de vídeo por inteiro no modo de segurança, para reinstalar do zero" Foreground="{DynamicResource Muted}" FontSize="12"/>
-                                    </StackPanel>
-                                </DockPanel>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,12">
-                                    Use quando o driver der problema (tela preta, travamentos, erro na instalação) ou ao trocar de placa. O PC reinicia no modo de
-                                    segurança, o Display Driver Uninstaller (Wagnardsoft) remove driver, painel, PhysX, GeForce Experience e Vulkan, e o PC volta
-                                    ao normal sem driver de vídeo: depois é só instalar o driver de novo.
-                                </TextBlock>
-                                <WrapPanel Margin="0,0,0,6">
-                                    <TextBlock Text="MODO" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
-                                    <RadioButton x:Name="DduAuto" Style="{StaticResource Chip}" GroupName="DduMode" Content="Automático (limpa e reinicia sozinho)" IsChecked="True"/>
-                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduMode" Content="Manual (abre o DDU no modo de segurança)"/>
-                                </WrapPanel>
-                                <WrapPanel x:Name="DduGpuPanel" Margin="0,0,0,8">
-                                    <TextBlock Text="LIMPAR" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
-                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="NVIDIA" Tag="nvidia"/>
-                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="AMD" Tag="amd"/>
-                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="Intel" Tag="intel"/>
-                                    <RadioButton Style="{StaticResource Chip}" GroupName="DduGpu" Content="Todas as placas" Tag="all"/>
-                                </WrapPanel>
-                                <CheckBox x:Name="DduBlockWu" Content="Impedir o Windows Update de instalar um driver de vídeo sozinho (dá para desfazer)" IsChecked="True" Margin="0,0,0,8"/>
-                                <CheckBox x:Name="DduAudio" Content="Também remover drivers de áudio Realtek e Sound Blaster (o PC fica sem som até reinstalar)" Margin="0,0,0,12"/>
-                                <WrapPanel>
-                                    <Button x:Name="BtnDduRun" Style="{StaticResource PrimaryButton}" Content="Preparar e reiniciar no modo de segurança" Padding="18,9" Margin="0,0,10,8" Click="BtnDduRun_Click"/>
-                                    <Button x:Name="BtnDduCancel" Style="{StaticResource OutlineButton}" Content="Cancelar reinício" Padding="16,9" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnDduCancel_Click"/>
-                                    <Button x:Name="BtnDduLocal" Style="{StaticResource OutlineButton}" Content="Usar um DDU que eu baixei…" Padding="14,9" Margin="0,0,10,8" Click="BtnDduLocal_Click"
-                                            ToolTip="Escolha o instalador oficial do DDU baixado do site da Wagnardsoft"/>
-                                    <Button x:Name="BtnDduWuRestore" Style="{StaticResource OutlineButton}" Content="Liberar drivers pelo Windows Update" Padding="14,9" Margin="0,0,10,8"
-                                            Visibility="Collapsed" Click="BtnDduWuRestore_Click"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="DduStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
-                                <TextBlock x:Name="DduLog" Foreground="{DynamicResource Muted}" FontSize="11.5" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" Margin="0,6,0,0"/>
-                            </StackPanel>
-                        </Border>
-
                         <!-- ===== Windows Update e backup, lado a lado ===== -->
                         <Grid Margin="0,0,0,14">
                             <Grid.ColumnDefinitions>
@@ -1210,10 +1210,7 @@
                             <StackPanel>
                                 <DockPanel>
                                     <ToggleButton x:Name="DrvListToggle" DockPanel.Dock="Right" Style="{StaticResource ChipToggle}" Content="Mostrar a lista"/>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Todos os drivers instalados" FontSize="15" FontWeight="SemiBold"/>
-                                        <TextBlock x:Name="DrvListCount" Text="Versão, data e assinatura de cada driver deste PC" Foreground="{DynamicResource Muted}" FontSize="12"/>
-                                    </StackPanel>
+                                    <local:SectionHeader x:Name="DrvListCount" Margin="0" Icon="&#xE8FD;" Title="Todos os drivers instalados" Subtitle="Versão, data e assinatura de cada driver deste PC"/>
                                 </DockPanel>
                                 <ItemsControl x:Name="DrvList" Margin="0,12,0,0" Visibility="{Binding IsChecked, ElementName=DrvListToggle, Converter={StaticResource BoolVis}}">
                                     <ItemsControl.ItemTemplate>
@@ -1257,7 +1254,7 @@
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="INTEGRAÇÕES" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE703;" Title="Integrações" Subtitle="Programas de iluminação que o app controla (iCUE e OpenRGB)"/>
 
                                 <TextBlock Text="Corsair iCUE / iCUE LINK" FontSize="14" FontWeight="SemiBold" Margin="0,8,0,2"/>
                                 <TextBlock x:Name="LightStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
@@ -1294,7 +1291,7 @@
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="DISPOSITIVOS" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE772;" Title="Dispositivos" Subtitle="Teclados, mouses, memórias e fitas de LED encontrados"/>
                                 <TextBlock x:Name="LightDevicesHint" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
                                 <ItemsControl x:Name="LightDevices">
                                     <ItemsControl.ItemTemplate>
@@ -1316,7 +1313,7 @@
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="EFEITO" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE790;" Title="Efeito" Subtitle="Cor e animação aplicadas aos dispositivos"/>
                                 <WrapPanel x:Name="LightFxPanel" Margin="0,4,0,12">
                                     <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Cor fixa" Tag="static" IsChecked="True" Checked="LightFx_Checked"/>
                                     <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Respiração" Tag="breath" Checked="LightFx_Checked"/>
@@ -1367,7 +1364,7 @@
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="DIAGNÓSTICO" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE9D9;" Title="Diagnóstico" Subtitle="Detalhes técnicos para resolver problemas de conexão"/>
                                 <TextBox x:Name="LightDiag" IsReadOnly="True" FontFamily="{StaticResource Mono}" FontSize="12" TextWrapping="Wrap"
                                          MinHeight="90" MaxHeight="260" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0">
@@ -1746,9 +1743,9 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="PROGRAMAS PARA FECHAR" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader Margin="0,0,110,12" Icon="&#xE711;" Title="Programas para fechar" Subtitle="Fechados junto com a limpeza da memória, para liberar RAM antes de jogar"/>
                                     <Button Style="{StaticResource OutlineButton}" Content="ATUALIZAR" Padding="10,4" FontSize="12"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnRefreshApps_Click"/>
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnRefreshApps_Click"/>
                                 </Grid>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Marcados = seguros de fechar durante o jogo. Programas com janela recebem o pedido de
@@ -1803,11 +1800,11 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <Border Width="38" Height="38" CornerRadius="10" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                        <Border Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
                                             <TextBlock Text="&#xE95E;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Revisão semanal" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <TextBlock Text="Revisão semanal" FontSize="17" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,12,0"/>
                                         <Border Style="{StaticResource MaintBadge}" VerticalAlignment="Center">
                                             <TextBlock x:Name="MaintWeeklyBadge" Text="Recomendado 1 vez por semana"/>
                                         </Border>
@@ -1890,7 +1887,7 @@
                         <!-- Sensores (equivalente à aba Sensors do GPU-Z) -->
                         <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="20,16,12,12">
                             <DockPanel>
-                                <TextBlock DockPanel.Dock="Top" Text="SENSORES AO VIVO" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <local:SectionHeader DockPanel.Dock="Top" Icon="&#xE9D9;" Title="Sensores ao vivo" Subtitle="Leituras da placa de vídeo em tempo real"/>
                                 <ItemsControl x:Name="GpuExtras" DockPanel.Dock="Top" Margin="0,0,8,6">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -2214,7 +2211,7 @@
                             <!-- Equilíbrio teórico -->
                             <Border Style="{StaticResource CardBorder}">
                                 <StackPanel>
-                                    <TextBlock Text="EQUILÍBRIO DO HARDWARE" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader Icon="&#xE9D2;" Title="Equilíbrio do hardware" Subtitle="O quanto processador e placa de vídeo combinam, em teoria"/>
                                     <Grid Margin="0,4,0,0">
                                         <TextBlock x:Name="BnCpuName" Foreground="{DynamicResource Muted}"/>
                                         <TextBlock x:Name="BnGpuName" Foreground="{DynamicResource Muted}" HorizontalAlignment="Right"/>
@@ -2252,7 +2249,7 @@
                         <!-- Leituras ao vivo -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14" Padding="18,16,18,6">
                             <StackPanel>
-                                <TextBlock Text="LEITURAS AO VIVO" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xEC4A;" Title="Leituras ao vivo" Subtitle="Uso do processador e da placa de vídeo enquanto você joga"/>
                                 <ItemsControl x:Name="BnMeters" ItemTemplate="{StaticResource Meter}" Margin="0,4,0,0">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -2399,8 +2396,8 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <Grid>
-                                    <TextBlock Text="O QUE MOSTRAR" Style="{StaticResource Label}"/>
-                                    <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                                    <local:SectionHeader Margin="0,0,230,12" Icon="&#xE7F4;" Title="O que mostrar" Subtitle="Os itens do overlay sobre o jogo"/>
+                                    <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <Button Style="{StaticResource OutlineButton}" Content="SÓ FPS" Tag="min" Padding="10,4" FontSize="12" Margin="0,0,6,0" Click="OvPreset_Click"/>
                                         <Button Style="{StaticResource OutlineButton}" Content="PADRÃO" Tag="default" Padding="10,4" FontSize="12" Margin="0,0,6,0" Click="OvPreset_Click"/>
                                         <Button Style="{StaticResource OutlineButton}" Content="TUDO" Tag="all" Padding="10,4" FontSize="12" Click="OvPreset_Click"/>
@@ -2420,7 +2417,7 @@
 
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
-                                <TextBlock Text="DETECÇÃO DE FPS" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE916;" Title="Detecção de FPS" Subtitle="O jogo detectado e a medição dos quadros"/>
                                 <TextBlock x:Name="OvStatus" FontSize="15"/>
                                 <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,10,0,0">
                                     O FPS é medido pelo rastreamento de eventos do Windows (ETW), a mesma técnica do PresentMon:
@@ -2494,7 +2491,7 @@
                             <StackPanel>
                                 <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                                     <StackPanel>
-                                        <TextBlock Text="TESTE" Style="{StaticResource Label}"/>
+                                        <local:SectionHeader Icon="&#xE945;" Title="Teste" Subtitle="Escolha o que vai ser medido"/>
                                         <WrapPanel x:Name="BenchModePanel">
                                             <RadioButton Style="{StaticResource Chip}" GroupName="BenchMode" Content="Multi-core" Tag="mt"/>
                                             <RadioButton Style="{StaticResource Chip}" GroupName="BenchMode" Content="Single-core" Tag="st"/>
@@ -2533,7 +2530,7 @@
 
                                 <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                                     <StackPanel>
-                                        <TextBlock Text="DURANTE O TESTE" Style="{StaticResource Label}"/>
+                                        <local:SectionHeader Icon="&#xE9D9;" Title="Durante o teste" Subtitle="Temperaturas e uso ao vivo"/>
                                         <ItemsControl x:Name="BenchLive">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -2567,7 +2564,7 @@
                         </Grid.ColumnDefinitions>
                         <Border Style="{StaticResource CardBorder}" VerticalAlignment="Top" Padding="24,20">
                             <StackPanel>
-                                <TextBlock Text="VALE · CENA DE JOGO" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE7F4;" Title="Vale · cena de jogo" Subtitle="Teste da placa de vídeo com uma cena 3D"/>
                                 <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}">
                                     Sobrevoo de um vale com terreno gerado por ruído fractal (~500 mil triângulos), 40 mil árvores
                                     por instancing, sombras em tempo real (mapa 4096² com bordas suaves), água com ondas, neblina,
@@ -2637,7 +2634,7 @@
                             <StackPanel>
                                 <Border Style="{StaticResource CardBorder}" VerticalAlignment="Top" Padding="24,20" Margin="0,0,0,12">
                                     <StackPanel>
-                                        <TextBlock Text="CIDADE DE OBJETOS · RAY TRACING POR HARDWARE" Style="{StaticResource Label}"/>
+                                        <local:SectionHeader Icon="&#xE950;" Title="Cidade de objetos" Subtitle="Ray tracing por hardware (DXR 1.1)"/>
                                         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}">
                                             Direct3D 12 com DXR 1.1: usa os núcleos de ray tracing da placa (RTX 20 ou mais nova, Radeon RX 6000
                                             ou mais nova, Intel Arc). 4 mil objetos em materiais fosco, metal e espelho; por pixel, path tracing com
@@ -2664,7 +2661,7 @@
                                 </Border>
                                 <Border Style="{StaticResource CardBorder}" Padding="24,20">
                                     <StackPanel>
-                                        <TextBlock Text="COMO COMPARAR COM CONFIANÇA" Style="{StaticResource Label}"/>
+                                        <local:SectionHeader Icon="&#xE897;" Title="Como comparar com confiança" Subtitle="Cuidados para o resultado valer a comparação"/>
                                         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}" FontSize="12">
                                             O teste aquece a placa sem medir (o clock e a temperatura se estabilizam) e depois roda 3 passadas
                                             iguais. A nota usa a MEDIANA das passadas, e a variação entre elas mostra se o resultado é
@@ -2919,9 +2916,9 @@
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
-                                    <TextBlock x:Name="StartupSummary" Text="PROGRAMAS DE INICIALIZAÇÃO" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader x:Name="StartupSummary" Margin="0,0,190,12" Icon="&#xE7E8;" Title="Programas de inicialização" Subtitle="O que abre junto com o Windows"/>
                                     <Button x:Name="BtnStartupRestore" Style="{StaticResource OutlineButton}" Content="RESTAURAR REMOVIDOS" Padding="10,4" FontSize="12"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnStartupRestore_Click"/>
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnStartupRestore_Click"/>
                                 </Grid>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     O interruptor ativa ou desativa na hora, do mesmo jeito que o Gerenciador de Tarefas (a entrada continua
@@ -3157,7 +3154,7 @@
 
                             <Border Style="{StaticResource CardBorder}">
                                 <StackPanel>
-                                    <TextBlock Text="LINK" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader Icon="&#xE71B;" Title="Link do vídeo" Subtitle="YouTube ou Instagram, em MP4 ou MP3"/>
                                     <TextBox x:Name="DlUrl" Tag="Cole o link do YouTube, Instagram, etc." Margin="0,0,0,14"/>
 
                                     <TextBlock Text="FORMATO" Style="{StaticResource Label}"/>
@@ -3297,7 +3294,7 @@
                         <!-- Profundidade da varredura (como o Revo) e ponto de restauração -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,14,0,0">
                             <StackPanel>
-                                <TextBlock Text="VARREDURA DE SOBRAS" Style="{StaticResource Label}" Margin="0,0,0,8"/>
+                                <local:SectionHeader Icon="&#xE721;" Title="Varredura de sobras" Subtitle="Profundidade da busca depois de desinstalar e ponto de restauração"/>
                                 <WrapPanel>
                                     <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Seguro" Tag="Seguro" Checked="UnMode_Checked"/>
                                     <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Moderado" Tag="Moderado" IsChecked="True" Checked="UnMode_Checked"/>
@@ -3326,7 +3323,7 @@
                         <Border x:Name="UnLeftoverCard" Style="{StaticResource CardBorder}" Margin="0,16,0,0" Visibility="Collapsed">
                             <StackPanel>
                                 <Grid Margin="0,0,0,4">
-                                    <TextBlock x:Name="UnLeftoverTitle" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <local:SectionHeader x:Name="UnLeftoverTitle" Margin="0,0,240,8" Icon="&#xE74D;" Subtitle="O que o programa deixou para trás no disco e no registro"/>
                                     <WrapPanel HorizontalAlignment="Right">
                                         <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODAS" Padding="10,4" FontSize="12" Margin="0,0,8,0" Click="BtnUnMarkAll_Click"/>
                                         <Button Style="{StaticResource OutlineButton}" Content="SÓ AS CLARAS" Padding="10,4" FontSize="12" Margin="0,0,8,0" Click="BtnUnMarkStrong_Click"/>
@@ -3412,9 +3409,9 @@
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="USB E PORTAS COM (ARDUINO, ESP32, CONVERSORES SERIAIS)" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader Margin="0,0,110,12" Icon="&#xE88E;" Title="USB e portas COM" Subtitle="Arduino, ESP32 e conversores seriais"/>
                                     <Button Style="{StaticResource OutlineButton}" Content="PROCURAR" Padding="10,4" FontSize="12"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnUsbScan_Click"/>
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnUsbScan_Click"/>
                                 </Grid>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,12">
                                     Cada placa plugada numa porta USB diferente vira um registro novo e prende um número COM. Os registros
@@ -3490,7 +3487,7 @@
                         <!-- Conectados agora -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="PLACAS E CONVERSORES CONECTADOS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <local:SectionHeader Icon="&#xE88E;" Title="Placas e conversores conectados" Subtitle="O que está ligado no USB agora"/>
                                 <TextBlock x:Name="MakerNoDevices" Text="Nenhuma placa ou conversor serial conectado. Plugue a placa e clique em VERIFICAR."
                                            Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 <ItemsControl x:Name="MakerDevices">
@@ -3537,9 +3534,9 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="DRIVERS INCLUÍDOS" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader Margin="0,0,140,12" Icon="&#xE896;" Title="Drivers incluídos" Subtitle="Drivers oficiais que já vêm dentro do app"/>
                                     <Button x:Name="BtnMakerBundleAll" Style="{StaticResource OutlineButton}" Content="INSTALAR TODOS" Padding="10,4" FontSize="12"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnMakerBundleAll_Click"/>
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnMakerBundleAll_Click"/>
                                 </Grid>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Drivers oficiais de cada fabricante que já vêm dentro do PcismoMaster: instalam sem internet, ideal logo depois
@@ -3577,9 +3574,9 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="DRIVERS INSTALADOS NO WINDOWS" Style="{StaticResource Label}"/>
+                                    <local:SectionHeader Margin="0,0,190,12" Icon="&#xE950;" Title="Drivers instalados no Windows" Subtitle="Versões guardadas para cada chip serial"/>
                                     <Button x:Name="BtnMakerRestore" Style="{StaticResource OutlineButton}" Content="RESTAURAR REMOVIDOS" Padding="10,4" FontSize="12"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnMakerRestore_Click"/>
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnMakerRestore_Click"/>
                                 </Grid>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Versões guardadas no Windows para cada chip, da mais nova para a mais antiga. Quando a versão nova não funciona
@@ -3614,7 +3611,7 @@
                         <!-- Arduino IDE -->
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
-                                <TextBlock Text="ARDUINO IDE" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <local:SectionHeader Icon="&#xE943;" Title="Arduino IDE" Subtitle="Instale ou abra a IDE oficial"/>
                                 <TextBlock x:Name="MakerIde" TextWrapping="Wrap" Margin="0,0,0,4"/>
                                 <TextBlock x:Name="MakerHolders" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
                                 <WrapPanel>
@@ -3682,8 +3679,8 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
-                                    <TextBlock Text="CURVA TENSÃO × FREQUÊNCIA (V/F) · UNDERVOLT" Style="{StaticResource Label}"/>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                    <local:SectionHeader Margin="0,0,250,12" Icon="&#xE9D2;" Title="Curva tensão × frequência (V/F)" Subtitle="Undervolt: a mesma frequência com menos tensão"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <Button Style="{StaticResource OutlineButton}" Content="LER DA PLACA" Padding="10,4" FontSize="12" Margin="0,0,8,0"
                                                 ToolTip="Traz para cá o ajuste aplicado agora na placa (inclusive pelo MSI Afterburner)" Click="BtnOcImport_Click"/>
                                         <Button Style="{StaticResource OutlineButton}" Content="RELER CURVA" Padding="10,4" FontSize="12" Click="BtnOcReadCurve_Click"/>
@@ -3713,7 +3710,7 @@
                         <!-- Curva de fans -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="CURVA DE FANS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <local:SectionHeader Icon="&#xE9E9;" Title="Curva de fans" Subtitle="Velocidade das ventoinhas conforme a temperatura"/>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Como no Afterburner, a curva é controlada pelo PcismoMaster: ele lê a temperatura a cada segundo e ajusta
                                     os fans. Arraste os pontos, clique duas vezes no gráfico para criar um ponto e clique com o botão direito
@@ -3745,7 +3742,7 @@
                         <!-- Monitoramento -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="MONITORAMENTO · ÚLTIMOS 2 MINUTOS" Style="{StaticResource Label}" Margin="0,0,0,10"/>
+                                <local:SectionHeader Icon="&#xE9D2;" Title="Monitoramento" Subtitle="Os últimos 2 minutos da placa de vídeo"/>
                                 <UniformGrid x:Name="OcCharts" Columns="2"/>
                             </StackPanel>
                         </Border>
@@ -3753,7 +3750,7 @@
                         <!-- Verificador de estabilidade -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="VERIFICADOR DE ESTABILIDADE" Style="{StaticResource Label}"/>
+                                <local:SectionHeader Icon="&#xE73E;" Title="Verificador de estabilidade" Subtitle="Procura travamentos e erros do driver depois do overclock"/>
                                 <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,12">
                                     Depois de mudar algo (aqui ou na BIOS): mede a nota, roda stress, vigia temperatura e procura erros de
                                     hardware (WHEA) e reinícios do driver de vídeo no registro do Windows.
@@ -3827,7 +3824,7 @@
                         <!-- Guia de overclock na BIOS -->
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
-                                <TextBlock x:Name="OcGuideTitle" Text="GUIA: OVERCLOCK NA BIOS" Style="{StaticResource Label}"/>
+                                <local:SectionHeader x:Name="OcGuideTitle" Icon="&#xE82D;" Title="Guia: overclock na BIOS" Subtitle="Passo a passo para o seu processador e memória"/>
                                 <TextBlock x:Name="OcGuideIntro" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
                                 <ItemsControl x:Name="OcGuide">
                                     <ItemsControl.ItemTemplate>
@@ -4033,7 +4030,7 @@
                     <Border Grid.Row="3" Style="{StaticResource CardBorder}" Margin="0,0,0,14" Padding="18,14,18,12">
                         <DockPanel>
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
-                                <TextBlock Text="TEMPERATURAS — ÚLTIMOS 5 MIN" Style="{StaticResource Label}" Margin="0"/>
+                                <local:SectionHeader Margin="0,0,200,4" Icon="&#xE9D2;" Title="Temperaturas" Subtitle="Os últimos 5 minutos do teste"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                     <Rectangle Width="14" Height="2" Fill="{DynamicResource Fg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                     <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,0,16,0"/>
@@ -4050,7 +4047,7 @@
                     <!-- Log -->
                     <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="18,14,10,10">
                         <DockPanel>
-                            <TextBlock DockPanel.Dock="Top" Text="REGISTRO" Style="{StaticResource Label}"/>
+                            <local:SectionHeader DockPanel.Dock="Top" Icon="&#xE8A5;" Title="Registro" Subtitle="O que aconteceu durante o teste"/>
                             <ListBox x:Name="StressLog" FontFamily="{StaticResource Mono}" FontSize="12"
                                      Foreground="{DynamicResource Muted}" ItemContainerStyle="{StaticResource PlainItem}"/>
                         </DockPanel>

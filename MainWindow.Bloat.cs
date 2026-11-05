@@ -41,7 +41,7 @@ public partial class MainWindow
 
     private void AddBloatSection(Panel host)
     {
-        TweakCard(host, "BLOATWARE · ESCOLHER APP POR APP",
+        TweakCard(host, "", "Bloatware: escolher app por app",
             "A mesma lista do script Bloatware, só que você escolhe o que sai. Cada item mostra o que é e um selo: SEGURO (pode tirar sem medo), " +
             "ATENÇÃO (algum app ou recurso pode depender dele) e PERIGOSO (pode quebrar login, Iniciar ou o Windows). Os que o script mantém " +
             "aparecem travados. Tudo que sair por aqui fica em REMOVIDOS POR AQUI, com o botão para voltar.",

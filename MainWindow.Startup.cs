@@ -19,8 +19,8 @@ public partial class MainWindow
 
         StartupList.ItemsSource = list;
         int on = list.Count(e => e.Enabled);
-        StartupSummary.Text = list.Count == 0 ? "NENHUM PROGRAMA NA INICIALIZAÇÃO"
-                            : $"{list.Count} PROGRAMAS · {on} ATIVADOS · {list.Count - on} DESATIVADOS";
+        StartupSummary.Subtitle = list.Count == 0 ? "Nenhum programa abre junto com o Windows"
+                            : $"{list.Count} programas · {on} ativados · {list.Count - on} desativados";
         BtnStartupRestore.IsEnabled = _settings.StartupRemoved.Count > 0;
         BtnStartupRestore.Content = _settings.StartupRemoved.Count > 0
             ? $"RESTAURAR REMOVIDOS ({_settings.StartupRemoved.Count})" : "RESTAURAR REMOVIDOS";

@@ -49,7 +49,7 @@ public partial class MainWindow
             DrvSet("Lendo drivers instalados…", 0.1);
             var inv = await Task.Run(DriverManager.Inventory);
             DrvList.ItemsSource = inv;
-            DrvListCount.Text = $"{inv.Count} drivers: versão, data e assinatura de cada um";
+            DrvListCount.Subtitle = $"{inv.Count} drivers: versão, data e assinatura de cada um";
 
             DrvSet("Lendo placa de vídeo e placa-mãe…", 0.3);
             _drvGpus = await Task.Run(DriverManager.ReadGpus);

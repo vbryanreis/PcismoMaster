@@ -21,10 +21,10 @@ public partial class MainWindow
     private static string ScriptDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PcismoMaster", "Scripts");
     private static string TweakBackupDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PcismoMaster", "ModuleBackups");
 
-    private Border TweakCard(Panel host, string title, string? intro, out StackPanel body)
+    private Border TweakCard(Panel host, string icon, string title, string? intro, out StackPanel body)
     {
         body = new StackPanel();
-        body.Children.Add(new TextBlock { Text = title, Style = (Style)FindResource("Label"), Margin = new Thickness(0, 0, 0, 6) });
+        body.Children.Add(CardHeader(icon, title));
         if (intro != null)
             body.Children.Add(new TextBlock { Text = intro, Foreground = (Brush)FindResource("Faint"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 12) });
         var card = new Border { Style = (Style)FindResource("CardBorder"), Margin = new Thickness(0, 0, 0, 22), Child = body };
