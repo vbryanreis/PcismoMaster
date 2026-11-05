@@ -1078,13 +1078,48 @@
 
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="PLACA-MÃE / FABRICANTE" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="DrvBoard" Margin="0,10,0,0" TextWrapping="Wrap"/>
-                                <Button x:Name="BtnDrvBoardPage" Style="{StaticResource OutlineButton}" Content="ABRIR SUPORTE DO FABRICANTE" Padding="18,8" Margin="0,14,0,8"
-                                        HorizontalAlignment="Left" Click="BtnDrvBoardPage_Click" IsEnabled="False"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                        <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Placa-mãe: BIOS e drivers" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Compara o que está instalado com o suporte oficial do fabricante do seu modelo" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock x:Name="DrvBoard" TextWrapping="Wrap" FontWeight="SemiBold"/>
+
+                                <!-- BIOS: instalada x mais recente no site -->
+                                <Border Background="{DynamicResource Panel}" CornerRadius="10" Padding="16,12" Margin="0,10,0,10">
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button x:Name="BtnBoardBiosGet" Style="{StaticResource PrimaryButton}" Content="Baixar a BIOS mais recente" Padding="14,7" Margin="10,0,0,0"
+                                                    Visibility="Collapsed" Click="BtnBoardBiosGet_Click"/>
+                                            <Button x:Name="BtnBoardBiosPage" Style="{StaticResource OutlineButton}" Content="Página de BIOS do modelo" Padding="14,7" Margin="10,0,0,0"
+                                                    IsEnabled="False" Click="BtnBoardBiosPage_Click"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <TextBlock Text="BIOS" Style="{StaticResource Label}"/>
+                                            <TextBlock x:Name="BoardBiosLine" TextWrapping="Wrap" Text="—"/>
+                                            <TextBlock x:Name="BoardBiosHint" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+
+                                <TextBlock x:Name="BoardMessage" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                <TextBlock x:Name="BoardSummary" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6" Visibility="Collapsed"/>
+                                <StackPanel x:Name="BoardRows"/>
+                                <WrapPanel Margin="0,10,0,0">
+                                    <Button x:Name="BtnBoardCheck" Style="{StaticResource OutlineButton}" Content="Verificar placa-mãe de novo" Padding="14,7" Margin="0,0,10,8" Click="BtnBoardCheck_Click"/>
+                                    <Button x:Name="BtnBoardDrivers" Style="{StaticResource OutlineButton}" Content="Página de drivers do modelo" Padding="14,7" Margin="0,0,10,8"
+                                            IsEnabled="False" Click="BtnBoardDrivers_Click"/>
+                                    <Button x:Name="BtnDrvBoardPage" Style="{StaticResource OutlineButton}" Content="Suporte do fabricante" Padding="14,7" Margin="0,0,10,8"
+                                            Click="BtnDrvBoardPage_Click" IsEnabled="False"/>
+                                </WrapPanel>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
-                                    ASUS, MSI, Gigabyte e outros não têm API pública de versões. Abrimos o suporte oficial do fabricante detectado
-                                    (chipset, áudio, rede, BIOS). Se a página não abrir no seu modelo, digite o modelo mostrado acima na busca do site.
+                                    A BIOS nunca é gravada pelo app: o arquivo vem do site oficial e você atualiza pela própria BIOS (Q-Flash, EZ Flash, M-Flash, Instant Flash)
+                                    seguindo o manual. Os drivers também baixam do site oficial do fabricante. O Windows Update, logo abaixo, traz drivers certificados para os mesmos dispositivos.
                                 </TextBlock>
                             </StackPanel>
                         </Border>

@@ -34,6 +34,7 @@ public partial class MainWindow
         BtnDrvScan.IsEnabled = !busy;
         BtnDrvBackup.IsEnabled = !busy;
         BtnDrvWuSearch.IsEnabled = !busy;
+        BtnBoardCheck.IsEnabled = !busy;
         BtnDrvWuInstall.IsEnabled = !busy && _drvWu.Count > 0;
     }
 
@@ -52,6 +53,8 @@ public partial class MainWindow
             _drvGpus = await Task.Run(DriverManager.ReadGpus);
             _drvBoardInfo = await Task.Run(DriverManager.ReadBoard);
             ShowBoard();
+            _drvInventory = inv;
+            var boardTask = CheckBoardAsync(_drvCts.Token); // em paralelo com a consulta da placa de vídeo
 
             bool studio = DrvStudio.IsChecked == true;
             int i = 0;
@@ -65,6 +68,7 @@ public partial class MainWindow
                 i++;
             }
             ShowDriverVersion();
+            await boardTask;
             DrvSet($"Pronto às {DateTime.Now:HH:mm:ss}.", 1);
         }
         catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
@@ -74,8 +78,8 @@ public partial class MainWindow
     private void ShowBoard()
     {
         var b = _drvBoardInfo;
-        DrvBoard.Text = $"{b.Maker} {b.Model}\nBIOS: {(b.Bios.Length > 0 ? b.Bios : "—")}" +
-                        (b.Brand.Length > 0 ? $"\nFabricante reconhecido: {b.Brand}" : "\nFabricante não reconhecido");
+        DrvBoard.Text = $"{b.Maker} {b.Model}".Trim() + (b.Brand.Length > 0 ? "" : "  (fabricante não reconhecido)");
+        BoardBiosLine.Text = $"Instalada: {(b.Bios.Length > 0 ? b.Bios : "—")}";
         BtnDrvBoardPage.IsEnabled = b.SupportUrl.Length > 0;
     }
 

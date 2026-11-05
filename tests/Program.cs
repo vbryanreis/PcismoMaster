@@ -577,6 +577,40 @@ Test("NVIDIA release notes: Game Ready title, fixed bugs and article link are re
     Assert(NvidiaNotes.ParseDate("Wed Nov 04, 2026") == new DateTime(2026, 11, 4));
     Assert(NvidiaNotes.Parse("", out _, out _).Count == 0);
 });
+Test("Motherboard: ASUS list keeps the newest of each driver and compares it with what is installed", () => {
+    string F(string t, string v, string d, string u) => $"{{\"Title\":\"{t}\",\"Version\":\"{v}\",\"ReleaseDate\":\"{d}\",\"DownloadUrl\":{{\"Global\":\"{u}\"}}}}";
+    string json = "{\"Result\":{\"Obj\":[" +
+        "{\"Name\":\"Chipset\",\"Files\":[" + F("AMD Chipset driver v7.09.23.2230 for Windows 10/11 64-bit.", "7.09.23.2230", "2025/12/31", "https://dlcdnets.asus.com/a.zip") + "," +
+                                              F("AMD Chipset driver v6.05.16.221 for Windows 10/11 64-bit.", "6.05.16.221", "2024/07/03", "https://dlcdnets.asus.com/b.zip") + "]}," +
+        "{\"Name\":\"Audio\",\"Files\":[" + F("Realtek Audio Driver v6.0.9888.1 for windows 11 64-bit.", "6.0.9888.1", "2025/12/18", "https://dlcdnets.asus.com/c.zip") + "]}," +
+        "{\"Name\":\"LAN\",\"Files\":[" + F("Intel I225/I226 LAN driver v2.1.5.7 for Windows 11 64-bit.", "2.1.5.7", "2025/12/31", "https://dlcdnets.asus.com/d.zip") + "]}," +
+        "{\"Name\":\"BlueTooth\",\"Files\":[" + F("Intel Bluetooth driver for Windows 11", "23.60.0.1", "2025/01/01", "https://dlcdnets.asus.com/e.zip") + "]}," +
+        "{\"Name\":\"Software and Utility\",\"Files\":[" + F("WinRAR v7.13.0 for Windows 10/11 64-bit", "7.13.0", "2025/08/27", "http://insecure/f.zip") + "]}]}}";
+    var files = BoardSupport.ParseAsus(json);
+    Assert(files.Count == 5 && files[0].Version == "7.09.23.2230" && files[0].Date == new DateTime(2025, 12, 31)); // o http:// ficou de fora
+    var newest = BoardSupport.Newest(files);
+    Assert(newest.Count == 4 && newest[0].Category == "Chipset" && newest[0].Version == "7.09.23.2230");
+    var installed = new List<DriverRow>
+    {
+        new() { Device = "Realtek High Definition Audio", Class = "MEDIA", Vendor = "Realtek", Version = "6.0.9888.1", Date = "10/11/2025" },
+        new() { Device = "Intel(R) Ethernet Controller I225-V", Class = "NET", Vendor = "Intel", Version = "2.1.4.3", Date = "01/01/2024" },
+        new() { Device = "WAN Miniport (IP)", Class = "NET", Vendor = "Intel", Version = "9.9.9.9" },
+    };
+    var programs = new Dictionary<string, string> { ["AMD Chipset Software"] = "6.10.17.152" };
+    var rows = BoardSupport.Compare(newest, installed, programs);
+    Assert(rows.Single(r => r.Category == "Chipset").Status == BoardStatus.Newer);
+    Assert(rows.Single(r => r.Category == "Áudio").Status == BoardStatus.UpToDate);
+    var lan = rows.Single(r => r.Category == "Rede (cabo)");
+    Assert(lan.Status == BoardStatus.Newer && lan.Installed == "2.1.4.3");
+    Assert(rows.Single(r => r.Category == "Bluetooth").Status == BoardStatus.NotInstalled);
+    Assert(BoardSupport.CompareVersions("6.0.10000.1", "6.0.9888.1") > 0 && !BoardSupport.Comparable("31.0.1", "6.0.1"));
+    Assert(BoardSupport.CompareBios("3402", "3646") == false && BoardSupport.CompareBios("3646", "3646") == true && BoardSupport.CompareBios("FHd", "F18") == null);
+    Assert(BoardSupport.BiosVersion("3646 (12/03/2025)") == "3646");
+    Assert(BoardSupport.CleanModel("MAG B550 TOMAHAWK (MS-7C91)") == "MAG B550 TOMAHAWK" && BoardSupport.CleanModel("Default string") == "");
+    Assert(BoardSupport.Pages("MSI", "MAG B550 TOMAHAWK").Bios == "https://www.msi.com/Motherboard/MAG-B550-TOMAHAWK/support#bios");
+    Assert(BoardSupport.Pages("Gigabyte", "B550M AORUS ELITE").Drivers == "https://www.gigabyte.com/Search?kw=B550M%20AORUS%20ELITE");
+    Assert(BoardSupport.Pages("ASUS", "ROG STRIX B550-F GAMING").Bios.StartsWith("https://www.asus.com/supportonly/ROG%20STRIX%20B550-F%20GAMING/"));
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 
