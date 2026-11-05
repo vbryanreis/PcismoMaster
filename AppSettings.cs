@@ -129,9 +129,10 @@ public sealed class AppSettings
     public string OverlayValueColor { get; set; } = "#F5F5F5";
     public string OverlayLabelColor { get; set; } = "#8C8C8C";
     // Cores por grupo (Valores e Rótulos de FPS, GPU, CPU e RAM). Nulo = cai na cor antiga única acima (migração) e no padrão.
-    // OverlayColFpsHead é a sub-opção do grupo FPS: cor de FPS, FRAME e 1% LOW juntos.
-    public string? OverlayColFpsHead { get; set; }
-    public string? OverlayColFpsVal { get; set; }
+    // OverlayColFps é o grupo FPS (o número de FPS e as estatísticas); FRAME e 1% LOW são sub-opções dele (nulo = seguem o FPS).
+    public string? OverlayColFps { get; set; }
+    public string? OverlayColFrame { get; set; }
+    public string? OverlayColLow1 { get; set; }
     public string? OverlayColGpuVal { get; set; }
     public string? OverlayColCpuVal { get; set; }
     public string? OverlayColRamVal { get; set; }
