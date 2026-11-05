@@ -1209,7 +1209,7 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <DockPanel>
-                                    <ToggleButton x:Name="DrvListToggle" DockPanel.Dock="Right" Style="{StaticResource ChipToggle}" Content="Mostrar a lista"/>
+                                    <ToggleButton x:Name="DrvListToggle" DockPanel.Dock="Right" VerticalAlignment="Center" Style="{StaticResource ChipToggle}" Content="Mostrar a lista"/>
                                     <local:SectionHeader x:Name="DrvListCount" Margin="0" Icon="&#xE8FD;" Title="Todos os drivers instalados" Subtitle="Versão, data e assinatura de cada driver deste PC"/>
                                 </DockPanel>
                                 <ItemsControl x:Name="DrvList" Margin="0,12,0,0" Visibility="{Binding IsChecked, ElementName=DrvListToggle, Converter={StaticResource BoolVis}}">

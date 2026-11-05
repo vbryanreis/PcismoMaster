@@ -9,8 +9,6 @@ public enum DrsLocation { Current = 0, Global = 1, Base = 2, Default = 3 }
 /// <summary>Uma configuração lida do driver para um perfil.</summary>
 public sealed record DrsValue(uint Id, DrsType Type, DrsLocation Location, bool IsPredefined, ulong Number, string? Text);
 
-/// <summary>Aplicativo (executável) ligado a um perfil.</summary>
-public sealed record DrsApp(string Name, string FriendlyName, bool IsPredefined);
 
 public sealed class DrsException(string what, int status) : Exception($"{what}: {NvDrs.Describe(status)}")
 {
@@ -44,18 +42,14 @@ public static class NvDrs
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtr(IntPtr p);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtr(IntPtr a, IntPtr b);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrRefPtr(IntPtr a, ref IntPtr b);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrUintRefPtr(IntPtr a, uint i, ref IntPtr b);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtrPtr(IntPtr a, IntPtr b, IntPtr c);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtrUint(IntPtr a, IntPtr b, uint c);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate int FnPtrStrRefPtr(IntPtr a, string name, ref IntPtr b);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate int FnPtrPtrStr(IntPtr a, IntPtr b, string name);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnGetSetting5(IntPtr s, IntPtr p, uint id, IntPtr setting, ref uint x);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnGetSetting4(IntPtr s, IntPtr p, uint id, IntPtr setting);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnSetSetting5(IntPtr s, IntPtr p, IntPtr setting, uint x, uint y);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnSetSetting3(IntPtr s, IntPtr p, IntPtr setting);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnEnum(IntPtr s, IntPtr p, uint start, ref uint count, IntPtr arr);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnIds(IntPtr arr, ref uint count);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnIdName(uint id, IntPtr name);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnErr(int status, StringBuilder text);
 
     private static T? Fn<T>(uint id, uint? fallback = null) where T : Delegate
@@ -120,35 +114,6 @@ public static class NvDrs
         return p;
     }
 
-    public static (string Name, bool Predefined, int Apps, int Settings) ProfileInfo(IntPtr s, IntPtr p)
-    {
-        IntPtr buf = Alloc(ProfileSize);
-        try
-        {
-            Marshal.WriteInt32(buf, (int)Ver(ProfileSize, 1));
-            Check(Fn<FnPtrPtrPtr>(0x61CD6FD6)!(s, p, buf), "DRS_GetProfileInfo");
-            return (ReadStr(buf, 4), Marshal.ReadInt32(buf, 4104) != 0, Marshal.ReadInt32(buf, 4108), Marshal.ReadInt32(buf, 4112));
-        }
-        finally { Marshal.FreeHGlobal(buf); }
-    }
-
-    /// <summary>Todos os perfis do driver (milhares: um por jogo conhecido), com o nome e se têm alterações do usuário.</summary>
-    public static List<(string Name, bool Predefined, int Apps)> Profiles(IntPtr s)
-    {
-        var list = new List<(string, bool, int)>();
-        var enumFn = Fn<FnPtrUintRefPtr>(0xBC371EE0)!;
-        for (uint i = 0; ; i++)
-        {
-            IntPtr p = IntPtr.Zero;
-            int st = enumFn(s, i, ref p);
-            if (st == EndEnumeration) break;
-            Check(st, "DRS_EnumProfiles");
-            var info = ProfileInfo(s, p);
-            list.Add((info.Name, info.Predefined, info.Apps));
-        }
-        return list;
-    }
-
     public static IntPtr CreateProfile(IntPtr s, string name)
     {
         IntPtr buf = Alloc(ProfileSize);
@@ -165,37 +130,9 @@ public static class NvDrs
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtrRef(IntPtr a, IntPtr b, ref IntPtr c);
 
-    public static void DeleteProfile(IntPtr s, IntPtr p) => Check(Fn<FnPtrPtr>(0x17093206)!(s, p), "DRS_DeleteProfile");
     public static void RestoreProfile(IntPtr s, IntPtr p) => Check(Fn<FnPtrPtr>(0xFA5F6134)!(s, p), "DRS_RestoreProfileDefault");
 
     // ---------------- Aplicativos do perfil ----------------
-
-    public static List<DrsApp> Apps(IntPtr s, IntPtr p)
-    {
-        var list = new List<DrsApp>();
-        var fn = Fn<FnEnum>(0x7FA2173A)!;
-        const int batch = 32;
-        IntPtr buf = Alloc(AppSize * batch);
-        try
-        {
-            for (uint start = 0; ; start += batch)
-            {
-                uint count = batch;
-                for (int i = 0; i < batch; i++) Marshal.WriteInt32(buf + i * AppSize, (int)Ver(AppSize, 4));
-                int st = fn(s, p, start, ref count, buf);
-                if (st == EndEnumeration || count == 0) break;
-                Check(st, "DRS_EnumApplications");
-                for (int i = 0; i < count; i++)
-                {
-                    IntPtr e = buf + i * AppSize;
-                    list.Add(new DrsApp(ReadStr(e, 8), ReadStr(e, 8 + StrBytes), Marshal.ReadInt32(e, 4) != 0));
-                }
-                if (count < batch) break;
-            }
-        }
-        finally { Marshal.FreeHGlobal(buf); }
-        return list;
-    }
 
     public static void AddApp(IntPtr s, IntPtr p, string exe)
     {
@@ -224,8 +161,6 @@ public static class NvDrs
         }
         finally { Marshal.FreeHGlobal(buf); }
     }
-
-    public static void RemoveApp(IntPtr s, IntPtr p, string exe) => Check(Fn<FnPtrPtrStr>(0x2C694BC6)!(s, p, exe), "DRS_DeleteApplication");
 
     // ---------------- Configurações ----------------
 
@@ -328,29 +263,6 @@ public static class NvDrs
     {
         int st = Fn<FnPtrPtrUint>(0xD20D29DF, 0xE4A26362)!(s, p, id);
         if (st != SettingNotFound) Check(st, "DRS_DeleteProfileSetting");
-    }
-
-    /// <summary>IDs de todas as configurações que este driver conhece (inclusive as que não têm nome no catálogo).</summary>
-    public static List<uint> AvailableIds()
-    {
-        uint count = 8192;
-        IntPtr buf = Alloc((int)count * 4);
-        try
-        {
-            Check(Fn<FnIds>(0xE5DE48E5, 0xF020614A)!(buf, ref count), "DRS_EnumAvailableSettingIds");
-            var ids = new int[count];
-            Marshal.Copy(buf, ids, 0, (int)count);
-            return ids.Select(i => (uint)i).ToList();
-        }
-        finally { Marshal.FreeHGlobal(buf); }
-    }
-
-    /// <summary>Nome interno da configuração no driver (ex.: "VSYNCMODE").</summary>
-    public static string? NameFromId(uint id)
-    {
-        IntPtr buf = Alloc(StrBytes);
-        try { return Fn<FnIdName>(0x1EB13791, 0xD61CBE6E)!(id, buf) == OK ? ReadStr(buf, 0) : null; }
-        finally { Marshal.FreeHGlobal(buf); }
     }
 
     // ---------------- Auxiliares ----------------

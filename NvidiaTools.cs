@@ -14,7 +14,6 @@ namespace ResetExplode;
 /// </summary>
 public static class NvidiaTools
 {
-    public const string NpiRepoPage = "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/latest";
     private const string NpiApi = "https://api.github.com/repos/Orbmu2k/nvidiaProfileInspector/releases/latest";
     private const string NpiPrefix = "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/";
 

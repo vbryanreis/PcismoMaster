@@ -2,7 +2,7 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
-## Em desenvolvimento
+## 0.10.0
 
 - **Interface mais limpa e legível**:
   - Textos de apoio mais claros (contraste de leitura) e as letras de 11 px passaram para 12 px.
@@ -24,7 +24,8 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
   - **Ajustes novos da placa NVIDIA** (todos com desfazer): desligar os logs do driver, o write combining, a preempção, a economia de energia escondida e o clock gating, e desligar serviços da NVIDIA que não servem para jogar (telemetria, FrameView, contêineres do NVIDIA App/Broadcast; o do Painel de Controle fica). O "P0" que já existia agora se chama "Fixar a placa no estado P0".
   - **Painel NVIDIA e Profile Inspector saíram de dentro do app**: toda instalação do driver NVIDIA por esta página instala o Painel de Controle NVIDIA pela Microsoft Store (se faltar) e baixa o NVIDIA Profile Inspector mais novo do GitHub oficial (SHA-256 conferido), com atalhos na Área de Trabalho. Também dá para fazer isso com um botão.
   - **Chipset AMD comparado com o site da AMD**: a versão do AMD Chipset Software instalada x a mais nova publicada na página oficial do chipset da placa, com link direto.
-- **Desempenho**: Inicialização, Portas COM e Biblioteca de jogos não travam mais a tela ao abrir (leituras em segundo plano); código sem uso removido (janela antiga do ResetExplode, funções NVAPI/NVML e auxiliares que ninguém chamava).
+- **Cabeçalho com ícone em todas as páginas**: os cartões principais (TWEAKING, Integração, Limpeza, Placa de vídeo, Gargalo, Overlay, Benchmark, Inicialização, Utilidades, Desinstalar apps, Maker, Overclock e Stress test) seguem o padrão da aba Drivers: ícone, título sem caixa alta e uma linha explicando o cartão. Na aba Drivers, a limpeza com o DDU passou a ser o primeiro cartão.
+- **Desempenho**: Inicialização, Portas COM e Biblioteca de jogos não travam mais a tela ao abrir (leituras em segundo plano); código sem uso removido (janela antiga do ResetExplode, o Profile Inspector embutido e as funções NVAPI/NVML e auxiliares que ninguém mais chamava).
 
 ## 0.9.0
 
