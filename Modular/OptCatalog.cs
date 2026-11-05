@@ -47,7 +47,7 @@ public sealed record OptProfile(string Id, string Title, string[] Lines, string[
 /// <summary>
 /// Catálogo do TWEAKING: Debloat, Windows, Mouse, Teclado e GPU. Inspirado na aba Otimizar do Galdino Control, escrito do
 /// zero (o que cada ajuste muda são configurações documentadas do Windows). Fica de fora o que o PcismoMaster já tem em
-/// outra aba (Game DVR, aceleração do mouse e plano de energia em Ferramentas › Otimização; apps pré-instalados no Bloatware) e o que
+/// outra aba (plano de energia por jogo no Launcher; apps pré-instalados no Bloatware) e o que
 /// desliga proteções do Windows (Isolamento de Núcleo, UAC).
 /// </summary>
 public static class OptCatalog
@@ -247,6 +247,9 @@ public static class OptCatalog
                 warn: "Evite se você esquece de atualizar: as correções de segurança dependem disso."),
             T("game_mode", W, N, "Jogos", "Modo de Jogo do Windows", "Garante o Modo de Jogo ligado: o jogo tem prioridade e o Windows Update não instala durante a partida.",
                 S(Cu(@"Software\Microsoft\GameBar", "AllowAutoGameMode", 1), Cu(@"Software\Microsoft\GameBar", "AutoGameModeEnabled", 1)), rec: true),
+            T("game_dvr", W, N, "Jogos", "Desligar a gravação em segundo plano (Game DVR)", "O Xbox Game Bar para de gravar os últimos minutos de jogo o tempo todo: recupera alguns FPS e alivia GPU e disco.",
+                S(Cu(@"System\GameConfigStore", "GameDVR_Enabled", 0), Cu(@"Software\Microsoft\Windows\CurrentVersion\GameDVR", "AppCaptureEnabled", 0)),
+                warn: "Evite se você usa o \"gravar o que aconteceu\" do Game Bar (Win+Alt+G).", rec: true),
             T("games_priority", W, N, "Jogos", "Prioridade alta para jogos", "Ajusta o perfil \"Games\" do agendador multimídia: mais prioridade de processador e GPU para o jogo.",
                 S(Lm(Mm + @"\Tasks\Games", "GPU Priority", 8), Lm(Mm + @"\Tasks\Games", "Priority", 6),
                   LmT(Mm + @"\Tasks\Games", "Scheduling Category", "High"), LmT(Mm + @"\Tasks\Games", "SFIO Priority", "High")), rec: true),
@@ -471,8 +474,7 @@ public static class OptCatalog
                   CuT(@"Control Panel\Mouse", "Beep", "No"), CuT(@"Control Panel\Mouse", "ExtendedSounds", "No"), Cu(@"Control Panel\Mouse", "ActiveWindowTracking", 0),
                   CuT(@"Control Panel\Mouse", "SnapToDefaultButton", "0"),
                   CuB(@"Control Panel\Mouse", "SmoothMouseXCurve", "0000000000000000156E000000000000004001000000000029DC0300000000000000280000000000"),
-                  CuB(@"Control Panel\Mouse", "SmoothMouseYCurve", "0000000000000000FD11010000000000002404000000000000FC12000000000000C0BB010000000000")),
-                warn: "Inclui o 1:1 sem aceleração: se o cartão \"Desligar aceleração do mouse\" de Ferramentas › Otimização estiver ligado, desligue um dos dois.", rec: true),
+                  CuB(@"Control Panel\Mouse", "SmoothMouseYCurve", "0000000000000000FD11010000000000002404000000000000FC12000000000000C0BB010000000000")), rec: true),
 
             // ===================== TECLADO =====================
             T("sticky_hotkey_off", K, N, "Jogos", "Sem atalho de Teclas de Aderência", "Apertar Shift cinco vezes no meio do jogo não abre mais a janela de acessibilidade.",

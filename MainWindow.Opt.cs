@@ -326,7 +326,7 @@ public partial class MainWindow
         var items = OptCatalog.For(OptPage.Windows).ToList();
         var tools = TweakCard(host, "AJUSTES DO WINDOWS",
             "Ligue um ajuste para aplicar; desligue para voltar exatamente como estava. O selo RECOMENDADO marca o que serve para quase todo mundo; " +
-            "o ⚠ diz quando evitar. Ajustes do plano de energia, de jogos (Game DVR, otimização de janela) e de aceleração do mouse ficam em Ferramentas › Otimização.", out var tb);
+            "o ⚠ diz quando evitar. A aceleração do mouse fica em Mouse e teclado; o plano de energia de alto desempenho é ligado por jogo no Launcher.", out var tb);
         var search = new TextBox { Margin = new Thickness(0, 0, 0, 10), ToolTip = "Pesquisar ajustes" };
         tb.Children.Add(OptText("Pesquisar", "Faint", 11, 4));
         tb.Children.Add(search);
@@ -356,6 +356,7 @@ public partial class MainWindow
         bar.Children.Add(TweakButton("SALVAR COMO PERFIL", false, (_, _) => SaveActiveAsProfile()));
         tb.Children.Add(bar);
         AddScriptOutput(tb, "O que for aplicado aparece aqui.");
+        AddLegacyTweakRestore(tb);
 
         foreach (var t in items) cards.Children.Add(OptCard(t));
         host.Children.Add(cards);
@@ -382,7 +383,7 @@ public partial class MainWindow
         OptOutputCard(host);
         foreach (var (page, title, intro) in new[]
                  {
-                     (OptPage.Mouse, "MOUSE", "A aceleração do mouse sozinha também está em Ferramentas › Otimização; aqui é o pacote completo de resposta do mouse."),
+                     (OptPage.Mouse, "MOUSE", "Pacote completo de resposta do mouse (inclui o 1:1 sem aceleração)."),
                      (OptPage.Teclado, "TECLADO", "Atalhos de acessibilidade e de idioma que costumam disparar no meio do jogo, e a resposta das teclas."),
                  })
         {
@@ -614,7 +615,7 @@ public partial class MainWindow
     {
         TweakCard(host, "LIMPEZA",
             "Clique em ANALISAR para ver quanto cada tipo ocupa. Só arquivos que o Windows e os programas recriam sozinhos; nada pessoal. " +
-            "Arquivos em uso são pulados. Limpar a memória RAM e o cache de DNS fica em Ferramentas › Otimização e Reparos do Windows.", out var body);
+            "Arquivos em uso são pulados. A memória RAM fica no cartão acima; o cache de DNS, em Manutenção.", out var body);
         var checks = new Dictionary<string, (CheckBox Box, TextBlock Size)>();
         foreach (var c in Cleanup.Categories)
         {

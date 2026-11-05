@@ -547,6 +547,19 @@ Test("Friendly UI: home tasks and search lead to real pages, and simple mode hid
     Assert(PageCatalog.Search("overclock", false).Count == 0 && PageCatalog.Search("overclock", true).First().Nav == "NavOc");
     Assert(PageCatalog.Search("  ", true).Count == 0 && PageCatalog.Search("driver", false).First().Nav == "NavDriver");
 });
+Test("Uninstall list: entries of apps already removed are orphans; a vanished uninstaller with the folder still there is not", () => {
+    string dir = Path.Combine(temp, "orphan-app");
+    Directory.CreateDirectory(dir);
+    string gone = Path.Combine(temp, "nao-existe", "unins000.exe");
+    Assert(ProgramInventory.Check($"\"{gone}\" /SILENT", "", "x_is1") == (true, false));
+    Assert(ProgramInventory.Check($"\"{gone}\"", dir, "x_is1") == (false, true));
+    string exe = Path.Combine(dir, "uninstall.exe");
+    File.WriteAllText(exe, "");
+    Assert(ProgramInventory.Check(exe + " /S", Path.Combine(temp, "sumiu"), "x") == (false, false));
+    Assert(ProgramInventory.Check("steam://uninstall/123", Path.Combine(temp, "sumiu"), "Steam App 123") == (true, false));
+    Assert(ProgramInventory.Check("rundll32.exe something", "", "x") == (false, false));
+    Assert(ProgramInventory.Check("MsiExec.exe /X{00000000-1111-2222-3333-444444444444}", "", "{00000000-1111-2222-3333-444444444444}") == (true, false));
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

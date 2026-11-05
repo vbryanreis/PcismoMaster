@@ -93,7 +93,7 @@ public partial class MainWindow
     private void DashOption_Checked(object sender, RoutedEventArgs e) { if (DashChart != null) DrawDashChart(); }
     private void DashChart_SizeChanged(object sender, SizeChangedEventArgs e) => DrawDashChart();
     private void DashBench_Click(object sender, RoutedEventArgs e) => NavBench.IsChecked = true;
-    private void DashOptimize_Click(object sender, RoutedEventArgs e) => NavOptimize.IsChecked = true;
+    private void DashOptimize_Click(object sender, RoutedEventArgs e) => NavOptClean.IsChecked = true; // memória e programas em segundo plano ficam na Limpeza
 
     private void DashGo_Click(object sender, RoutedEventArgs e)
     {
@@ -404,7 +404,7 @@ public partial class MainWindow
         var gm = _tweaks.FirstOrDefault(t => t.Id == "gamemode");
         var dvr = _tweaks.FirstOrDefault(t => t.Id == "gamedvr");
         try { gm?.Refresh(); dvr?.Refresh(); } catch { }
-        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em OTIMIZAÇÃO."));
+        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em Tweaking › Windows."));
         if (dvr != null) list.Add(Item(dvr.IsOn, "Gravação em segundo plano desligada", "O Game Bar não grava o tempo todo.",
                                        "O Game DVR está gravando: custa FPS."));
 
