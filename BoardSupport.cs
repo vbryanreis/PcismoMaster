@@ -31,6 +31,16 @@ public sealed class BoardCheck
     public string BiosPage { get; init; } = "";
     public string DriversPage { get; init; } = "";
     public List<BoardDriverRow> Rows { get; set; } = new();
+    /// <summary>Pacote de chipset mais novo no site da AMD (null = processador Intel ou a AMD não respondeu).</summary>
+    public AmdChipsetInfo? AmdChipset { get; set; }
+    public string ChipsetPage { get; set; } = "";
+    public string ChipsetMessage { get; set; } = "";
+}
+
+/// <summary>"AMD Chipset Drivers" da página oficial da AMD: versão, data e link do instalador.</summary>
+public sealed record AmdChipsetInfo(string Version, DateTime? Date, string Url, string Page)
+{
+    public string DateText => Date is DateTime d ? d.ToString("dd/MM/yyyy") : "";
 }
 
 /// <summary>
@@ -83,7 +93,73 @@ public static class BoardSupport
             };
         }
         if (!check.Online) check.Rows = LocalRows(installed, programs);
+
+        // Chipset AMD: a página oficial da AMD do chipset da placa tem a versão mais nova do pacote (vale para todas as marcas).
+        if (CpuIsAmd())
+        {
+            check.ChipsetPage = AmdChipsetPages(model).First();
+            try
+            {
+                if (await AmdChipsetAsync(model, ct) is { } amd)
+                {
+                    check.AmdChipset = amd;
+                    var chip = programs.FirstOrDefault(kv => kv.Key.Contains("AMD Chipset Software", StringComparison.OrdinalIgnoreCase));
+                    string inst = chip.Value ?? "";
+                    var st = inst.Length == 0 ? BoardStatus.NotInstalled
+                        : !Comparable(amd.Version, inst) ? BoardStatus.Check
+                        : CompareVersions(amd.Version, inst) > 0 ? BoardStatus.Newer : BoardStatus.UpToDate;
+                    check.Rows.RemoveAll(r => r.Category == "Chipset");
+                    check.Rows.Insert(0, new BoardDriverRow("Chipset", "AMD Chipset Software (site da AMD)", amd.Version, amd.DateText, amd.Page,
+                                                            inst, "", st, chip.Key ?? ""));
+                }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException) { check.ChipsetMessage = "Não foi possível consultar a AMD agora: " + ex.Message; }
+        }
         return check;
+    }
+
+    // ------------------------------------------------------------------ AMD (chipset)
+
+    /// <summary>
+    /// Páginas da AMD para o chipset da placa ("B550M AORUS ELITE" → am4/b550). O pacote de chipset da AMD é o mesmo para
+    /// todos os chipsets AM4/AM5, então, sem modelo reconhecido, as páginas do B650 e do B550 servem de reserva.
+    /// </summary>
+    internal static List<string> AmdChipsetPages(string model)
+    {
+        const string root = "https://www.amd.com/en/support/downloads/drivers.html/chipsets/";
+        var list = new List<string>();
+        var m = Regex.Match(model ?? "", @"\b([ABX])([3-9])(\d{2})", RegexOptions.IgnoreCase);
+        if (m.Success)
+        {
+            string socket = m.Groups[2].Value[0] >= '6' ? "am5" : "am4";
+            list.Add($"{root}{socket}/{m.Groups[1].Value.ToLowerInvariant()}{m.Groups[2].Value}{m.Groups[3].Value}.html");
+        }
+        foreach (var p in new[] { root + "am5/b650.html", root + "am4/b550.html" }) if (!list.Contains(p)) list.Add(p);
+        return list;
+    }
+
+    private static async Task<AmdChipsetInfo?> AmdChipsetAsync(string model, CancellationToken ct)
+    {
+        foreach (var page in AmdChipsetPages(model))
+        {
+            using var resp = await Http.GetAsync(page, ct);
+            if (!resp.IsSuccessStatusCode) continue;
+            if (ParseAmdChipset(await resp.Content.ReadAsStringAsync(ct), page) is { } info) return info;
+        }
+        return null;
+    }
+
+    /// <summary>Lê a versão, a data e o link do "AMD Chipset Drivers" na página da AMD (o arquivo é amd_chipset_software_X.exe).</summary>
+    internal static AmdChipsetInfo? ParseAmdChipset(string html, string page)
+    {
+        var file = Regex.Match(html, @"https://drivers\.amd\.com/drivers/amd_chipset_software_(\d+(?:\.\d+)+)\.exe", RegexOptions.IgnoreCase);
+        if (!file.Success) return null;
+        string text = Regex.Replace(Regex.Replace(html, "<[^>]+>", " "), @"\s+", " ");
+        DateTime? date = null;
+        int at = text.IndexOf(file.Groups[1].Value, StringComparison.Ordinal);
+        var d = Regex.Match(at >= 0 ? text[at..Math.Min(text.Length, at + 400)] : text, @"Release Date (\d{4}-\d{2}-\d{2})");
+        if (d.Success && DateTime.TryParseExact(d.Groups[1].Value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt)) date = dt;
+        return new AmdChipsetInfo(file.Groups[1].Value, date, file.Value, page);
     }
 
     // ------------------------------------------------------------------ ASUS

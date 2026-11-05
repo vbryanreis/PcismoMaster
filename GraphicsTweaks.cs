@@ -76,6 +76,22 @@ public static class GraphicsTweaks
     private static Setting Cu(string path, string name, int value) => new("HKCU", path, name, value);
     private static Setting CuText(string path, string name, string text) => new("HKCU", path, name, 0, text);
 
+    /// <summary>
+    /// Serviços da NVIDIA dispensáveis para jogar (só os que existem neste PC; o valor Start antigo fica no backup).
+    /// O NVDisplay.ContainerLocalSystem fica de fora: o Painel de Controle NVIDIA depende dele.
+    /// </summary>
+    private static Setting[] NvServices()
+    {
+        var list = new List<Setting>();
+        foreach (var (name, start) in new[] { ("NvTelemetryContainer", 4), ("FvSvc", 3), ("NvContainerLocalSystem", 3), ("NvBroadcast.ContainerLocalSystem", 3) })
+        {
+            string key = @"SYSTEM\CurrentControlSet\Services\" + name;
+            using var k = Registry.LocalMachine.OpenSubKey(key);
+            if (k?.GetValue("Start") is int cur && cur <= start) list.Add(Lm(key, "Start", start));
+        }
+        return list.ToArray();
+    }
+
     private static string[] MonitorKeys()
     {
         using var k = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\GraphicsDrivers\MonitorDataStore");
@@ -113,8 +129,26 @@ public static class GraphicsTweaks
             () => new[] { Cu(@"Software\NVIDIA Corporation\NvTray", "StartOnLogin", 0) }),
         new("gfx-nv-sharpen", "nvidia", "Nitidez de imagem clássica", "Volta a nitidez antiga (\"Image Sharpening\") no Painel de Controle NVIDIA.", false, true,
             () => new[] { Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm\FTS", "EnableGR535", 0), Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters\FTS", "EnableGR535", 0) }),
-        new("gfx-nv-pstate", "nvidia", "Desligar o P-state dinâmico", "A placa fica sempre no clock máximo, até parada: pode tirar microtravadas, mas aumenta consumo e calor em repouso.", true, false,
+        new("gfx-nv-pstate", "nvidia", "Fixar a placa no estado P0 (clock máximo)", "Desliga o P-state dinâmico: a placa fica sempre no clock máximo, até parada. Pode tirar microtravadas, mas aumenta consumo e calor em repouso.", true, false,
             () => Each(Adapters("nvidia"), "DisableDynamicPstate", 1)),
+        new("gfx-nv-logging", "nvidia", "Desligar os registros (logs) do driver", "O driver de vídeo da NVIDIA para de gravar entradas de log (avisos, eventos, paginação e erros) enquanto você joga.", false, true,
+            () => Adapters("nvidia").SelectMany(a => new[] { "LogWarningEntries", "LogPagingEntries", "LogEventEntries", "LogErrorEntries" }.Select(n => Lm(a, n, 0))).ToArray()),
+        new("gfx-nv-writecombine", "nvidia", "Desligar o write combining", "Desliga a combinação de escritas da GPU, que em algumas versões do driver causa microtravadas. Compare antes e depois.", true, false,
+            () => new[] { Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm", "DisableWriteCombining", 1) }),
+        new("gfx-nv-preemption", "nvidia", "Desligar a preempção da GPU", "A placa termina cada quadro de uma vez, sem pausar para trabalhos em segundo plano: ritmo de quadros mais estável, menos microtravadas e 1% low melhores. Programas de IA/CUDA ao mesmo tempo que o jogo podem ficar mais lentos.", true, false,
+            () => new[]
+            {
+                Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters", "DisablePreemption", 1),
+                Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters", "DisableCudaContextPreemption", 1),
+                Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters", "DisablePreemptionOnS3S4", 1),
+                Lm(@"SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters", "ComputePreemption", 0),
+            }),
+        new("gfx-nv-powersave", "nvidia", "Desligar a economia de energia escondida", "Desliga as reduções de clock do núcleo, da memória e do barramento que o driver faz sozinho e não mostra no Painel NVIDIA.", true, false,
+            () => Adapters("nvidia").SelectMany(a => new[] { Lm(a, "EnableCoreSlowdown", 0), Lm(a, "EnableMClkSlowdown", 0), Lm(a, "EnableNVClkSlowdown", 0) }).ToArray()),
+        new("gfx-nv-clockgating", "nvidia", "Desligar o clock gating", "Os blocos da GPU parados deixam de ter o clock cortado: responde mais rápido quando o jogo volta a usá-los, com um pouco mais de consumo em repouso.", true, false,
+            () => Adapters("nvidia").SelectMany(a => new[] { Lm(a, "RMElcg", 0x55555555), Lm(a, "RMBlcg", 0x11111111) }).ToArray()),
+        new("gfx-nv-services", "nvidia", "Desligar serviços da NVIDIA que não servem para jogar", "Telemetria, FrameView e o contêiner do NVIDIA App/Broadcast ficam em modo manual ou desativados. O Painel de Controle NVIDIA continua funcionando. Se você usa o overlay, a gravação ou o Broadcast do NVIDIA App, deixe desligado.", false, false,
+            () => NvServices()),
         new("gfx-nv-hdcp", "nvidia", "Desligar o HDCP", "Remove a proteção de conteúdo do driver. ATENÇÃO: Netflix, Disney+, Prime Video e Blu-ray param de tocar em alta qualidade (ou nada) no PC.", true, false,
             () => Each(Adapters("nvidia"), "RMHdcpKeyglobZero", 1)),
         // AMD

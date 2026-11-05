@@ -159,15 +159,13 @@ public partial class MainWindow
                 bool any = items.Children.OfType<RadioButton>().Any(r => r.Visibility == Visibility.Visible);
                 g.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
             }
-        DrvTabNpi.Visibility = adv ? Visibility.Visible : Visibility.Collapsed;
-        if (!adv && DrvTabNpi.IsChecked == true) DrvTabDrivers.IsChecked = true;
         FilterBloat();
 
         ApplyModeAccent();
         BtnMode.Content = adv ? "Modo Avançado" : "Modo Simples";
         if (_homeModeText != null)
             _homeModeText.Text = adv
-                ? "Você está no modo avançado: aparecem todas as páginas, incluindo sensores, overclock, stress test, ajustes de hardware, scripts completos e o Profile Inspector. Use com calma: alguns mexem fundo no PC."
+                ? "Você está no modo avançado: aparecem todas as páginas, incluindo sensores, overclock, stress test, ajustes de hardware, scripts completos e os ajustes avançados de GPU. Use com calma: alguns mexem fundo no PC."
                 : "Você está no modo simples: aparece só o essencial e o que é seguro. Sensores detalhados, overclock, stress test, ajustes técnicos e os scripts completos ficam escondidos até você ligar o modo avançado.";
         if (_homeModeButton != null) _homeModeButton.Content = adv ? "Voltar para o modo simples" : "Ligar o modo avançado";
 

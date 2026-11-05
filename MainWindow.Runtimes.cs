@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace ResetExplode;
 
-/// <summary>FERRAMENTAS · Drivers: verificação das bibliotecas Visual C++ e DirectX (sem instalar nada).</summary>
+/// <summary>TWEAKING · Drivers: verificação das bibliotecas Visual C++ e DirectX (sem instalar nada).</summary>
 public partial class MainWindow
 {
     private async void InitRuntimes()

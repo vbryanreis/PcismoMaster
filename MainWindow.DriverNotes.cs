@@ -17,6 +17,7 @@ public partial class MainWindow
 
     private void ShowDriverVersion()
     {
+        ShowGpuTile();
         var g = MainDriverGpu;
         DrvNotesHost.Children.Clear();
         if (g == null)

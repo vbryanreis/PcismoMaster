@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace ResetExplode;
 
-/// <summary>FERRAMENTAS · Drivers: instalar o driver NVIDIA em silêncio e as configurações recomendadas da placa de vídeo.</summary>
+/// <summary>TWEAKING · Drivers: instalar o driver NVIDIA em silêncio e as configurações recomendadas da placa de vídeo.</summary>
 public partial class MainWindow
 {
     private bool _gfxInit, _gfxBusy;
@@ -172,7 +172,7 @@ public partial class MainWindow
         BtnGfxReboot.Visibility = Visibility.Visible;
         await RebuildGfxAsync();
         return (errors.Count == 0 ? $"Pronto: {turnOn.Count} configuração(ões) aplicada(s)" + (turnOff.Count > 0 ? $", {turnOff.Count} desfeita(s)." : ".") : $"Concluído com {errors.Count} erro(s): " + string.Join(" · ", errors) + ".")
-               + " Alguns ajustes (modo MSI, P-state, HDCP) só valem depois de reiniciar.";
+               + " Os ajustes de driver (P0, preempção, clock gating, serviços, modo MSI, HDCP…) só valem depois de reiniciar.";
     }
 
     private void BtnGfxUndoAll_Click(object sender, RoutedEventArgs e)
@@ -181,16 +181,19 @@ public partial class MainWindow
         BtnGfxApply_Click(sender, e);
     }
 
-    private void BtnGfxNvPanel_Click(object sender, RoutedEventArgs e)
+    private async void BtnGfxNvPanel_Click(object sender, RoutedEventArgs e)
     {
-        try { if (!GraphicsTweaks.OpenNvidiaControlPanel()) GfxStatus.Text = "O Painel de Controle NVIDIA não está instalado: a página dele na Microsoft Store foi aberta, clique em Obter."; }
+        if (GraphicsTweaks.HasNvidiaControlPanel()) { try { GraphicsTweaks.OpenNvidiaControlPanel(); } catch (Exception ex) { GfxStatus.Text = ex.Message; } return; }
+        if (_gfxBusy || !RequireAdmin()) return;
+        _gfxBusy = true;
+        try
+        {
+            GfxStatus.Text = "Instalando o Painel de Controle NVIDIA pela Microsoft Store…";
+            GfxStatus.Text = await NvidiaTools.InstallControlPanelAsync(CancellationToken.None);
+            if (GraphicsTweaks.HasNvidiaControlPanel()) GraphicsTweaks.OpenNvidiaControlPanel();
+        }
         catch (Exception ex) { GfxStatus.Text = "Não foi possível abrir o Painel de Controle NVIDIA: " + ex.Message; }
-    }
-
-    private void BtnGfxNvShortcut_Click(object sender, RoutedEventArgs e)
-    {
-        try { GraphicsTweaks.CreateNvidiaControlPanelShortcut(); GfxStatus.Text = "Atalho \"NVIDIA Control Panel\" criado na Área de Trabalho."; }
-        catch (Exception ex) { GfxStatus.Text = "Não foi possível criar o atalho: " + ex.Message; }
+        finally { _gfxBusy = false; }
     }
 
     /// <summary>"NVIDIA Settings: Default" do script: perfil global de volta ao padrão do driver.</summary>

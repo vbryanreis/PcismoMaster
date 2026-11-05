@@ -271,6 +271,12 @@
                                     <TextBlock Text="GPU" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Drivers" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavOptProfiles" Style="{StaticResource NavItem}" Tag="PageOptProfiles" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -356,12 +362,6 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Desinstalar apps" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Drivers" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             <RadioButton x:Name="NavInteg" Style="{StaticResource NavItem}" Tag="PageInteg" Checked="Nav_Checked">
@@ -867,48 +867,269 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== DRIVER ===== -->
-                <Grid x:Name="PageDriver" Visibility="Collapsed">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <!-- Sub-abas: Drivers (atual) e Profile Inspector -->
-                    <StackPanel Orientation="Horizontal" Margin="36,24,36,0">
-                        <RadioButton x:Name="DrvTabDrivers" Style="{StaticResource Chip}" GroupName="DrvTab" Content="Drivers" IsChecked="True" Checked="DrvTab_Changed"/>
-                        <RadioButton x:Name="DrvTabNvcp" Style="{StaticResource Chip}" GroupName="DrvTab" Content="Painel NVIDIA" Checked="DrvTab_Changed"/>
-                        <RadioButton x:Name="DrvTabNpi" Style="{StaticResource Chip}" GroupName="DrvTab" Content="Profile Inspector" Checked="DrvTab_Changed"/>
-                    </StackPanel>
-                <ScrollViewer x:Name="DrvPanel" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="36,16,36,30">
-                        <Grid Margin="0,0,0,20">
-                            <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="Driver" Style="{StaticResource H1}"/>
-                                <TextBlock Text="Verifique, baixe e instale drivers · NVIDIA e AMD automáticos, fabricantes pela página oficial" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <Button x:Name="BtnDrvScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR TUDO" Padding="20,9"
-                                    HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnDrvScan_Click"/>
-                        </Grid>
-                        <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
-                                <Border.RenderTransform><ScaleTransform x:Name="DrvProgress" ScaleX="0"/></Border.RenderTransform>
-                            </Border>
-                        </Grid>
-                        <TextBlock x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                <!-- ===== DRIVERS (TWEAKING) ===== -->
+                <ScrollViewer x:Name="PageDriver" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,22,36,30">
 
-                        <!-- Limpeza completa do driver de vídeo com o DDU (Ultimate · 5 Graphics · 1 Driver Clean) -->
+                        <!-- Cabeçalho: verificação e o resumo de cada fabricante (logos montados no código) -->
+                        <Border CornerRadius="16" Padding="24,20,24,18" Margin="0,0,0,16" Background="{DynamicResource Panel}"
+                                BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Margin="0,0,190,0">
+                                        <TextBlock Text="Drivers" Style="{StaticResource H1}"/>
+                                        <TextBlock Text="Placa de vídeo, placa-mãe, chipset e bibliotecas: o que está instalado comparado com o site oficial de cada fabricante."
+                                                   Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <Button x:Name="BtnDrvScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR TUDO" Padding="20,9"
+                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnDrvScan_Click"/>
+                                </Grid>
+                                <Grid Height="3" Margin="0,14,0,8" Background="{DynamicResource Line}">
+                                    <Border Background="{DynamicResource AccentGradient}" RenderTransformOrigin="0,0.5">
+                                        <Border.RenderTransform><ScaleTransform x:Name="DrvProgress" ScaleX="0"/></Border.RenderTransform>
+                                    </Border>
+                                </Grid>
+                                <TextBlock x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,14"/>
+                                <UniformGrid Columns="3">
+                                    <Border CornerRadius="12" Padding="14,12" Margin="0,0,8,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                                        <DockPanel>
+                                            <ContentControl x:Name="DrvTileGpuLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="PLACA DE VÍDEO" Style="{StaticResource Label}"/>
+                                                <TextBlock x:Name="DrvTileGpuName" Text="—" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock x:Name="DrvTileGpuState" Text="Aguardando a verificação" FontSize="12" Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                    <Border CornerRadius="12" Padding="14,12" Margin="4,0,4,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                                        <DockPanel>
+                                            <ContentControl x:Name="DrvTileBoardLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="PLACA-MÃE E BIOS" Style="{StaticResource Label}"/>
+                                                <TextBlock x:Name="DrvTileBoardName" Text="—" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock x:Name="DrvTileBoardState" Text="Aguardando a verificação" FontSize="12" Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                    <Border CornerRadius="12" Padding="14,12" Margin="8,0,0,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                                        <DockPanel>
+                                            <ContentControl x:Name="DrvTileChipLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="CHIPSET" Style="{StaticResource Label}"/>
+                                                <TextBlock x:Name="DrvTileChipName" Text="—" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock x:Name="DrvTileChipState" Text="Aguardando a verificação" FontSize="12" Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ===== Placa de vídeo: versão, o que mudou, instalação e ajustes ===== -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
-                                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
+                                <DockPanel Margin="0,0,0,12">
+                                    <ContentControl x:Name="DrvGpuLogo" DockPanel.Dock="Left" Margin="0,0,14,0" VerticalAlignment="Center" Focusable="False"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Placa de vídeo" FontSize="17" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Driver instalado x mais recente, o que mudou em cada versão, instalação limpa e os ajustes do driver" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBlock x:Name="GfxCardInfo" Visibility="Collapsed" Foreground="{DynamicResource AccentCyan}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                                <!-- Versão instalada x mais recente e o que mudou (notas oficiais da NVIDIA) -->
+                                <Border Background="{DynamicResource Panel}" CornerRadius="12" Padding="18,14" Margin="0,0,0,14">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,22,0">
+                                                <TextBlock Text="INSTALADO" Style="{StaticResource Label}"/>
+                                                <TextBlock x:Name="DrvVerInstalled" Text="—" FontFamily="{StaticResource Mono}" FontSize="24" FontWeight="SemiBold"/>
+                                                <TextBlock x:Name="DrvVerGpu" Foreground="{DynamicResource Muted}" FontSize="12" TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="&#xE72A;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource Faint}"
+                                                       VerticalAlignment="Center" Margin="0,0,22,0"/>
+                                            <StackPanel Grid.Column="2" Margin="0,0,22,0">
+                                                <TextBlock Text="MAIS RECENTE" Style="{StaticResource Label}"/>
+                                                <TextBlock x:Name="DrvVerLatest" Text="—" FontFamily="{StaticResource Mono}" FontSize="24" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
+                                                <TextBlock x:Name="DrvVerDate" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                <Border x:Name="DrvVerBadge" CornerRadius="8" Padding="12,5" HorizontalAlignment="Right" Visibility="Collapsed">
+                                                    <TextBlock x:Name="DrvVerBadgeText" FontWeight="SemiBold" FontSize="12"/>
+                                                </Border>
+                                                <CheckBox x:Name="DrvStudio" Content="Driver Studio (criação) em vez de Game Ready" Margin="0,10,0,0" HorizontalAlignment="Right"
+                                                          Checked="DrvStudio_Changed" Unchecked="DrvStudio_Changed"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock x:Name="DrvVerMessage" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                                        <StackPanel x:Name="DrvNotesHost" Margin="0,6,0,0"/>
+                                        <WrapPanel Margin="0,8,0,0">
+                                            <Button x:Name="BtnDrvOlder" Style="{StaticResource OutlineButton}" Content="Ver versões anteriores" Padding="12,6" Margin="0,0,8,6"
+                                                    Visibility="Collapsed" Click="BtnDrvOlder_Click"/>
+                                            <Button x:Name="BtnDrvNotesPage" Style="{StaticResource OutlineButton}" Content="Notas completas no site da NVIDIA" Padding="12,6" Margin="0,0,8,6"
+                                                    Visibility="Collapsed" Click="BtnDrvNotesPage_Click"/>
+                                            <Button x:Name="BtnDrvGpuPage" Style="{StaticResource OutlineButton}" Content="Página oficial do driver" Padding="12,6" Margin="0,0,8,6" Click="BtnDrvGpuPage_Click"/>
+                                        </WrapPanel>
+                                        <!-- Outra marca, ou placa ainda não reconhecida (ex.: logo depois do DDU) -->
+                                        <WrapPanel x:Name="DrvVendorRow" Margin="0,4,0,0">
+                                            <TextBlock Text="BAIXAR O MAIS RECENTE DE" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="INSTALAÇÃO" Style="{StaticResource Label}" Margin="0,4,0,8"/>
+                                <WrapPanel Margin="0,0,0,8">
+                                    <RadioButton x:Name="InstNormal" Style="{StaticResource Chip}" GroupName="InstMode" Content="Normal (driver completo)" IsChecked="True" Checked="InstMode_Changed"/>
+                                    <RadioButton x:Name="InstDebloat" Style="{StaticResource Chip}" GroupName="InstMode" Content="Enxuta (debloat)" Checked="InstMode_Changed"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="InstModeHelp" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"
+                                           Text="Driver oficial com assinatura conferida, instalado sem telas e do zero (apaga as configurações antigas do driver)."/>
+                                <StackPanel x:Name="InstDebloatPanel" Visibility="Collapsed">
+                                    <TextBlock x:Name="DebloatNo7z" Visibility="Collapsed" Foreground="{DynamicResource TempWarn}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8">
+                                        Precisa do 7-Zip para abrir o pacote do driver. <Hyperlink Click="BtnDebloat7z_Click">Instalar o 7-Zip (winget)</Hyperlink>
+                                    </TextBlock>
+                                    <StackPanel x:Name="DebloatRows"/>
+                                </StackPanel>
+                                <WrapPanel Margin="0,4,0,0">
+                                    <Button x:Name="BtnDebloatLatest" Style="{StaticResource PrimaryButton}" Content="Baixar o driver NVIDIA mais recente e instalar" Padding="16,8" Margin="0,0,10,8" Click="BtnInstLatest_Click"/>
+                                    <Button x:Name="BtnDebloatFile" Style="{StaticResource OutlineButton}" Content="Escolher o instalador…" Padding="14,8" Margin="0,0,10,8" Click="BtnInstFile_Click"
+                                            ToolTip="Use um instalador de driver NVIDIA, AMD ou Intel que você já baixou"/>
+                                    <Button x:Name="BtnDebloatUndo" Style="{StaticResource OutlineButton}" Content="Desfazer as limpezas" Padding="14,8" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnDebloatUndo_Click"
+                                            ToolTip="Reativa os serviços e as entradas de inicialização que a instalação enxuta desligou"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="DebloatStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,6"/>
+
+                                <!-- Ferramentas NVIDIA: instaladas junto com cada driver -->
+                                <Border x:Name="GfxNvInstallRow" Background="{DynamicResource Panel}" CornerRadius="12" Padding="16,12" Margin="0,6,0,6">
+                                    <StackPanel>
+                                        <TextBlock Text="FERRAMENTAS NVIDIA (VÊM JUNTO COM CADA DRIVER INSTALADO POR AQUI)" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="NvToolsInfo" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                        <WrapPanel>
+                                            <Button Style="{StaticResource OutlineButton}" Content="Abrir Painel de Controle NVIDIA" Padding="14,7" Margin="0,0,10,6" Click="BtnGfxNvPanel_Click"
+                                                    ToolTip="Se ainda não estiver instalado, instala pela Microsoft Store"/>
+                                            <Button x:Name="BtnNpiOpen" Style="{StaticResource OutlineButton}" Content="Abrir Profile Inspector" Padding="14,7" Margin="0,0,10,6" Click="BtnNpiOpen_Click"
+                                                    ToolTip="NVIDIA Profile Inspector (Orbmu2k), baixado da última versão no GitHub"/>
+                                            <Button Style="{StaticResource OutlineButton}" Content="Atualizar as duas agora" Padding="14,7" Margin="0,0,10,6" Click="BtnNvTools_Click"
+                                                    ToolTip="Instala o Painel NVIDIA (se faltar) e baixa o Profile Inspector mais novo do GitHub, com o SHA-256 conferido"/>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="AJUSTES DA PLACA DE VÍDEO (aplicados depois de instalar, ou quando você clicar em Aplicar)" Style="{StaticResource Label}" Margin="0,14,0,0"/>
+                                <StackPanel x:Name="GfxRows" Margin="0,4,0,0"/>
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="BtnGfxApply" Style="{StaticResource PrimaryButton}" Content="Aplicar" Padding="18,8" Margin="0,0,10,8" Click="BtnGfxApply_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Marcar os recomendados" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxDefaults_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Desfazer tudo" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxUndoAll_Click"/>
+                                    <Button x:Name="BtnGfxNvDefault" Style="{StaticResource OutlineButton}" Content="Perfil global NVIDIA no padrão do driver" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxNvDefault_Click"
+                                            ToolTip="O &quot;NVIDIA Settings: Default&quot; do script: tira do perfil global tudo o que foi mudado (por qualquer programa)"/>
+                                    <Button x:Name="BtnGfxReboot" Style="{StaticResource OutlineButton}" Content="Reiniciar agora" Padding="14,8" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnGfxReboot_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="GfxStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ===== Placa-mãe: BIOS, chipset (site da AMD) e todos os drivers do modelo ===== -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,12">
+                                    <ContentControl x:Name="DrvBoardLogo" DockPanel.Dock="Left" Margin="0,0,14,0" VerticalAlignment="Center" Focusable="False"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Placa-mãe: BIOS, chipset e drivers" FontSize="17" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="DrvBoard" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </DockPanel>
+
+                                <UniformGrid Columns="2" Margin="0,0,0,10">
+                                    <!-- BIOS: instalada x mais recente no site -->
+                                    <Border Background="{DynamicResource Panel}" CornerRadius="12" Padding="16,12" Margin="0,0,6,0">
+                                        <StackPanel>
+                                            <TextBlock Text="BIOS" Style="{StaticResource Label}"/>
+                                            <TextBlock x:Name="BoardBiosLine" TextWrapping="Wrap" Text="—" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="BoardBiosHint" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,8"/>
+                                            <WrapPanel>
+                                                <Button x:Name="BtnBoardBiosGet" Style="{StaticResource PrimaryButton}" Content="Baixar a BIOS mais recente" Padding="12,6" Margin="0,0,8,4"
+                                                        Visibility="Collapsed" Click="BtnBoardBiosGet_Click"/>
+                                                <Button x:Name="BtnBoardBiosPage" Style="{StaticResource OutlineButton}" Content="Página de BIOS do modelo" Padding="12,6" Margin="0,0,8,4"
+                                                        IsEnabled="False" Click="BtnBoardBiosPage_Click"/>
+                                            </WrapPanel>
+                                        </StackPanel>
+                                    </Border>
+                                    <!-- Chipset: instalado x site da AMD -->
+                                    <Border Background="{DynamicResource Panel}" CornerRadius="12" Padding="16,12" Margin="6,0,0,0">
+                                        <StackPanel>
+                                            <TextBlock Text="CHIPSET" Style="{StaticResource Label}"/>
+                                            <TextBlock x:Name="BoardChipLine" TextWrapping="Wrap" Text="—" FontWeight="SemiBold"/>
+                                            <TextBlock x:Name="BoardChipHint" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,8"/>
+                                            <WrapPanel>
+                                                <Button x:Name="BtnBoardChipPage" Style="{StaticResource OutlineButton}" Content="Página do chipset" Padding="12,6" Margin="0,0,8,4"
+                                                        IsEnabled="False" Click="BtnBoardChipPage_Click"/>
+                                            </WrapPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </UniformGrid>
+
+                                <TextBlock x:Name="BoardMessage" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                <TextBlock x:Name="BoardSummary" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6" Visibility="Collapsed"/>
+                                <StackPanel x:Name="BoardRows"/>
+                                <WrapPanel Margin="0,10,0,0">
+                                    <Button x:Name="BtnBoardCheck" Style="{StaticResource OutlineButton}" Content="Verificar placa-mãe de novo" Padding="14,7" Margin="0,0,10,8" Click="BtnBoardCheck_Click"/>
+                                    <Button x:Name="BtnBoardDrivers" Style="{StaticResource OutlineButton}" Content="Página de drivers do modelo" Padding="14,7" Margin="0,0,10,8"
+                                            IsEnabled="False" Click="BtnBoardDrivers_Click"/>
+                                    <Button x:Name="BtnDrvBoardPage" Style="{StaticResource OutlineButton}" Content="Suporte do fabricante" Padding="14,7" Margin="0,0,10,8"
+                                            Click="BtnDrvBoardPage_Click" IsEnabled="False"/>
+                                </WrapPanel>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap">
+                                    A BIOS nunca é gravada pelo app: o arquivo vem do site oficial e você atualiza pela própria BIOS (Q-Flash, EZ Flash, M-Flash, Instant Flash)
+                                    seguindo o manual. Os drivers também baixam do site oficial do fabricante. O Windows Update, logo abaixo, traz drivers certificados para os mesmos dispositivos.
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ===== Bibliotecas para jogos (Visual C++ do abbodi1406/vcredist; DirectX da Microsoft) ===== -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,12">
+                                    <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Content="Verificar de novo" Padding="12,6" VerticalAlignment="Center" Click="BtnRuntimeCheck_Click"/>
+                                    <ContentControl x:Name="DrvRtLogo" DockPanel.Dock="Left" Margin="0,0,14,0" VerticalAlignment="Center" Focusable="False"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Bibliotecas para jogos (Visual C++ e DirectX)" FontSize="17" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Confere o que está instalado e baixa o que faltar direto das fontes oficiais" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <StackPanel x:Name="RuntimeRows"/>
+                                <TextBlock x:Name="RuntimeNote" Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                <WrapPanel Margin="0,12,0,0">
+                                    <Button x:Name="BtnRtVc" Style="{StaticResource PrimaryButton}" Content="Baixar e instalar Visual C++ (todas)" Padding="16,8" Margin="0,0,10,8" Click="BtnRtVc_Click"
+                                            ToolTip="Pacote AIO do abbodi1406/vcredist (GitHub): Visual C++ 2005 a 2022, 32 e 64 bits, num instalador só. O SHA-256 publicado no GitHub é conferido antes de abrir."/>
+                                    <Button x:Name="BtnRtDx" Style="{StaticResource OutlineButton}" Content="Baixar e instalar DirectX" Padding="14,8" Margin="0,0,10,8" Click="BtnRtDx_Click"
+                                            ToolTip="DirectX End-User Runtime (junho de 2010) do site da Microsoft, com a assinatura conferida. Só acrescenta as DLLs antigas; não mexe no DirectX 12."/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Página do vcredist" Tag="vc" Padding="12,8" Margin="0,0,10,8" Click="BtnRtPage_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Página do DirectX (Microsoft)" Tag="dx" Padding="12,8" Margin="0,0,10,8" Click="BtnRtPage_Click"/>
+                                </WrapPanel>
+                                <TextBlock x:Name="RuntimeInstallStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ===== Limpeza completa do driver de vídeo com o DDU (Ultimate · 5 Graphics · 1 Driver Clean) ===== -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,8">
+                                    <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
+                                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Limpeza completa do driver de vídeo (DDU)" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Limpeza completa do driver de vídeo (DDU)" FontSize="17" FontWeight="SemiBold"/>
                                         <TextBlock Text="Remove o driver de vídeo por inteiro no modo de segurança, para reinstalar do zero" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                     </StackPanel>
-                                </StackPanel>
+                                </DockPanel>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,12">
                                     Use quando o driver der problema (tela preta, travamentos, erro na instalação) ou ao trocar de placa. O PC reinicia no modo de
                                     segurança, o Display Driver Uninstaller (Wagnardsoft) remove driver, painel, PhysX, GeForce Experience e Vulkan, e o PC volta
@@ -941,231 +1162,79 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Instalar driver (normal ou enxuta) + configurações do Painel NVIDIA (Ultimate · 5 Graphics · 2, 3 e 4) -->
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
-                                        <TextBlock Text="&#xE9F5;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Instalar driver e configurações" FontSize="15" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Instalação normal ou enxuta; nas duas, as configurações marcadas abaixo são aplicadas logo depois" Foreground="{DynamicResource Muted}" FontSize="12"/>
-                                    </StackPanel>
+                        <!-- ===== Windows Update e backup, lado a lado ===== -->
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,10">
+                                        <ContentControl x:Name="DrvWuLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Windows Update" FontSize="15" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Drivers certificados pela Microsoft" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                    <TextBlock x:Name="DrvWuList" TextWrapping="Wrap" Text="Ainda não pesquisado." Foreground="{DynamicResource Muted}"/>
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Button x:Name="BtnDrvWuSearch" Style="{StaticResource OutlineButton}" Content="Procurar" Padding="16,7" Margin="0,0,10,6" Click="BtnDrvWuSearch_Click"/>
+                                        <Button x:Name="BtnDrvWuInstall" Style="{StaticResource PrimaryButton}" Content="Instalar todos" Padding="16,7" Margin="0,0,10,6" Click="BtnDrvWuInstall_Click" IsEnabled="False"/>
+                                    </WrapPanel>
                                 </StackPanel>
-                                <TextBlock x:Name="GfxCardInfo" Visibility="Collapsed" Foreground="{DynamicResource AccentCyan}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
-
-                                <!-- Versão instalada x mais recente e o que mudou (notas oficiais da NVIDIA) -->
-                                <Border Background="{DynamicResource Panel}" CornerRadius="10" Padding="18,14" Margin="0,4,0,14">
-                                    <StackPanel>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Margin="0,0,34,0">
-                                                <TextBlock Text="INSTALADO" Style="{StaticResource Label}"/>
-                                                <TextBlock x:Name="DrvVerInstalled" Text="—" FontFamily="{StaticResource Mono}" FontSize="22" FontWeight="SemiBold"/>
-                                                <TextBlock x:Name="DrvVerGpu" Foreground="{DynamicResource Muted}" FontSize="12" TextTrimming="CharacterEllipsis" MaxWidth="260"/>
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="1" Margin="0,0,34,0">
-                                                <TextBlock Text="MAIS RECENTE" Style="{StaticResource Label}"/>
-                                                <TextBlock x:Name="DrvVerLatest" Text="—" FontFamily="{StaticResource Mono}" FontSize="22" FontWeight="SemiBold"/>
-                                                <TextBlock x:Name="DrvVerDate" Foreground="{DynamicResource Muted}" FontSize="12"/>
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                                <Border x:Name="DrvVerBadge" CornerRadius="8" Padding="12,5" HorizontalAlignment="Right" Visibility="Collapsed">
-                                                    <TextBlock x:Name="DrvVerBadgeText" FontWeight="SemiBold" FontSize="12"/>
-                                                </Border>
-                                                <CheckBox x:Name="DrvStudio" Content="Driver Studio (criação) em vez de Game Ready" Margin="0,10,0,0" HorizontalAlignment="Right"
-                                                          Checked="DrvStudio_Changed" Unchecked="DrvStudio_Changed"/>
-                                            </StackPanel>
-                                        </Grid>
-                                        <TextBlock x:Name="DrvVerMessage" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,10,0,0"/>
-                                        <StackPanel x:Name="DrvNotesHost" Margin="0,6,0,0"/>
-                                        <WrapPanel Margin="0,8,0,0">
-                                            <Button x:Name="BtnDrvOlder" Style="{StaticResource OutlineButton}" Content="Ver versões anteriores" Padding="12,6" Margin="0,0,8,6"
-                                                    Visibility="Collapsed" Click="BtnDrvOlder_Click"/>
-                                            <Button x:Name="BtnDrvNotesPage" Style="{StaticResource OutlineButton}" Content="Notas completas no site da NVIDIA" Padding="12,6" Margin="0,0,8,6"
-                                                    Visibility="Collapsed" Click="BtnDrvNotesPage_Click"/>
-                                            <Button x:Name="BtnDrvGpuPage" Style="{StaticResource OutlineButton}" Content="Página oficial do driver" Padding="12,6" Margin="0,0,8,6" Click="BtnDrvGpuPage_Click"/>
-                                        </WrapPanel>
-                                        <!-- Outra marca, ou placa ainda não reconhecida (ex.: logo depois do DDU) -->
-                                        <WrapPanel Margin="0,4,0,0">
-                                            <TextBlock Text="BAIXAR O MAIS RECENTE DE" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,10,6"/>
-                                            <Button Style="{StaticResource OutlineButton}" Content="NVIDIA" Tag="NVIDIA" Padding="12,5" Margin="0,0,8,6" Click="BtnDrvVendor_Click"/>
-                                            <Button Style="{StaticResource OutlineButton}" Content="AMD" Tag="AMD" Padding="12,5" Margin="0,0,8,6" Click="BtnDrvVendor_Click"
-                                                    ToolTip="Procura o instalador na página oficial do seu modelo (RX 4000 a 9000) e confere a assinatura antes de abrir"/>
-                                            <Button Style="{StaticResource OutlineButton}" Content="Intel" Tag="Intel" Padding="12,5" Margin="0,0,8,6" Click="BtnDrvVendor_Click"
-                                                    ToolTip="Abre a lista de drivers gráficos da Intel para Windows 11"/>
-                                        </WrapPanel>
-                                    </StackPanel>
-                                </Border>
-
-                                <TextBlock Text="INSTALAÇÃO" Style="{StaticResource Label}" Margin="0,4,0,8"/>
-                                <WrapPanel Margin="0,0,0,8">
-                                    <RadioButton x:Name="InstNormal" Style="{StaticResource Chip}" GroupName="InstMode" Content="Normal (driver completo)" IsChecked="True" Checked="InstMode_Changed"/>
-                                    <RadioButton x:Name="InstDebloat" Style="{StaticResource Chip}" GroupName="InstMode" Content="Enxuta (debloat)" Checked="InstMode_Changed"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="InstModeHelp" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"
-                                           Text="Driver oficial com assinatura conferida, instalado sem telas e do zero (apaga as configurações antigas do driver)."/>
-                                <StackPanel x:Name="InstDebloatPanel" Visibility="Collapsed">
-                                    <TextBlock x:Name="DebloatNo7z" Visibility="Collapsed" Foreground="{DynamicResource TempWarn}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8">
-                                        Precisa do 7-Zip para abrir o pacote do driver. <Hyperlink Click="BtnDebloat7z_Click">Instalar o 7-Zip (winget)</Hyperlink>
-                                    </TextBlock>
-                                    <StackPanel x:Name="DebloatRows"/>
-                                </StackPanel>
-                                <WrapPanel Margin="0,4,0,0">
-                                    <Button x:Name="BtnDebloatLatest" Style="{StaticResource PrimaryButton}" Content="Baixar o driver NVIDIA mais recente e instalar" Padding="16,8" Margin="0,0,10,8" Click="BtnInstLatest_Click"/>
-                                    <Button x:Name="BtnDebloatFile" Style="{StaticResource OutlineButton}" Content="Escolher o instalador…" Padding="14,8" Margin="0,0,10,8" Click="BtnInstFile_Click"
-                                            ToolTip="Use um instalador de driver NVIDIA, AMD ou Intel que você já baixou"/>
-                                    <Button x:Name="BtnDebloatUndo" Style="{StaticResource OutlineButton}" Content="Desfazer as limpezas" Padding="14,8" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnDebloatUndo_Click"
-                                            ToolTip="Reativa os serviços e as entradas de inicialização que a instalação enxuta desligou"/>
-                                </WrapPanel>
-                                <WrapPanel x:Name="GfxNvInstallRow" Margin="0,0,0,4">
-                                    <Button Style="{StaticResource OutlineButton}" Content="Abrir Painel de Controle NVIDIA" Padding="14,8" Margin="0,0,10,6" Click="BtnGfxNvPanel_Click"
-                                            ToolTip="Se ainda não estiver instalado, abre a página dele na Microsoft Store"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="Atalho na Área de Trabalho" Padding="14,8" Margin="0,0,10,6" Click="BtnGfxNvShortcut_Click"
-                                            ToolTip="Cria o atalho &quot;NVIDIA Control Panel&quot; na Área de Trabalho"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="DebloatStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,6"/>
-
-                                <TextBlock Text="CONFIGURAÇÕES (aplicadas depois de instalar, ou quando você clicar em Aplicar)" Style="{StaticResource Label}" Margin="0,10,0,0"/>
-                                <StackPanel x:Name="GfxRows" Margin="0,4,0,0"/>
-                                <WrapPanel Margin="0,8,0,0">
-                                    <Button x:Name="BtnGfxApply" Style="{StaticResource PrimaryButton}" Content="Aplicar" Padding="18,8" Margin="0,0,10,8" Click="BtnGfxApply_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="Marcar os recomendados" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxDefaults_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="Desfazer tudo" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxUndoAll_Click"/>
-                                    <Button x:Name="BtnGfxNvDefault" Style="{StaticResource OutlineButton}" Content="Perfil global NVIDIA no padrão do driver" Padding="14,8" Margin="0,0,10,8" Click="BtnGfxNvDefault_Click"
-                                            ToolTip="O &quot;NVIDIA Settings: Default&quot; do script: tira do perfil global tudo o que foi mudado (por qualquer programa)"/>
-                                    <Button x:Name="BtnGfxReboot" Style="{StaticResource OutlineButton}" Content="Reiniciar agora" Padding="14,8" Margin="0,0,10,8" Visibility="Collapsed" Click="BtnGfxReboot_Click"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="GfxStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Bibliotecas para jogos: verificação e instalação (Visual C++ do abbodi1406/vcredist; DirectX da Microsoft) -->
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <StackPanel>
-                                <DockPanel Margin="0,0,0,10">
-                                    <Button DockPanel.Dock="Right" Style="{StaticResource OutlineButton}" Content="Verificar de novo" Padding="12,6" VerticalAlignment="Center" Click="BtnRuntimeCheck_Click"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
-                                            <TextBlock Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
+                            </Border>
+                            <Border Grid.Column="2" Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,10">
+                                        <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                            <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Bibliotecas para jogos (Visual C++ e DirectX)" FontSize="15" FontWeight="SemiBold"/>
-                                            <TextBlock Text="Confere o que está instalado e baixa o que faltar direto das fontes oficiais" Foreground="{DynamicResource Muted}" FontSize="12"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </DockPanel>
-                                <StackPanel x:Name="RuntimeRows"/>
-                                <TextBlock x:Name="RuntimeNote" Foreground="{DynamicResource Faint}" FontSize="11.5" TextWrapping="Wrap" Margin="0,6,0,0"/>
-                                <WrapPanel Margin="0,12,0,0">
-                                    <Button x:Name="BtnRtVc" Style="{StaticResource PrimaryButton}" Content="Baixar e instalar Visual C++ (todas)" Padding="16,8" Margin="0,0,10,8" Click="BtnRtVc_Click"
-                                            ToolTip="Pacote AIO do abbodi1406/vcredist (GitHub): Visual C++ 2005 a 2022, 32 e 64 bits, num instalador só. O SHA-256 publicado no GitHub é conferido antes de abrir."/>
-                                    <Button x:Name="BtnRtDx" Style="{StaticResource OutlineButton}" Content="Baixar e instalar DirectX" Padding="14,8" Margin="0,0,10,8" Click="BtnRtDx_Click"
-                                            ToolTip="DirectX End-User Runtime (junho de 2010) do site da Microsoft, com a assinatura conferida. Só acrescenta as DLLs antigas; não mexe no DirectX 12."/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="Página do vcredist" Tag="vc" Padding="12,8" Margin="0,0,10,8" Click="BtnRtPage_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="Página do DirectX (Microsoft)" Tag="dx" Padding="12,8" Margin="0,0,10,8" Click="BtnRtPage_Click"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="RuntimeInstallStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Visibility="Collapsed"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
-                                        <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="16" Foreground="{DynamicResource OnAccent}"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="Placa-mãe: BIOS e drivers" FontSize="15" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Compara o que está instalado com o suporte oficial do fabricante do seu modelo" Foreground="{DynamicResource Muted}" FontSize="12"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <TextBlock x:Name="DrvBoard" TextWrapping="Wrap" FontWeight="SemiBold"/>
-
-                                <!-- BIOS: instalada x mais recente no site -->
-                                <Border Background="{DynamicResource Panel}" CornerRadius="10" Padding="16,12" Margin="0,10,0,10">
-                                    <DockPanel>
-                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <Button x:Name="BtnBoardBiosGet" Style="{StaticResource PrimaryButton}" Content="Baixar a BIOS mais recente" Padding="14,7" Margin="10,0,0,0"
-                                                    Visibility="Collapsed" Click="BtnBoardBiosGet_Click"/>
-                                            <Button x:Name="BtnBoardBiosPage" Style="{StaticResource OutlineButton}" Content="Página de BIOS do modelo" Padding="14,7" Margin="10,0,0,0"
-                                                    IsEnabled="False" Click="BtnBoardBiosPage_Click"/>
-                                        </StackPanel>
-                                        <StackPanel>
-                                            <TextBlock Text="BIOS" Style="{StaticResource Label}"/>
-                                            <TextBlock x:Name="BoardBiosLine" TextWrapping="Wrap" Text="—"/>
-                                            <TextBlock x:Name="BoardBiosHint" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                            <TextBlock Text="Backup dos drivers" FontSize="15" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Antes de formatar ou de trocar um driver" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                         </StackPanel>
                                     </DockPanel>
-                                </Border>
+                                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}"
+                                               Text="Exporta todos os drivers de terceiros para Documentos\PcismoMaster-Drivers."/>
+                                    <Button x:Name="BtnDrvBackup" Style="{StaticResource OutlineButton}" Content="Fazer backup" Padding="16,7" Margin="0,12,0,0"
+                                            HorizontalAlignment="Left" Click="BtnDrvBackup_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
 
-                                <TextBlock x:Name="BoardMessage" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                                <TextBlock x:Name="BoardSummary" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6" Visibility="Collapsed"/>
-                                <StackPanel x:Name="BoardRows"/>
-                                <WrapPanel Margin="0,10,0,0">
-                                    <Button x:Name="BtnBoardCheck" Style="{StaticResource OutlineButton}" Content="Verificar placa-mãe de novo" Padding="14,7" Margin="0,0,10,8" Click="BtnBoardCheck_Click"/>
-                                    <Button x:Name="BtnBoardDrivers" Style="{StaticResource OutlineButton}" Content="Página de drivers do modelo" Padding="14,7" Margin="0,0,10,8"
-                                            IsEnabled="False" Click="BtnBoardDrivers_Click"/>
-                                    <Button x:Name="BtnDrvBoardPage" Style="{StaticResource OutlineButton}" Content="Suporte do fabricante" Padding="14,7" Margin="0,0,10,8"
-                                            Click="BtnDrvBoardPage_Click" IsEnabled="False"/>
-                                </WrapPanel>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
-                                    A BIOS nunca é gravada pelo app: o arquivo vem do site oficial e você atualiza pela própria BIOS (Q-Flash, EZ Flash, M-Flash, Instant Flash)
-                                    seguindo o manual. Os drivers também baixam do site oficial do fabricante. O Windows Update, logo abaixo, traz drivers certificados para os mesmos dispositivos.
-                                </TextBlock>
-                            </StackPanel>
-                        </Border>
-
+                        <!-- ===== Todos os drivers instalados (fechado por padrão) ===== -->
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
-                                <TextBlock Text="WINDOWS UPDATE (DRIVERS CERTIFICADOS)" Style="{StaticResource Label}"/>
-                                <TextBlock x:Name="DrvWuList" Margin="0,10,0,0" TextWrapping="Wrap" Text="Ainda não pesquisado."/>
-                                <WrapPanel Margin="0,14,0,0">
-                                    <Button x:Name="BtnDrvWuSearch" Style="{StaticResource OutlineButton}" Content="PROCURAR" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvWuSearch_Click"/>
-                                    <Button x:Name="BtnDrvWuInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR TODOS" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvWuInstall_Click" IsEnabled="False"/>
-                                </WrapPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <StackPanel>
-                                <TextBlock Text="BACKUP DOS DRIVERS" Style="{StaticResource Label}"/>
-                                <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"
-                                           Text="Exporta todos os drivers de terceiros para Documentos\PcismoMaster-Drivers. Útil antes de formatar ou de trocar um driver."/>
-                                <Button x:Name="BtnDrvBackup" Style="{StaticResource OutlineButton}" Content="FAZER BACKUP" Padding="18,8" Margin="0,14,0,0"
-                                        HorizontalAlignment="Left" Click="BtnDrvBackup_Click"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
-                            <StackPanel>
-                                <TextBlock Text="DRIVERS INSTALADOS" Style="{StaticResource Label}"/>
-                                <ItemsControl x:Name="DrvList" Margin="0,10,0,0">
+                                <DockPanel>
+                                    <ToggleButton x:Name="DrvListToggle" DockPanel.Dock="Right" Style="{StaticResource ChipToggle}" Content="Mostrar a lista"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Todos os drivers instalados" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="DrvListCount" Text="Versão, data e assinatura de cada driver deste PC" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                    </StackPanel>
+                                </DockPanel>
+                                <ItemsControl x:Name="DrvList" Margin="0,12,0,0" Visibility="{Binding IsChecked, ElementName=DrvListToggle, Converter={StaticResource BoolVis}}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding Device}" TextWrapping="Wrap"/>
-                                                    <TextBlock Foreground="{DynamicResource Muted}" FontSize="12">
-                                                        <Run Text="{Binding Class, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Vendor, Mode=OneWay}"/>
+                                            <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,7">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Device}" TextWrapping="Wrap"/>
+                                                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12">
+                                                            <Run Text="{Binding Class, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Vendor, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="12" TextAlignment="Right" Margin="12,0,0,0">
+                                                        <Run Text="{Binding Version, Mode=OneWay}"/><LineBreak/><Run Text="{Binding Date, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding SignedText, Mode=OneWay}"/>
                                                     </TextBlock>
-                                                </StackPanel>
-                                                <TextBlock Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="12" TextAlignment="Right" Margin="12,0,0,0">
-                                                    <Run Text="{Binding Version, Mode=OneWay}"/><LineBreak/><Run Text="{Binding Date, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding SignedText, Mode=OneWay}"/>
-                                                </TextBlock>
-                                            </Grid>
+                                                </Grid>
+                                            </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -1173,157 +1242,6 @@
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
-
-                <!-- ===== Painel NVIDIA ("Gerenciar as configurações em 3D" do Painel de Controle NVIDIA) ===== -->
-                <Grid x:Name="NvcpPanel" Grid.Row="1" Visibility="Collapsed" Margin="36,16,36,24">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
-                        <ColumnDefinition Width="18"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.ColumnSpan="3" Margin="0,0,0,14">
-                        <TextBlock Text="Painel NVIDIA" Style="{StaticResource H1}"/>
-                        <TextBlock Text="As configurações em 3D do Painel de Controle NVIDIA, com os mesmos nomes e opções: globais (todos os jogos) ou de um programa."
-                                   Style="{StaticResource Sub}" TextWrapping="Wrap"/>
-                    </StackPanel>
-
-                    <DockPanel Grid.Row="1">
-                        <TextBox x:Name="NvcpProfileSearch" DockPanel.Dock="Top" Tag="Buscar programa ou jogo…" Margin="0,0,0,8" TextChanged="NvcpProfileSearch_Changed"/>
-                        <TextBlock x:Name="NvcpProfileCount" DockPanel.Dock="Top" Foreground="{DynamicResource Muted}" FontSize="11.5" Margin="2,0,0,6"/>
-                        <Border Style="{StaticResource CardBorder}" Padding="4">
-                            <ListBox x:Name="NvcpProfiles" SelectionChanged="NvcpProfiles_Changed" VirtualizingPanel.IsVirtualizing="True"
-                                     VirtualizingPanel.VirtualizationMode="Recycling" ItemContainerStyle="{StaticResource ListNavItem}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
-                                            <TextBlock Text="{Binding Detail}" FontSize="10.5" Opacity="0.6"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </Border>
-                    </DockPanel>
-
-                    <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource CardBorder}" Padding="20,16">
-                        <DockPanel>
-                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
-                                <TextBlock x:Name="NvcpTitle" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock x:Name="NvcpSubtitle" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <StackPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
-                                <WrapPanel>
-                                    <Button x:Name="BtnNvcpApply" Style="{StaticResource PrimaryButton}" Content="Aplicar" Padding="18,8" Margin="0,0,10,8" Click="BtnNvcpApply_Click"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="Descartar alterações" Padding="14,8" Margin="0,0,10,8" Click="BtnNvcpDiscard_Click"/>
-                                    <Button x:Name="BtnNvcpRestore" Style="{StaticResource OutlineButton}" Content="Restaurar" Padding="14,8" Margin="0,0,10,8" Click="BtnNvcpRestore_Click"/>
-                                </WrapPanel>
-                                <TextBlock x:Name="NvcpStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <StackPanel x:Name="NvcpRows" Margin="0,0,8,0"/>
-                            </ScrollViewer>
-                        </DockPanel>
-                    </Border>
-                </Grid>
-
-                <!-- ===== Profile Inspector (perfis do driver NVIDIA) ===== -->
-                <Grid x:Name="NpiPanel" Grid.Row="1" Visibility="Collapsed" Margin="36,16,36,24">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
-                        <ColumnDefinition Width="18"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.ColumnSpan="3" Margin="0,0,0,14">
-                        <TextBlock Text="Profile Inspector" Style="{StaticResource H1}"/>
-                        <TextBlock x:Name="NpiSub" Text="Todas as configurações dos perfis do driver NVIDIA, inclusive as que o Painel de Controle esconde."
-                                   Style="{StaticResource Sub}" TextWrapping="Wrap"/>
-                    </StackPanel>
-
-                    <!-- Perfis -->
-                    <DockPanel Grid.Row="1">
-                        <TextBox x:Name="NpiProfileSearch" DockPanel.Dock="Top" Tag="Buscar perfil ou jogo…" Margin="0,0,0,8" TextChanged="NpiProfileSearch_Changed"/>
-                        <TextBlock x:Name="NpiProfileCount" DockPanel.Dock="Top" Foreground="{DynamicResource Muted}" FontSize="11.5" Margin="2,0,0,6"/>
-                        <Border Style="{StaticResource CardBorder}" Padding="4">
-                            <ListBox x:Name="NpiProfiles" SelectionChanged="NpiProfiles_Changed" VirtualizingPanel.IsVirtualizing="True"
-                                     VirtualizingPanel.VirtualizationMode="Recycling" ItemContainerStyle="{StaticResource ListNavItem}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" FontSize="12.5"/>
-                                            <TextBlock Text="{Binding Detail}" FontSize="10.5" Opacity="0.6"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </Border>
-                    </DockPanel>
-
-                    <!-- Configurações do perfil -->
-                    <DockPanel Grid.Row="1" Grid.Column="2">
-                        <StackPanel DockPanel.Dock="Top">
-                            <TextBlock x:Name="NpiTitle" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                            <WrapPanel x:Name="NpiApps" Margin="0,6,0,0"/>
-                            <WrapPanel Margin="0,10,0,0">
-                                <Button x:Name="BtnNpiApply" Style="{StaticResource PrimaryButton}" Content="Aplicar alterações" Padding="16,8" Margin="0,0,8,8" Click="BtnNpiApply_Click"/>
-                                <Button x:Name="BtnNpiUndo" Style="{StaticResource OutlineButton}" Content="Desfazer" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiUndo_Click"/>
-                                <Button Style="{StaticResource OutlineButton}" Content="Restaurar padrão do perfil" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiRestore_Click"/>
-                                <Button Style="{StaticResource OutlineButton}" Content="Novo perfil…" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiNew_Click"/>
-                                <Button x:Name="BtnNpiDelete" Style="{StaticResource OutlineButton}" Content="Excluir perfil" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiDelete_Click"/>
-                                <Button Style="{StaticResource OutlineButton}" Content="Exportar .nip" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiExport_Click"/>
-                                <Button Style="{StaticResource OutlineButton}" Content="Importar .nip" Padding="12,8" Margin="0,0,8,8" Click="BtnNpiImport_Click"/>
-                            </WrapPanel>
-                            <Grid Margin="0,2,0,8">
-                                <TextBox x:Name="NpiSettingSearch" Width="260" HorizontalAlignment="Left" Tag="Buscar configuração…" TextChanged="NpiFilter_Changed"/>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <CheckBox x:Name="NpiOnlyChanged" Content="Só alteradas" Margin="0,0,16,0" Click="NpiFilter_Changed"/>
-                                    <CheckBox x:Name="NpiShowAll" Content="Mostrar tudo (escondidas e sem nome)" Click="NpiShowAll_Changed"/>
-                                </StackPanel>
-                            </Grid>
-                            <TextBlock x:Name="NpiStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                        </StackPanel>
-                        <Border Style="{StaticResource CardBorder}" Padding="6">
-                            <ListBox x:Name="NpiSettings" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                                     VirtualizingPanel.ScrollUnit="Pixel" ItemContainerStyle="{StaticResource PlainItem}" HorizontalContentAlignment="Stretch">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <!-- Cabeçalho de grupo -->
-                                            <Border Visibility="{Binding HeaderVisibility}" Background="{DynamicResource Hover}" CornerRadius="6" Padding="10,6" Margin="0,10,0,4">
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
-                                            </Border>
-                                            <!-- Configuração -->
-                                            <Grid Visibility="{Binding RowVisibility}" Margin="6,2" ToolTip="{Binding Tip}">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="330"/>
-                                                    <ColumnDefinition Width="82"/>
-                                                    <ColumnDefinition Width="32"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12.5"
-                                                           FontWeight="{Binding NameWeight}" Foreground="{Binding NameBrush}" Margin="0,0,10,0"/>
-                                                <ComboBox Grid.Column="1" IsEditable="True" ItemsSource="{Binding Choices}" IsEnabled="{Binding Editable}"
-                                                          Text="{Binding EditText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxDropDownHeight="320"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding SourceText}" Foreground="{Binding SourceBrush}" FontSize="12"
-                                                           VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                                <Button Grid.Column="3" Style="{StaticResource OutlineButton}" Content="↺" Padding="6,1" FontSize="12" BorderThickness="0"
-                                                        Visibility="{Binding ResetVisibility}" ToolTip="Tirar do perfil (volta a herdar o valor)" Click="BtnNpiReset_Click"/>
-                                            </Grid>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </Border>
-                    </DockPanel>
-                </Grid>
-                </Grid>
 
                 <!-- ===== INTEGRAÇÃO (iluminação) ===== -->
                 <ScrollViewer x:Name="PageInteg" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">

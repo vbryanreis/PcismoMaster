@@ -7,7 +7,7 @@ using Microsoft.Win32;
 
 namespace ResetExplode;
 
-/// <summary>FERRAMENTAS · Drivers: limpeza completa do driver de vídeo com o DDU no modo de segurança.</summary>
+/// <summary>TWEAKING · Drivers: limpeza completa do driver de vídeo com o DDU no modo de segurança.</summary>
 public partial class MainWindow
 {
     private bool _dduInit, _dduBusy;

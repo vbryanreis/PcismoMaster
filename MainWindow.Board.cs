@@ -59,11 +59,12 @@ public partial class MainWindow
 
         BoardMessage.Text = c.Message;
         int newer = c.Rows.Count(r => r.Status == BoardStatus.Newer), missing = c.Rows.Count(r => r.Status == BoardStatus.NotInstalled);
-        BoardSummary.Visibility = c.Online ? Visibility.Visible : Visibility.Collapsed;
+        BoardSummary.Visibility = c.Online || c.AmdChipset != null ? Visibility.Visible : Visibility.Collapsed;
         BoardSummary.Text = newer == 0 && missing == 0 ? "✔ Todos os drivers da placa estão em dia."
                           : $"{newer} com versão mais nova no site" + (missing > 0 ? $" · {missing} não instalado(s)" : "") + ".";
         BoardSummary.Foreground = (Brush)FindResource(newer + missing == 0 ? "ChartGpu" : "TempWarn");
 
+        ShowBoardTiles();
         BoardRows.Children.Clear();
         foreach (var group in c.Rows.GroupBy(r => r.Category))
         {

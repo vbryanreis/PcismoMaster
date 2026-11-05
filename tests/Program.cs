@@ -611,6 +611,18 @@ Test("Motherboard: ASUS list keeps the newest of each driver and compares it wit
     Assert(BoardSupport.Pages("Gigabyte", "B550M AORUS ELITE").Drivers == "https://www.gigabyte.com/Search?kw=B550M%20AORUS%20ELITE");
     Assert(BoardSupport.Pages("ASUS", "ROG STRIX B550-F GAMING").Bios.StartsWith("https://www.asus.com/supportonly/ROG%20STRIX%20B550-F%20GAMING/"));
 });
+Test("Motherboard: AMD chipset page gives version, date and the official installer", () => {
+    var pages = BoardSupport.AmdChipsetPages("B550M AORUS ELITE");
+    Assert(pages[0] == "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am4/b550.html" && pages.Count == 2);
+    Assert(BoardSupport.AmdChipsetPages("X870E AORUS MASTER")[0].EndsWith("/am5/x870.html") && BoardSupport.AmdChipsetPages("")[0].EndsWith("/am5/b650.html"));
+    string html = "<div><div>AMD Chipset Drivers</div><div>Revision Number</div><div>8.09.28.1124</div><div>File Size</div><div>79 MB</div>" +
+                  "<div>Release Date</div><div>\n 2026-10-21\n</div><a href=\"https://drivers.amd.com/drivers/amd_chipset_software_8.09.28.1124.exe\">Download</a>" +
+                  "<a href=\"https://drivers.amd.com/drivers/amd_raid_software_2.20.19.037.exe\">RAID</a></div>";
+    var info = BoardSupport.ParseAmdChipset(html, pages[0])!;
+    Assert(info.Version == "8.09.28.1124" && info.Date == new DateTime(2026, 10, 21) && info.Url.EndsWith("amd_chipset_software_8.09.28.1124.exe"));
+    Assert(BoardSupport.ParseAmdChipset("<html>nada</html>", pages[0]) == null);
+    Assert(BoardSupport.CompareVersions("8.09.28.1124", "7.01.08.129") > 0 && BoardSupport.Comparable("8.09.28.1124", "7.01.08.129"));
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

@@ -14,6 +14,7 @@ public partial class MainWindow
 
     private void InitDriver()
     {
+        InitDriverLook();
         InitDdu();
         InitGfxTweaks();
         if (_drvInit) return;
@@ -48,6 +49,7 @@ public partial class MainWindow
             DrvSet("Lendo drivers instalados…", 0.1);
             var inv = await Task.Run(DriverManager.Inventory);
             DrvList.ItemsSource = inv;
+            DrvListCount.Text = $"{inv.Count} drivers: versão, data e assinatura de cada um";
 
             DrvSet("Lendo placa de vídeo e placa-mãe…", 0.3);
             _drvGpus = await Task.Run(DriverManager.ReadGpus);
@@ -81,6 +83,7 @@ public partial class MainWindow
         DrvBoard.Text = $"{b.Maker} {b.Model}".Trim() + (b.Brand.Length > 0 ? "" : "  (fabricante não reconhecido)");
         BoardBiosLine.Text = $"Instalada: {(b.Bios.Length > 0 ? b.Bios : "—")}";
         BtnDrvBoardPage.IsEnabled = b.SupportUrl.Length > 0;
+        ShowBoardTiles();
     }
 
     private static void OpenUrl(string url)

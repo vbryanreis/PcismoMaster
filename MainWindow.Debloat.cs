@@ -4,7 +4,7 @@ using Microsoft.Win32;
 
 namespace ResetExplode;
 
-/// <summary>FERRAMENTAS · Drivers: instalação enxuta do driver (componentes escolhidos) e limpezas com desfazer.</summary>
+/// <summary>TWEAKING · Drivers: instalação enxuta do driver (componentes escolhidos) e limpezas com desfazer.</summary>
 public partial class MainWindow
 {
     private readonly Dictionary<string, CheckBox> _debloatToggles = new();
@@ -124,10 +124,11 @@ public partial class MainWindow
                 }
             });
             string panel = "";
-            if (vendor == "nvidia" && !GraphicsTweaks.HasNvidiaControlPanel())
+            if (vendor == "nvidia")
             {
-                try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(GraphicsTweaks.NvidiaControlPanelStore) { UseShellExecute = true }); } catch { }
-                panel = " A página do Painel de Controle NVIDIA na Microsoft Store foi aberta: clique em Obter.";
+                DebloatStatus.Text = "Instalando o Painel de Controle NVIDIA e o Profile Inspector mais recente…";
+                panel = " " + await NvidiaTools.AfterDriverInstallAsync(CancellationToken.None);
+                UpdateNvToolsInfo();
             }
             InitDebloat(_debloatVendors);
             string settings = "";
