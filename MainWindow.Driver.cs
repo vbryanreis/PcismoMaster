@@ -34,7 +34,6 @@ public partial class MainWindow
         BtnDrvScan.IsEnabled = !busy;
         BtnDrvBackup.IsEnabled = !busy;
         BtnDrvWuSearch.IsEnabled = !busy;
-        BtnDrvInstall.IsEnabled = !busy && _drvGpus.Any(g => g.CanAutoInstall);
         BtnDrvWuInstall.IsEnabled = !busy && _drvWu.Count > 0;
     }
 
@@ -65,8 +64,7 @@ public partial class MainWindow
                 else g.Message = "Fabricante não reconhecido.";
                 i++;
             }
-            DrvGpus.ItemsSource = null;
-            DrvGpus.ItemsSource = _drvGpus;
+            ShowDriverVersion();
             DrvSet($"Pronto às {DateTime.Now:HH:mm:ss}.", 1);
         }
         catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
@@ -93,28 +91,6 @@ public partial class MainWindow
     }
 
     private void BtnDrvBoardPage_Click(object sender, RoutedEventArgs e) => OpenUrl(_drvBoardInfo.SupportUrl);
-
-    private async void BtnDrvInstall_Click(object sender, RoutedEventArgs e)
-    {
-        var g = _drvGpus.FirstOrDefault(x => x.CanAutoInstall);
-        if (g == null || _drvBusy) return;
-        string msg = g.Vendor == "AMD"
-            ? $"Baixar e abrir o instalador AMD Software {g.Latest}?\nO arquivo vem do servidor oficial da AMD."
-            : g.UpdateAvailable
-            ? $"Instalar o driver NVIDIA {g.Latest} ({g.SizeText})?\nO instalador oficial será baixado e aberto."
-            : $"Você já está com a versão {g.Installed}. Baixar e abrir o instalador {g.Latest} mesmo assim (reinstalação)?";
-        if (MessageBox.Show(this, msg, "DRIVER", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
-
-        DrvBusy(true);
-        _drvCts = new CancellationTokenSource();
-        try
-        {
-            string r = await DriverManager.DownloadAndLaunchAsync(g, (t, f) => Dispatcher.BeginInvoke(new Action(() => DrvSet(t, f))), _drvCts.Token);
-            DrvSet(r + (g.Vendor == "NVIDIA" ? "\n" + GpuDriverStatus.NvidiaAppTips : ""), 1);
-        }
-        catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
-        finally { DrvBusy(false); }
-    }
 
     /// <summary>Instalar o driver mais recente escolhendo o fabricante (quando a placa não é reconhecida, como logo depois do DDU).</summary>
     private async void BtnDrvVendor_Click(object sender, RoutedEventArgs e)

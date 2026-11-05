@@ -560,6 +560,23 @@ Test("Uninstall list: entries of apps already removed are orphans; a vanished un
     Assert(ProgramInventory.Check("rundll32.exe something", "", "x") == (false, false));
     Assert(ProgramInventory.Check("MsiExec.exe /X{00000000-1111-2222-3333-444444444444}", "", "{00000000-1111-2222-3333-444444444444}") == (true, false));
 });
+Test("NVIDIA release notes: Game Ready title, fixed bugs and article link are read, headings translated", () => {
+    const string html = "<b>Game Ready for World of Warcraft: Forever</b><br />This new Game Ready Driver provides the best gaming experience.<br />  <br />  " +
+        "<b>Fixed Gaming Bugs</b><br />  <ul><li>Call of Duty: Modern Warfare 4: Game may display incorrect visual colors [6972531]</li></ul>      <br />      " +
+        "<b>Fixed General Bugs</b><br />      <ul><li>Video playback may freeze &amp; black screen. [6979343]</li><li>Second &quot;item&quot;</li></ul> <br /> " +
+        "<a href=\"https://www.nvidia.com/en-us/geforce/news/wow-game-ready-driver\">Learn more in our Game Ready Driver article here</a>. <br />" +
+        "<p align=\"justify\"><img title=\"Game Ready Driver\" src=\"https://images.nvidia.com/x.jpg\" /></p>";
+    var s = NvidiaNotes.Parse(html, out string title, out string article);
+    Assert(title == "Game Ready para World of Warcraft: Forever");
+    Assert(article == "https://www.nvidia.com/en-us/geforce/news/wow-game-ready-driver");
+    Assert(s.Count == 3 && s[0].Text.StartsWith("This new Game Ready") && s[0].Items.Count == 0);
+    Assert(s[1].Heading == "Correções em jogos" && s[1].Items.Single().EndsWith("[6972531]"));
+    Assert(s[2].Heading == "Correções gerais" && s[2].Items.Count == 2 && s[2].Items[0].Contains("freeze & black") && s[2].Items[1] == "Second \"item\"");
+    Assert(!s.Any(x => x.Text.Contains("Learn more")));
+    Assert(NvidiaNotes.Translate("Game Ready for Phantom Blade Zero & Call of Duty") == "Game Ready para Phantom Blade Zero e Call of Duty");
+    Assert(NvidiaNotes.ParseDate("Wed Nov 04, 2026") == new DateTime(2026, 11, 4));
+    Assert(NvidiaNotes.Parse("", out _, out _).Count == 0);
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

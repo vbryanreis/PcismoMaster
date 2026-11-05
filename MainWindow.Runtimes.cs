@@ -40,4 +40,48 @@ public partial class MainWindow
     }
 
     private void BtnRuntimeCheck_Click(object sender, RoutedEventArgs e) => InitRuntimes();
+
+    private bool _rtBusy;
+
+    private void BtnRtVc_Click(object sender, RoutedEventArgs e) =>
+        _ = InstallRuntimeAsync("Visual C++",
+            "Baixar e instalar o Visual C++ AIO (abbodi1406/vcredist, GitHub)?\n\nInstala todas as versões de 2005 a 2022, 32 e 64 bits, e atualiza as que já existem. " +
+            "O arquivo é conferido pelo SHA-256 publicado no GitHub antes de abrir.", RuntimeInstaller.InstallVisualCppAsync);
+
+    private void BtnRtDx_Click(object sender, RoutedEventArgs e) =>
+        _ = InstallRuntimeAsync("DirectX",
+            "Baixar e instalar o DirectX End-User Runtime (junho de 2010) do site da Microsoft (cerca de 96 MB)?\n\n" +
+            "Só acrescenta as bibliotecas antigas que jogos DirectX 9, 10 e 11 pedem; o DirectX 12 do Windows não muda.", RuntimeInstaller.InstallDirectXAsync);
+
+    private void BtnRtPage_Click(object sender, RoutedEventArgs e) =>
+        OpenUrl((sender as FrameworkElement)?.Tag as string == "dx" ? RuntimeInstaller.DxPage : RuntimeInstaller.VcRepoPage);
+
+    private async Task InstallRuntimeAsync(string what, string question, Func<Action<string, double>, CancellationToken, Task<string>> install)
+    {
+        if (_rtBusy || !RequireAdmin()) return;
+        if (MessageBox.Show(this, question, what, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        _rtBusy = true;
+        BtnRtVc.IsEnabled = BtnRtDx.IsEnabled = false;
+        RuntimeInstallStatus.Visibility = Visibility.Visible;
+        RuntimeInstallStatus.Foreground = (Brush)FindResource("Accent");
+        try
+        {
+            // O progresso chega de outra thread: só o texto mais recente vai para a tela.
+            var progress = new Progress<(string Text, double Frac)>(p => RuntimeInstallStatus.Text = p.Text);
+            IProgress<(string, double)> report = progress;
+            string result = await Task.Run(() => install((t, f) => report.Report((t, f)), CancellationToken.None));
+            RuntimeInstallStatus.Text = result;
+        }
+        catch (Exception ex)
+        {
+            RuntimeInstallStatus.Text = $"{what}: falhou ({ex.Message}). Use a página oficial ao lado.";
+            RuntimeInstallStatus.Foreground = (Brush)FindResource("TempCrit");
+        }
+        finally
+        {
+            _rtBusy = false;
+            BtnRtVc.IsEnabled = BtnRtDx.IsEnabled = true;
+        }
+        InitRuntimes();
+    }
 }
