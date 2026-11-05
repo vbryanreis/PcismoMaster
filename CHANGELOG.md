@@ -2,7 +2,7 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
-## Em desenvolvimento
+## 0.9.0
 
 - **TWEAKING refeito do zero** no estilo da aba Otimizar do Galdino Control (escrito do zero: as funções vêm das configurações documentadas do Windows, sem copiar código). As sub-abas antigas (Iniciar, Windows, Hardware, Avançado) e os scripts completos do Ultimate saíram; ficou o bloatware app por app, agora dentro de Debloat.
   - Páginas novas: **Formatação**, **Debloat** (Essencial, Recomendado e Avançado), **Windows**, **Mouse e teclado**, **GPU**, **Perfis** e **Limpeza**.
@@ -19,6 +19,7 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
   - **Aparência**: cor do FPS, dos valores e dos rótulos, fonte e contorno no texto.
   - **Perfis por jogo**: itens, posição e formato salvos para cada executável, aplicados quando o jogo fica na tela; cada perfil pode ligar o overlay sozinho e ter o próprio limite de FPS.
   - Fora do escopo (precisariam injetar código no jogo): scanline sync, limitador Reflex, limitador em AMD/Intel e overlay sobre tela cheia exclusiva antiga.
+  - A aba Overlay aberta não procura mais o ffmpeg nem consulta o driver NVIDIA a cada meio segundo (em PC sem NVIDIA, cada consulta falhava com erro).
 
 ## 0.8.2
 

@@ -170,7 +170,11 @@ public partial class MainWindow
 
     private void OvSlider_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) => OvOption_Changed(sender, e);
 
-    private void PageOverlay_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) => SyncOverlayTimer();
+    private void PageOverlay_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (PageOverlay.IsVisible) _ovFfmpeg = null; // o ffmpeg pode ter sido instalado enquanto a aba estava fechada
+        SyncOverlayTimer();
+    }
 
     /// <summary>Prévia na aba com os números reais deste PC, no formato e na opacidade escolhidos.</summary>
     private void UpdateOverlayPreview(FrameStats? f, OverlayLive live, IReadOnlyList<OverlayPart> parts, string? hour, OverlayStyle style)

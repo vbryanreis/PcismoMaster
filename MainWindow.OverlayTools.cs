@@ -123,7 +123,7 @@ public partial class MainWindow
 
     private async void ToggleLimiter()
     {
-        if (!FpsLimiter.Available) { Flash("Limitador de FPS: só em placas NVIDIA"); return; }
+        if (!OvNvidia) { Flash("Limitador de FPS: só em placas NVIDIA"); return; }
         try
         {
             var (now, _) = await Task.Run(FpsLimiter.ReadGlobal);
@@ -168,7 +168,7 @@ public partial class MainWindow
                 Flash("Vídeo salvo");
                 _ovLastVideo = file;
             }
-            else if (await _rec.StartAsync(ForegroundName(), _settings.RecordFps, NvDrs.Available) is { } why) { Flash(why, 8); _ovRecError = why; }
+            else if (await _rec.StartAsync(ForegroundName(), _settings.RecordFps, OvNvidia) is { } why) { Flash(why, 8); _ovRecError = why; }
             else _ovRecError = null;
         }
         finally { _recBusy = false; }
@@ -176,6 +176,11 @@ public partial class MainWindow
         SyncOverlayTimer();
     }
     private string? _ovLastVideo, _ovRecError;
+
+    // Guardados: o PATH e a NVAPI não são consultados a cada atualização da aba (sem NVIDIA, cada consulta falhava com exceção).
+    private bool? _ovNvidia, _ovFfmpeg;
+    private bool OvNvidia => _ovNvidia ??= FpsLimiter.Available;
+    private bool OvHasFfmpeg => _ovFfmpeg ??= ExternalTools.Has("ffmpeg");
 
     // ------------------------------------------------------------------ atalhos extras
 
@@ -362,7 +367,7 @@ public partial class MainWindow
         _ovLimiterBody = OvCard("LIMITADOR DE FPS", "Pelo driver NVIDIA (a mesma \"Taxa Máxima de Quadros\" do Painel NVIDIA): nada é injetado no jogo. " +
             "Fica gravado no driver e vale mesmo com o PcismoMaster fechado. Com G-SYNC/FreeSync, 3 a 4 FPS abaixo da taxa do monitor dá a menor latência sem tearing. " +
             "Limite por jogo: em Perfis por jogo, abaixo.");
-        _ovLimiterInfo = OvSmall(FpsLimiter.Available ? "Lendo o driver…" : "Precisa de placa e driver NVIDIA.");
+        _ovLimiterInfo = OvSmall(OvNvidia ? "Lendo o driver…" : "Precisa de placa e driver NVIDIA.");
         _ovLimiterBody.Children.Add(_ovLimiterInfo);
 
         // Benchmark
@@ -476,7 +481,7 @@ public partial class MainWindow
         BuildBenchHistory();
         RefreshOverlayTools();
         SyncProfileWatcher();
-        if (FpsLimiter.Available) _ = LoadLimiterAsync();
+        if (OvNvidia) _ = LoadLimiterAsync();
     }
 
     private async Task LoadLimiterAsync()
@@ -600,7 +605,7 @@ public partial class MainWindow
             var auto = new CheckBox { Content = "Ligar o overlay sozinho com este jogo", IsChecked = p.AutoShow, Margin = new Thickness(0, 0, 20, 8), VerticalAlignment = VerticalAlignment.Center };
             auto.Click += (_, _) => { p.AutoShow = auto.IsChecked == true; _settings.Save(); if (_ovProfileKey == key) SetActiveProfile(key, force: true); };
             opts.Children.Add(auto);
-            if (FpsLimiter.Available)
+            if (OvNvidia)
             {
                 opts.Children.Add(new TextBlock { Text = "Limite de FPS:", VerticalAlignment = VerticalAlignment.Center, Foreground = (Brush)FindResource("Muted"), Margin = new Thickness(0, 0, 8, 8) });
                 var status = OvSmall("", "Faint");
@@ -641,7 +646,7 @@ public partial class MainWindow
 
         _ovRecBtn!.Content = _rec.Running ? "Parar gravação" : "Gravar vídeo";
         _ovCaptureInfo!.Text = _rec.Running ? $"Gravando… {Elapsed(_rec.Started)} → {Path.GetFileName(_rec.File)}"
-            : _ovRecError ?? (ExternalTools.Has("ffmpeg") ? $"ffmpeg encontrado · vídeo com {(NvDrs.Available ? "NVENC (placa de vídeo)" : "x264 (processador)")}"
+            : _ovRecError ?? (OvHasFfmpeg ? $"ffmpeg encontrado · vídeo com {(OvNvidia ? "NVENC (placa de vídeo)" : "x264 (processador)")}"
                                                          : "Para gravar vídeo, instale o ffmpeg na aba Instalar apps. A captura de tela funciona sem ele.");
         if (_ovProfileHint != null && _ovProfileName != null)
         {
