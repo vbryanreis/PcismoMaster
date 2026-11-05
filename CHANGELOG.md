@@ -2,6 +2,12 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.10.2
+
+- **Overlay · cores de FPS, FRAME e 1% LOW separadas**: na 0.10.1 os três ficaram juntos numa sub-opção só. Agora a linha **FPS** (em Valores) tem a cor do FPS, como antes, e o **triângulo ▸** dela abre **FRAME** e **1% LOW**, cada um com a sua cor. Enquanto não ganham cor própria, os dois seguem a do FPS. O gráfico de frametime usa a cor do FRAME, e o de FPS usa a do FPS.
+- A cor do grupo **VALORES** (fechado) agora pinta também o FPS, além de GPU, CPU e RAM. O nome do jogo e a hora seguem a cor do grupo Valores/Rótulos.
+- Versão atualizada para 0.10.2.
+
 ## 0.10.1
 
 - **Cores do Overlay por grupo** (JOGOS · Overlay · Aparência): a seção de cores agora tem dois grupos, **Valores** e **Rótulos**. Fechados (o padrão), cada um tem uma cor só, que vale para tudo; o **triângulo ▸** ao lado abre uma cor para **FPS, GPU, CPU e RAM** — dá para pintar, por exemplo, tudo da GPU de verde e da CPU de azul. Dentro de **FPS** (Valores), outro triângulo abre a sub-opção **FPS, FRAME e 1% LOW**, que define a cor desses três juntos. Com o grupo fechado e cores próprias escolhidas, aparece o aviso "cores próprias por grupo"; escolher a cor do grupo volta todos para ela. A VRAM acompanha a cor da GPU e o nome do jogo/hora acompanha a de FPS. A cor automática por temperatura (verde/âmbar/vermelho) continua valendo por cima dos valores. Quem já tinha cores salvas as mantém; "Voltar ao padrão" zera tudo.

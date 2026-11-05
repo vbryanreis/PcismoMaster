@@ -612,19 +612,26 @@ public partial class MainWindow
         }
 
         // Dois grupos (Valores e Rótulos). Fechados (padrão), a cor do grupo vale para FPS, GPU, CPU e RAM de uma vez;
-        // o triângulo abre uma cor para cada um, e o de FPS (Valores) abre a sub-opção de FPS/FRAME/1% LOW.
-        // Cada cor cai na cor do grupo quando ainda não foi escolhida, então a migração das cores antigas é transparente.
-        bool valCustom = new[] { s.OverlayColFpsVal, s.OverlayColGpuVal, s.OverlayColCpuVal, s.OverlayColRamVal }.Any(c => c != null);
+        // o triângulo abre uma cor para cada um, e o de FPS (Valores) abre FRAME e 1% LOW, cada um com a sua cor.
+        // Cada cor cai na do grupo quando ainda não foi escolhida (FRAME e 1% LOW caem na do FPS), então a migração é transparente.
+        string fps = s.OverlayColFps ?? s.OverlayFpsColor;
+        bool valCustom = !string.Equals(fps, s.OverlayValueColor, StringComparison.OrdinalIgnoreCase)
+            || new[] { s.OverlayColFrame, s.OverlayColLow1, s.OverlayColGpuVal, s.OverlayColCpuVal, s.OverlayColRamVal }.Any(c => c != null);
         Colors("VALORES", s.OverlayValueColor, h =>
         {
-            s.OverlayValueColor = h; // pinta os quatro grupos: tira as cores próprias de cada um
-            s.OverlayColFpsVal = s.OverlayColGpuVal = s.OverlayColCpuVal = s.OverlayColRamVal = null;
+            s.OverlayValueColor = h; // pinta os quatro grupos: FPS fica nesta cor e os outros perdem a cor própria
+            s.OverlayColFps = h;
+            s.OverlayColFrame = s.OverlayColLow1 = s.OverlayColGpuVal = s.OverlayColCpuVal = s.OverlayColRamVal = null;
         }, level: 0, open: _ovColValOpen, toggle: () => _ovColValOpen = !_ovColValOpen,
             hint: valCustom && !_ovColValOpen ? "cores próprias por grupo" : null);
         if (_ovColValOpen)
         {
-            Colors("FPS", s.OverlayColFpsVal ?? s.OverlayValueColor, h => s.OverlayColFpsVal = h, open: _ovColFpsOpen, toggle: () => _ovColFpsOpen = !_ovColFpsOpen);
-            if (_ovColFpsOpen) Colors("FPS, FRAME e 1% LOW", s.OverlayColFpsHead ?? s.OverlayFpsColor, h => s.OverlayColFpsHead = h, level: 2);
+            Colors("FPS", fps, h => s.OverlayColFps = h, open: _ovColFpsOpen, toggle: () => _ovColFpsOpen = !_ovColFpsOpen);
+            if (_ovColFpsOpen)
+            {
+                Colors("FRAME", s.OverlayColFrame ?? fps, h => s.OverlayColFrame = h, level: 2);
+                Colors("1% LOW", s.OverlayColLow1 ?? fps, h => s.OverlayColLow1 = h, level: 2);
+            }
             Colors("GPU", s.OverlayColGpuVal ?? s.OverlayValueColor, h => s.OverlayColGpuVal = h);
             Colors("CPU", s.OverlayColCpuVal ?? s.OverlayValueColor, h => s.OverlayColCpuVal = h);
             Colors("RAM", s.OverlayColRamVal ?? s.OverlayValueColor, h => s.OverlayColRamVal = h);
@@ -651,7 +658,8 @@ public partial class MainWindow
         var reset = TweakButton("Voltar ao padrão", false, (_, _) =>
         {
             _settings.OverlayFpsColor = "#A66BFF"; _settings.OverlayValueColor = "#F5F5F5"; _settings.OverlayLabelColor = "#8C8C8C";
-            _settings.OverlayColFpsHead = _settings.OverlayColFpsVal = _settings.OverlayColGpuVal = _settings.OverlayColCpuVal = _settings.OverlayColRamVal = null;
+            _settings.OverlayColFps = _settings.OverlayColFrame = _settings.OverlayColLow1 = null;
+            _settings.OverlayColGpuVal = _settings.OverlayColCpuVal = _settings.OverlayColRamVal = null;
             _settings.OverlayColFpsLbl = _settings.OverlayColGpuLbl = _settings.OverlayColCpuLbl = _settings.OverlayColRamLbl = null;
             _settings.OverlayFont = "Segoe UI"; _settings.OverlayShadow = false; _settings.Save();
             BuildAppearance(); UpdateOverlay();
