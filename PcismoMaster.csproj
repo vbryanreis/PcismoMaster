@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.8.0</Version>
+    <Version>0.8.2</Version>
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -33,6 +33,8 @@
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo-badge.png" />
     <Resource Include="Assets\logo-dark.png" />
+    <!-- Fonte Orbitron (futurista, licença SIL OFL em licenses\Orbitron-OFL.txt): usada no botão de modo -->
+    <Resource Include="Assets\Fonts\Orbitron-Variable.ttf" />
   </ItemGroup>
 
   <!-- Drivers seriais oficiais embutidos (MAKER): cada pasta Drivers\<chip> vira recurso e é extraída na hora de instalar.

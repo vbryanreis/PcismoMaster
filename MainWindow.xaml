@@ -1913,6 +1913,7 @@
                         <!-- Sub-abas -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <RadioButton x:Name="DealsTabDeals" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Promoções" IsChecked="True" Checked="DealsTab_Checked"/>
+                            <RadioButton x:Name="DealsTabFav" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Favoritos" Checked="DealsTab_Checked"/>
                             <RadioButton x:Name="DealsTabSearch" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Pesquisar" Checked="DealsTab_Checked"/>
                             <RadioButton x:Name="DealsTabFree" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Grátis" Checked="DealsTab_Checked"/>
                             <RadioButton x:Name="DealsTabLib" Style="{StaticResource TopTab}" GroupName="DealsTab" Content="Da minha biblioteca" Checked="DealsTab_Checked"/>
@@ -1952,6 +1953,9 @@
                                     <TextBlock Text="LOJAS (NENHUMA MARCADA = TODAS)" Style="{StaticResource Label}"/>
                                     <!-- Montado no código com as lojas que têm mais promoções no país -->
                                     <WrapPanel x:Name="DealsShopPanel" Margin="0,6,0,6"/>
+                                    <TextBlock Text="ONDE O JOGO RODA (DRM) · NENHUM MARCADO = QUALQUER" Style="{StaticResource Label}"/>
+                                    <!-- Montado no código (ItadClient.DrmChoices). Marcar vários = o jogo tem que rodar só nos marcados; fica salvo -->
+                                    <WrapPanel x:Name="DealsDrmPanel" Margin="0,6,0,6"/>
                                     <Grid Margin="0,4,0,0">
                                         <CheckBox x:Name="DealsHlOnly" Content="Só menor preço da história" Checked="DealsFilter_Changed" Unchecked="DealsFilter_Changed"/>
                                         <Button x:Name="BtnDealsRefresh" Style="{StaticResource OutlineButton}" Content="Atualizar" Padding="14,6" FontSize="12"
@@ -1963,6 +1967,18 @@
                             <WrapPanel x:Name="DealsGrid"/>
                             <Button x:Name="BtnDealsMore" Style="{StaticResource OutlineButton}" Content="CARREGAR MAIS" Padding="18,8" HorizontalAlignment="Center"
                                     Margin="0,6,0,0" Visibility="Collapsed" Click="BtnDealsMore_Click"/>
+                        </StackPanel>
+
+                        <!-- ===== Favoritos: jogos marcados com o coração, com o preço de agora ===== -->
+                        <StackPanel x:Name="DealsPanelFav" Visibility="Collapsed">
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="Os jogos que você marcou com o coração, no preço mais barato de agora. Os em promoção vêm primeiro. Para acompanhar um jogo que não está em promoção, procure por ele em Pesquisar e toque no coração."
+                                           Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,120,0" VerticalAlignment="Center"/>
+                                <Button x:Name="BtnDealsFavRefresh" Style="{StaticResource OutlineButton}" Content="Atualizar" Padding="14,6" FontSize="12"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnDealsFavRefresh_Click"/>
+                            </Grid>
+                            <TextBlock x:Name="DealsFavStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                            <WrapPanel x:Name="DealsFavGrid"/>
                         </StackPanel>
 
                         <!-- ===== Pesquisar um jogo e comparar as lojas ===== -->

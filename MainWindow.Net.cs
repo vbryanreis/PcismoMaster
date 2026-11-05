@@ -82,6 +82,7 @@ public partial class MainWindow
         _settings.LightTheme = ThemeManager.IsLight;
         try { _settings.Save(); } catch { }
         UpdateThemeButton();
+        ApplyModeAccent(); // o roxo muda entre claro/escuro; o botão de modo acompanha
     }
 
     /// <summary>Mostra o ícone do modo para onde o clique leva (sol = ir para o claro, lua = ir para o escuro) e troca o logo.</summary>

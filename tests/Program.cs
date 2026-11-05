@@ -438,6 +438,35 @@ Test("ITAD: pasted key is cleaned of spaces, line breaks and quotes", () => {
     Assert(ItadClient.CleanKey("  \"abc123def\"\r\n") == "abc123def" && ItadClient.CleanKey("abc 123") == "abc123");
     Assert(ItadClient.CleanKey("   ") == null && ItadClient.CleanKey(null) == null && ItadClient.CleanKey("“abc”") == "abc");
 });
+Test("ITAD: DRM filter goes in the deals filter and each deal reads its DRM list", () => {
+    var p = QueryOf(ItadClient.BuildDealsQuery(new ItadDealsQuery { Drm = { 61, 16, ItadClient.DrmFree } }, "BR"));
+    using var doc = System.Text.Json.JsonDocument.Parse(p["filter"]);
+    Assert(doc.RootElement.GetProperty("drm").EnumerateArray().Select(x => x.GetInt32()).SequenceEqual(new[] { 61, 16, 1000 }));
+    var d = ItadClient.Parse<ItadDeal>("""{"shop":{"id":6,"name":"Fanatical"},"price":{"amount":10,"currency":"BRL"},"regular":{"amount":20,"currency":"BRL"},"cut":50,"drm":[{"id":61,"name":"Steam"}],"url":"https://x"}""");
+    Assert(d.Drm.Single().Id == 61 && d.Drm[0].Name == "Steam");
+    Assert(ItadClient.DrmChoices.Any(c => c.Id == 61) && ItadClient.DrmChoices.Any(c => c.Id == ItadClient.DrmFree));
+});
+Test("ITAD: a deal passes the DRM filter only if it runs just on the checked DRMs", () => {
+    ItadDeal Deal(int shop, double price, params int[] drm) => new() { Shop = new ItadShop { Id = shop, Name = "S" + shop }, Price = new ItadPrice { Amount = price },
+        Drm = drm.Select(i => new ItadDrm { Id = i, Name = i == 61 ? "Steam" : i == 62 ? "Ubisoft Connect" : i == 1000 ? "Drm Free" : "D" + i }).ToList() };
+    var steamOnly = new[] { 61 };
+    Assert(ItadClient.RunsOn(Deal(61, 1, 61), steamOnly) && !ItadClient.RunsOn(Deal(16, 1, 16), steamOnly));
+    Assert(!ItadClient.RunsOn(Deal(61, 1, 61, 62), steamOnly) && ItadClient.RunsOn(Deal(61, 1, 61, 62), new[] { 61, 62 })); // pede Ubisoft também
+    Assert(!ItadClient.RunsOn(Deal(37, 1), steamOnly) && ItadClient.RunsOn(Deal(37, 1), Array.Empty<int>())); // sem DRM informado / sem filtro
+    var prices = new ItadGamePrices { Deals = { Deal(16, 5, 16), Deal(6, 8, 61), Deal(61, 9, 61) } };
+    Assert(ItadClient.BestDeal(prices, steamOnly)!.Shop.Id == 6 && ItadClient.BestDeal(prices, Array.Empty<int>())!.Shop.Id == 16);
+    Assert(ItadClient.BestDeal(prices, new[] { 4 }) == null && ItadClient.BestDeal(null, steamOnly) == null);
+    Assert(ItadClient.DrmNote(Deal(61, 1, 61)) == null && ItadClient.DrmNote(Deal(6, 1, 61)) == "ativa na Steam");
+    Assert(ItadClient.DrmNote(Deal(35, 1, 1000)) == "sem DRM" && ItadClient.DrmNote(Deal(6, 1, 61, 62)) == "ativa na Steam + Ubisoft Connect" && ItadClient.DrmNote(Deal(37, 1)) == null);
+});
+Test("ITAD: the heart adds a favorite once and a second click removes it", () => {
+    var favs = new List<DealFavorite>(); var now = new DateTime(2026, 11, 4);
+    Assert(DealFavorite.Toggle(favs, "g1", "Hades", "hades", "https://img/h.jpg", now) && favs.Single().Title == "Hades" && favs[0].Added == now);
+    Assert(DealFavorite.Toggle(favs, "g2", "Celeste", "celeste", null, now) && favs.Count == 2);
+    Assert(!DealFavorite.Toggle(favs, "g1", "Hades", "hades", null, now) && favs.Single().Id == "g2");
+    var back = System.Text.Json.JsonSerializer.Deserialize<List<DealFavorite>>(System.Text.Json.JsonSerializer.Serialize(favs))!;
+    Assert(back.Single().Id == "g2" && back[0].Banner == null && back[0].Slug == "celeste");
+});
 Test("ITAD: Steam lookup maps appids and skips games it does not know", () => {
     var h = new FakeItadHandler { Reply = _ => new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent("""{"app/220":"g-hl2","app/1":null}""") } };
     var map = new ItadClient(h) { UserKey = "k" }.LookupSteamAsync(new[] { "220", "1" }).GetAwaiter().GetResult();

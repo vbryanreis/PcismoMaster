@@ -136,6 +136,18 @@ public partial class MainWindow
         ApplyMode();
     }
 
+    /// <summary>Deixa o botão de modo na cor do modo atual: azul (ciano) no simples, roxo no avançado,
+    /// com realce na mesma cor ao passar o mouse. Lê a cor atual da paleta, então acompanha o tema claro/escuro.</summary>
+    private void ApplyModeAccent()
+    {
+        // Simples: o mesmo azul da temperatura (TempCool), mais azul e menos esverdeado que o ciano. Avançado: o roxo.
+        var c = ((SolidColorBrush)FindResource(Advanced ? "Accent" : "TempCool")).Color;
+        var border = new SolidColorBrush(c); border.Freeze();
+        var soft = new SolidColorBrush(Color.FromArgb(0x33, c.R, c.G, c.B)); soft.Freeze();
+        Resources["ModeAccent"] = border;
+        Resources["ModeAccentSoft"] = soft;
+    }
+
     /// <summary>Partes de página que só aparecem no modo avançado (ex.: scripts completos).</summary>
     private void AdvancedOnly(FrameworkElement el)
     {
@@ -160,7 +172,8 @@ public partial class MainWindow
         if (!adv && DrvTabNpi.IsChecked == true) DrvTabDrivers.IsChecked = true;
         FilterBloat();
 
-        BtnMode.Content = adv ? "Modo avançado" : "Modo simples";
+        ApplyModeAccent();
+        BtnMode.Content = adv ? "Modo Avançado" : "Modo Simples";
         if (_homeModeText != null)
             _homeModeText.Text = adv
                 ? "Você está no modo avançado: aparecem todas as páginas, incluindo sensores, overclock, stress test, ajustes de hardware, scripts completos e o Profile Inspector. Use com calma: alguns mexem fundo no PC."

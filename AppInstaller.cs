@@ -28,6 +28,10 @@ public sealed class InstallableApp : INotifyPropertyChanged
     public string DownloadRepo { get; init; } = "";
     /// <summary>Final do nome do arquivo da release a baixar (ex.: "windows-x64.msi").</summary>
     public string AssetSuffix { get; init; } = "";
+    /// <summary>Endereço direto do ícone oficial (apps fora do winget, que não têm site no catálogo).</summary>
+    public string IconUrl { get; init; } = "";
+    /// <summary>Nome do ícone no cache em disco: o id do winget ou, fora dele, o repositório.</summary>
+    public string IconKey => WingetId.Length > 0 ? WingetId : DownloadRepo;
     /// <summary>Com o catálogo grande (estilo Ninite) nada vem pré-marcado: o usuário escolhe.</summary>
     public bool PreSelect { get; init; } = false;
 
@@ -144,11 +148,11 @@ public static class AppInstaller
         new() { Category = "Jogos", Name = "Epic Games", Description = "Loja e launcher da Epic (Fortnite, jogos grátis).", WingetId = "EpicGames.EpicGamesLauncher", DisplayPrefix = "Epic Games Launcher" },
 
         // ---- ArtCraft (apps de criação da ArtCraft; não estão no winget: baixamos o .msi oficial da última release no GitHub) ----
-        new() { Category = "ArtCraft", Name = "ArtCraft Launcher", Description = "Central oficial da ArtCraft: instala e mantém atualizados todos os apps de criação de uma vez. É o caminho recomendado pelo próprio site.", DownloadRepo = "storytold/craft-launcher", AssetSuffix = "windows-x64.msi", DisplayPrefix = "ArtCraft Launcher" },
-        new() { Category = "ArtCraft", Name = "PhotoCraft", Description = "Editor de imagens open-source, no estilo do Photoshop (early alpha).", DownloadRepo = "storytold/photocraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "PhotoCraft" },
-        new() { Category = "ArtCraft", Name = "PdfCraft", Description = "Central de PDF: ler, organizar, juntar, dividir e proteger PDFs (early alpha).", DownloadRepo = "storytold/pdfcraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "PdfCraft" },
-        new() { Category = "ArtCraft", Name = "FigCraft", Description = "Design de interfaces e prototipagem, no estilo do Figma (early alpha).", DownloadRepo = "storytold/figcraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "FigCraft" },
-        new() { Category = "ArtCraft", Name = "Craft Anything", Description = "Explora como um software funciona e ajuda a criar a sua própria versão (early alpha).", DownloadRepo = "storytold/craft-anything", AssetSuffix = "windows-x64.msi", DisplayPrefix = "Craft Anything" },
+        new() { Category = "ArtCraft", Name = "ArtCraft Launcher", Description = "Central oficial da ArtCraft: instala e mantém atualizados todos os apps de criação de uma vez. É o caminho recomendado pelo próprio site.", DownloadRepo = "storytold/craft-launcher", AssetSuffix = "windows-x64.msi", DisplayPrefix = "ArtCraft Launcher", IconUrl = ArtCraftIcon("craft-launcher", "artcraft-launcher") },
+        new() { Category = "ArtCraft", Name = "PhotoCraft", Description = "Editor de imagens open-source, no estilo do Photoshop (early alpha).", DownloadRepo = "storytold/photocraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "PhotoCraft", IconUrl = ArtCraftIcon("photocraft", "photocraft") },
+        new() { Category = "ArtCraft", Name = "PdfCraft", Description = "Central de PDF: ler, organizar, juntar, dividir e proteger PDFs (early alpha).", DownloadRepo = "storytold/pdfcraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "PdfCraft", IconUrl = ArtCraftIcon("pdfcraft", "pdfcraft") },
+        new() { Category = "ArtCraft", Name = "FigCraft", Description = "Design de interfaces e prototipagem, no estilo do Figma (early alpha).", DownloadRepo = "storytold/figcraft", AssetSuffix = "windows-x64.msi", DisplayPrefix = "FigCraft", IconUrl = ArtCraftIcon("figcraft", "figcraft") },
+        new() { Category = "ArtCraft", Name = "Craft Anything", Description = "Explora como um software funciona e ajuda a criar a sua própria versão (early alpha).", DownloadRepo = "storytold/craft-anything", AssetSuffix = "windows-x64.msi", DisplayPrefix = "Craft Anything", IconUrl = ArtCraftIcon("craft-anything", "craft-anything") },
     };
 
     public static string WingetPath =>
@@ -174,6 +178,10 @@ public static class AppInstaller
         ["Notepad++.Notepad++"] = "notepad-plus-plus.org", ["PuTTY.PuTTY"] = "putty.org", ["WinSCP.WinSCP"] = "winscp.net",
         ["Valve.Steam"] = "store.steampowered.com", ["EpicGames.EpicGamesLauncher"] = "store.epicgames.com",
     };
+
+    /// <summary>Ícone oficial de um app da ArtCraft, do próprio repositório no GitHub (128 px).</summary>
+    private static string ArtCraftIcon(string repo, string id) =>
+        $"https://raw.githubusercontent.com/storytold/{repo}/main/assets/app-icon/hicolor/128x128/apps/ai.storyteller.{id}.png";
 
     /// <summary>Ícone direto quando o do Google/DuckDuckGo não serve.</summary>
     public static readonly Dictionary<string, string> IconUrls = new()

@@ -91,7 +91,7 @@ public static class PageCatalog
         new("NavOptProfiles", "Perfis de otimização", "TWEAKING", "Pacotes prontos (Básico, Sem IA, Padrão do Windows) e os seus perfis salvos.", "perfil perfis pacote basico sem ia padrao exportar importar", false, ""),
         new("NavOptClean", "Limpeza", "TWEAKING", "Ver e apagar temporários, lixeira, cache de atualização, de shaders e dos navegadores.", "limpeza limpar temporarios lixo cache shader navegador lixeira espaco", false, ""),
         new("NavLauncher", "Meus jogos", "JOGOS", "Todos os seus jogos num lugar só, com perfil de abertura.", "jogos biblioteca steam epic launcher abrir", false, ""),
-        new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja", false, ""),
+        new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja favorito favoritos coracao drm steam epic xbox gog", false, ""),
         new("NavGames", "FPS estimado", "JOGOS", "Quanto FPS os jogos devem rodar no seu PC.", "fps jogos rodar requisitos", false, ""),
         new("NavBottleneck", "Gargalo", "JOGOS", "Se a CPU ou a placa de vídeo está segurando o desempenho.", "gargalo bottleneck", true, ""),
         new("NavOverlay", "Overlay", "JOGOS", "Mostrar FPS e temperatura por cima dos jogos.", "overlay fps tela jogo", false, ""),
