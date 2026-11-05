@@ -124,10 +124,21 @@ public sealed class AppSettings
     public uint OverlayHotkeyVk { get; set; } = 0x4F;
     /// <summary>Itens escolhidos para o overlay (chaves de OverlayMetrics); null = padrão.</summary>
     public List<string>? OverlayItems { get; set; }
-    // Aparência do overlay (cores em #RRGGBB)
+    // Aparência do overlay (cores em #RRGGBB). As três abaixo são herança: ainda servem de base/migração para as cores por grupo.
     public string OverlayFpsColor { get; set; } = "#A66BFF";
     public string OverlayValueColor { get; set; } = "#F5F5F5";
     public string OverlayLabelColor { get; set; } = "#8C8C8C";
+    // Cores por grupo (Valores e Rótulos de FPS, GPU, CPU e RAM). Nulo = cai na cor antiga única acima (migração) e no padrão.
+    // OverlayColFpsHead é a sub-opção do grupo FPS: cor de FPS, FRAME e 1% LOW juntos.
+    public string? OverlayColFpsHead { get; set; }
+    public string? OverlayColFpsVal { get; set; }
+    public string? OverlayColGpuVal { get; set; }
+    public string? OverlayColCpuVal { get; set; }
+    public string? OverlayColRamVal { get; set; }
+    public string? OverlayColFpsLbl { get; set; }
+    public string? OverlayColGpuLbl { get; set; }
+    public string? OverlayColCpuLbl { get; set; }
+    public string? OverlayColRamLbl { get; set; }
     public string OverlayFont { get; set; } = "Segoe UI";
     /// <summary>Contorno escuro no texto (legível sem fundo).</summary>
     public bool OverlayShadow { get; set; }

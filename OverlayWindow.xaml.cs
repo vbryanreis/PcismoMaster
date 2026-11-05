@@ -105,8 +105,8 @@ public partial class OverlayWindow : Window
         bool graph = show.Contains("graph"), fpsGraph = show.Contains("fpsgraph");
         OGraph.Visibility = graph ? Visibility.Visible : Visibility.Collapsed;
         OGraphFps.Visibility = fpsGraph ? Visibility.Visible : Visibility.Collapsed;
-        if (graph) DrawGraph(OGraph, f?.RecentFrameTimes, false, st.Fps);
-        if (fpsGraph) DrawGraph(OGraphFps, f?.RecentFrameTimes, true, st.Value);
+        if (graph) DrawGraph(OGraph, f?.RecentFrameTimes, false, st.FpsHead);
+        if (fpsGraph) DrawGraph(OGraphFps, f?.RecentFrameTimes, true, st.FpsHead);
     }
 
     private OverlayStyle? _style;
@@ -140,18 +140,20 @@ public partial class OverlayWindow : Window
         var cells = new List<OverlayCell>();
         if (live?.Status is { Length: > 0 } status) cells.Add(new("●", status, Rec, Rec));
         string N(double? v) => v is double x && x > 0 ? $"{x:0}" : "—";
-        if (show.Contains("fps")) cells.Add(new("FPS", N(f?.Fps), st.Fps, st.Label));
-        if (show.Contains("frametime")) cells.Add(new("FRAME", f != null ? $"{f.FrameTimeMs:0.0} ms" : "—", st.Value, st.Label));
-        if (show.Contains("low1")) cells.Add(new("1% LOW", N(f?.Low1Fps), st.Value, st.Label));
-        if (show.Contains("low01")) cells.Add(new("0,1% LOW", N(f?.Low01Fps), st.Value, st.Label));
-        if (show.Contains("fpsmin")) cells.Add(new("MÍN", f != null ? N(live?.Min) : "—", st.Value, st.Label));
-        if (show.Contains("fpsavg")) cells.Add(new("MÉD", f != null ? N(live?.Avg) : "—", st.Value, st.Label));
-        if (show.Contains("fpsmax")) cells.Add(new("MÁX", f != null ? N(live?.Max) : "—", st.Value, st.Label));
-        if (show.Contains("jitter")) cells.Add(new("VARIAÇÃO", f != null ? $"±{f.JitterMs:0.0} ms" : "—", st.Value, st.Label));
+        // FPS, FRAME e 1% LOW compartilham a cor "cabeça" do grupo FPS; o resto do FPS usa a cor de valores de FPS.
+        if (show.Contains("fps")) cells.Add(new("FPS", N(f?.Fps), st.FpsHead, st.FpsLbl));
+        if (show.Contains("frametime")) cells.Add(new("FRAME", f != null ? $"{f.FrameTimeMs:0.0} ms" : "—", st.FpsHead, st.FpsLbl));
+        if (show.Contains("low1")) cells.Add(new("1% LOW", N(f?.Low1Fps), st.FpsHead, st.FpsLbl));
+        if (show.Contains("low01")) cells.Add(new("0,1% LOW", N(f?.Low01Fps), st.FpsVal, st.FpsLbl));
+        if (show.Contains("fpsmin")) cells.Add(new("MÍN", f != null ? N(live?.Min) : "—", st.FpsVal, st.FpsLbl));
+        if (show.Contains("fpsavg")) cells.Add(new("MÉD", f != null ? N(live?.Avg) : "—", st.FpsVal, st.FpsLbl));
+        if (show.Contains("fpsmax")) cells.Add(new("MÁX", f != null ? N(live?.Max) : "—", st.FpsVal, st.FpsLbl));
+        if (show.Contains("jitter")) cells.Add(new("VARIAÇÃO", f != null ? $"±{f.JitterMs:0.0} ms" : "—", st.FpsVal, st.FpsLbl));
+        // Sensores: cor do valor pelo grupo (GPU/VRAM, CPU, RAM), mas a temperatura ainda manda (verde/âmbar/vermelho).
         foreach (var p in parts)
-            cells.Add(new(p.Short, p.Bare, p.Level switch { 1 => Cool, 2 => Warm, 3 => Hot, _ => st.Value }, st.Label));
-        if (show.Contains("game") && f != null) cells.Add(new("JOGO", f.ProcessName, st.Value, st.Label));
-        if (hour != null) cells.Add(new("HORA", hour, st.Value, st.Label));
+            cells.Add(new(p.Short, p.Bare, p.Level switch { 1 => Cool, 2 => Warm, 3 => Hot, _ => st.ValueFor(p.Group) }, st.LabelFor(p.Group)));
+        if (show.Contains("game") && f != null) cells.Add(new("JOGO", f.ProcessName, st.ValueFor("Outros"), st.LabelFor("Outros")));
+        if (hour != null) cells.Add(new("HORA", hour, st.ValueFor("Outros"), st.LabelFor("Outros")));
         return cells;
     }
 
@@ -211,11 +213,29 @@ public sealed record OverlayCell(string Label, string Value, Brush Fg, Brush Lab
 /// <summary>Mínimo, média e máximo desde que o jogo abriu, e o aviso de benchmark/gravação em andamento.</summary>
 public sealed record OverlayLive(double Min, double Avg, double Max, string? Status);
 
-/// <summary>Aparência do overlay: cores do FPS, dos valores e dos rótulos, fonte e contorno no texto.</summary>
-public sealed record OverlayStyle(Brush Fps, Brush Value, Brush Label, string Font, bool Shadow)
+/// <summary>
+/// Aparência do overlay: cores por grupo (Valores e Rótulos de FPS, GPU, CPU e RAM), fonte e contorno no texto.
+/// <see cref="FpsHead"/> é a cor de FPS, FRAME e 1% LOW; os demais valores de FPS (mín/méd/máx, gráficos) usam <see cref="FpsVal"/>.
+/// VRAM acompanha a GPU e "Outros" (jogo, hora) usa a cor de FPS. A cor automática por temperatura ainda vale por cima dos valores.
+/// </summary>
+public sealed record OverlayStyle(Brush FpsHead, Brush FpsVal, Brush GpuVal, Brush CpuVal, Brush RamVal,
+                                  Brush FpsLbl, Brush GpuLbl, Brush CpuLbl, Brush RamLbl, string Font, bool Shadow)
 {
-    public static OverlayStyle From(AppSettings s) => new(Parse(s.OverlayFpsColor, "#A66BFF"), Parse(s.OverlayValueColor, "#F5F5F5"),
-        Parse(s.OverlayLabelColor, "#8C8C8C"), string.IsNullOrWhiteSpace(s.OverlayFont) ? "Segoe UI" : s.OverlayFont, s.OverlayShadow);
+    public static OverlayStyle From(AppSettings s)
+    {
+        // Cada grupo usa a cor própria; se não houver, cai na cor única antiga (migração) e no padrão.
+        Brush V(string? c) => Parse(c ?? s.OverlayValueColor, "#F5F5F5");
+        Brush L(string? c) => Parse(c ?? s.OverlayLabelColor, "#8C8C8C");
+        return new(Parse(s.OverlayColFpsHead ?? s.OverlayFpsColor, "#A66BFF"),
+            V(s.OverlayColFpsVal), V(s.OverlayColGpuVal), V(s.OverlayColCpuVal), V(s.OverlayColRamVal),
+            L(s.OverlayColFpsLbl), L(s.OverlayColGpuLbl), L(s.OverlayColCpuLbl), L(s.OverlayColRamLbl),
+            string.IsNullOrWhiteSpace(s.OverlayFont) ? "Segoe UI" : s.OverlayFont, s.OverlayShadow);
+    }
+
+    /// <summary>Cor do valor do grupo do item (VRAM acompanha a GPU; "Outros" usa a de FPS).</summary>
+    public Brush ValueFor(string group) => group switch { "GPU" or "VRAM" => GpuVal, "CPU" => CpuVal, "RAM" => RamVal, _ => FpsVal };
+    /// <summary>Cor do rótulo do grupo do item.</summary>
+    public Brush LabelFor(string group) => group switch { "GPU" or "VRAM" => GpuLbl, "CPU" => CpuLbl, "RAM" => RamLbl, _ => FpsLbl };
 
     private static readonly Dictionary<string, Brush> Cache = new();
     public static Brush Parse(string? hex, string fallback)
