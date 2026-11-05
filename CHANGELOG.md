@@ -12,6 +12,15 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
   - Overlay dividido em sub-abas: Overlay, Limitador de FPS, Benchmark, Captura e vídeo e Perfis por jogo.
   - Sistema, Discos, Energia, Rede e Utilidades com largura máxima de 1400 px; a lista do Desinstalar apps cresce com a janela.
   - Abrir a categoria Manutenção já abre a página (ela só tem uma); títulos sem o ícone solto que só duas páginas tinham.
+- **Limpeza com a memória RAM em gráfico**: a limpeza de memória e o fechar programas saíram de Ferramentas › Otimização e foram para TWEAKING › Limpeza, com uma rosca da RAM (em uso, em espera, modificada e livre), o uso dos últimos 60 segundos e o resultado de cada limpeza.
+- **Aba Otimização removida**: os ajustes para jogos dela já existem nas outras abas; o Game DVR, que só existia lá, entrou em TWEAKING › Windows. Quem alterou algo pela aba antiga ainda pode restaurar em TWEAKING › Windows.
+- **Desinstalar apps**: programas já removidos que deixaram a entrada no registro (desinstalador e pasta sumiram, ou MSI que o Windows não conhece mais) não aparecem mais na lista; um botão apaga essas entradas órfãs com backup. Depois do desinstalador oficial, a entrada só é oferecida como sobra se o programa sumiu de verdade (se o desinstalador foi cancelado, o app continua instalado). Programas com o desinstalador sumido mas a pasta ainda lá mostram "use a remoção forçada".
+- **Drivers**:
+  - No topo, a versão do driver de vídeo instalada x a mais recente e **o que mudou** em cada versão nova, das notas oficiais da NVIDIA: jogos com suporte Game Ready, tecnologias, correções em jogos e gerais; versões anteriores sob demanda e link para as notas completas.
+  - **Bibliotecas**: botões para baixar e instalar o Visual C++ (pacote AIO do abbodi1406/vcredist, conferido pelo SHA-256 do GitHub) e o DirectX de junho de 2010 (site da Microsoft, assinatura conferida).
+  - O cartão "Placa de vídeo" de baixo saiu (repetia o de cima); o Driver Studio e os botões NVIDIA/AMD/Intel foram para o topo.
+  - **Placa-mãe**: BIOS instalada x mais recente e todos os drivers do modelo (chipset, áudio, rede, Wi-Fi, Bluetooth, SATA/RAID, USB, utilitários) comparados ao instalado, com download do site oficial — automático na ASUS. Gigabyte, MSI e ASRock bloqueiam programas no site: o app mostra os drivers da placa instalados e abre direto as páginas de BIOS e drivers do modelo. A BIOS nunca é gravada pelo app.
+- **Desempenho**: Inicialização, Portas COM e Biblioteca de jogos não travam mais a tela ao abrir (leituras em segundo plano); código sem uso removido (janela antiga do ResetExplode, funções NVAPI/NVML e auxiliares que ninguém chamava).
 
 ## 0.9.0
 

@@ -53,7 +53,7 @@ public partial class MainWindow
     private async void BtnDebloatLatest_Click(object sender, RoutedEventArgs e)
     {
         if (_gfxBusy || !RequireAdmin() || !Need7z()) return;
-        var g = _drvGpus.FirstOrDefault(x => x.Vendor == "NVIDIA") ?? DriverManager.ReadGpus().FirstOrDefault(x => x.Vendor == "NVIDIA");
+        var g = _drvGpus.FirstOrDefault(x => x.Vendor == "NVIDIA") ?? await Task.Run(() => DriverManager.ReadGpus().FirstOrDefault(x => x.Vendor == "NVIDIA"));
         if (g == null) { DebloatStatus.Text = "Nenhuma placa NVIDIA encontrada."; return; }
         if (!ConfirmDebloat("nvidia")) return;
         await RunDebloat(async () =>

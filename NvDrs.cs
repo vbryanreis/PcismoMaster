@@ -45,7 +45,6 @@ public static class NvDrs
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtr(IntPtr a, IntPtr b);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrRefPtr(IntPtr a, ref IntPtr b);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrUintRefPtr(IntPtr a, uint i, ref IntPtr b);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrRefUint(IntPtr a, ref uint n);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtrPtr(IntPtr a, IntPtr b, IntPtr c);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int FnPtrPtrUint(IntPtr a, IntPtr b, uint c);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate int FnPtrStrRefPtr(IntPtr a, string name, ref IntPtr b);

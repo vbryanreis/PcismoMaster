@@ -25,7 +25,6 @@ internal static class NvApi
     private const uint ID_Unload = 0xD22BDD7E;
     private const uint ID_GetErrorMessage = 0x6C2D048C;
     private const uint ID_EnumPhysicalGPUs = 0xE5AC921F;
-    private const uint ID_GPU_GetFullName = 0xCEEE8E9F;
     private const uint ID_GPU_GetPCIIdentifiers = 0x2DDFB66E;
 
     private const uint ID_GPU_GetPstates20 = 0x6FF81213;
@@ -51,7 +50,6 @@ internal static class NvApi
     private const uint ID_GPU_GetArchInfo = 0xD8265D24;
 
     /// <summary>NvAPI_GPU_GetThermalSettings — current temperatures. Takes a sensor-index arg.</summary>
-    private const uint ID_GPU_GetThermalSettings = 0xE3640A56;
 
     /// <summary>ClientPowerTopologyGetStatus — live board power draw (per-mille of percent of TGP).</summary>
     private const uint ID_GPU_GetPowerTopologyStatus = 0xEDCF624E;
@@ -76,15 +74,11 @@ internal static class NvApi
     private delegate int EnumPhysicalGpusDelegate([Out] IntPtr[] handles, out int count);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     private delegate int GetErrorMessageDelegate(int status, StringBuilder message);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    private delegate int GetFullNameDelegate(IntPtr gpu, StringBuilder name);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int GetPciIdentifiersDelegate(IntPtr gpu,
         out uint deviceId, out uint subSystemId, out uint revisionId, out uint extDeviceId);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int GpuStructDelegate(IntPtr gpu, IntPtr data);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int GpuThermalDelegate(IntPtr gpu, uint sensorIndex, IntPtr data);
 
     private static T GetDelegate<T>(uint id) where T : Delegate
     {
@@ -147,27 +141,6 @@ internal static class NvApi
         Check(GetDelegate<EnumPhysicalGpusDelegate>(ID_EnumPhysicalGPUs)(handles, out int count),
             "NvAPI_EnumPhysicalGPUs");
         return handles.Take(count).ToArray();
-    }
-
-    private static string GetFullName(IntPtr gpu)
-    {
-        var name = new StringBuilder(NVAPI_SHORT_STRING_MAX);
-        Check(GetDelegate<GetFullNameDelegate>(ID_GPU_GetFullName)(gpu, name), "NvAPI_GPU_GetFullName");
-        return name.ToString();
-    }
-
-    /// <summary>The GPU's full name, or <c>&lt;unknown&gt;</c> if the driver won't report it — for the
-    /// human-facing headers that shouldn't fail a command just because the name read did.</summary>
-    public static string SafeFullName(IntPtr gpu)
-    {
-        try
-        {
-            return GetFullName(gpu);
-        }
-        catch (Exception)
-        {
-            return "<unknown>";
-        }
     }
 
     /// <summary>The GPU's PCI identifiers — the exact card model (device, subsystem/board vendor,
@@ -306,32 +279,8 @@ internal static class NvApi
         return BitConverter.ToUInt32(bytes, 0x28);
     }
 
-    /// <summary>The live GPU core temperature (degrees C), from sensor 0 of GetThermalSettings (V2).</summary>
-    public static int GetCoreTemperatureC(IntPtr gpu)
-    {
-        const int size = 68; // NV_GPU_THERMAL_SETTINGS_V2: version, count, sensor[3] x 20 bytes
-        IntPtr buffer = AllocZeroed(size);
-        try
-        {
-            Marshal.WriteInt32(buffer, MakeVersion(size, 2));
-            Check(GetDelegate<GpuThermalDelegate>(ID_GPU_GetThermalSettings)(gpu, 0, buffer),
-                "NvAPI_GPU_GetThermalSettings");
-            return Marshal.ReadInt32(buffer, 0x14); // sensor[0].currentTemp
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(buffer);
-        }
-    }
-
     /// <summary>The live board power draw as a percentage of the total power limit (TGP). The power
     /// topology reports channel 0 (total) in thousandths of a percent, so the value is scaled by 1000.</summary>
-    public static double GetPowerPercent(IntPtr gpu)
-    {
-        byte[] bytes = ReadRaw(gpu, ID_GPU_GetPowerTopologyStatus, 1, 72, 256, requestMaskWords: 0);
-        return BitConverter.ToUInt32(bytes, 0x10) / 1000.0; // entry[0].value
-    }
-
     // --- V/F curve: status (effective curve) and control (per-point frequency deltas) ---
     //
     // Both buffers are flat arrays of per-point entries, one per voltage anchor (80-130ish of them,

@@ -536,11 +536,6 @@ public static class OptCatalog
     public static OptTweak? ById(string id) => All.FirstOrDefault(t => t.Id == id);
     public static IEnumerable<OptTweak> For(OptPage page) => All.Where(t => t.Page == page && t.Id != "new_users");
 
-    public static string PageTitle(OptPage p) => p switch
-    {
-        OptPage.Debloat => "Debloat", OptPage.Windows => "Windows", OptPage.Mouse => "Mouse", OptPage.Teclado => "Teclado", _ => "GPU",
-    };
-
     public static string LevelText(OptLevel l) => l switch { OptLevel.Essencial => "Essencial", OptLevel.Recomendado => "Recomendado", OptLevel.Avancado => "Avançado", _ => "" };
 
     public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Privacidade", "Jogos", "Rede", "IA" };

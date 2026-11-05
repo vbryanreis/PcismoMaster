@@ -23,10 +23,6 @@ public static class FpsLimiter
     public static void SetGlobal(uint fps) => Write(null, NvidiaPanel.MaxFps, fps);
     public static void SetBackground(uint fps) => Write(null, NvidiaPanel.BgFps, fps);
 
-    /// <summary>Limite gravado no perfil do jogo; 0 = sem limite próprio (usa o global).</summary>
-    public static uint ReadGame(string exe) => NvDrs.Session(s =>
-        NvDrs.FindAppProfile(s, Exe(exe)) is IntPtr p ? Value(s, p, NvidiaPanel.MaxFps, true) : 0u);
-
     /// <summary>Grava o limite no perfil do jogo (cria um perfil "PcismoMaster - jogo" se o driver não conhecer o executável).</summary>
     public static void SetGame(string exe, uint fps) => Write(Exe(exe), NvidiaPanel.MaxFps, fps);
 

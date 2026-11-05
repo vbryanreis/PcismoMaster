@@ -477,10 +477,11 @@ public partial class MainWindow : Window
 
     private void InitGames()
     {
+        // Nome da CPU pelo registro (instantâneo); a consulta WMI travava a tela por um instante ao abrir a página.
         try
         {
-            using var s = new System.Management.ManagementObjectSearcher("SELECT Name FROM Win32_Processor");
-            foreach (System.Management.ManagementObject mo in s.Get()) { _cpuName = mo["Name"]?.ToString()?.Trim() ?? ""; break; }
+            using var k = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
+            _cpuName = (k?.GetValue("ProcessorNameString") as string ?? "").Trim();
         }
         catch { }
         _gpuName = _gpus.Count > 0 ? _gpus[0].Name : "";
@@ -856,13 +857,27 @@ public partial class MainWindow : Window
 
     private List<UsbDevice> _usb = new();
 
-    private void ScanUsb()
+    private int _usbScan;
+
+    /// <summary>Varre os dispositivos (inclusive os ausentes) e as reservas COM fora da thread da tela.</summary>
+    private async void ScanUsb()
     {
+        int id = ++_usbScan;
+        List<UsbDevice> devices;
+        (List<int> Reserved, List<int> InUse)? com = null;
+        string? comError = null;
         try
         {
-            _usb = UsbCleaner.List();
+            (devices, com, comError) = await Task.Run(() =>
+            {
+                var d = UsbCleaner.List();
+                try { var (r, u) = UsbCleaner.ComStatus(); return (d, ((List<int>, List<int>)?)(r.ToList(), u.ToList()), (string?)null); }
+                catch (Exception ex) { return (d, null, ex.Message); }
+            });
         }
         catch (Exception ex) { UsbResult.Text = $"Não foi possível listar os dispositivos: {ex.Message}"; return; }
+        if (id != _usbScan) return;
+        _usb = devices;
 
         static bool Relevant(UsbDevice d) => d.Port != null || d.Maker != null;
         var connected = _usb.Where(d => d.Present && Relevant(d)).ToList();
@@ -876,13 +891,12 @@ public partial class MainWindow : Window
             ? "Nenhum registro antigo encontrado."
             : $"{shown.Count} registros antigos na lista ({ghosts} dispositivos ausentes no total).";
 
-        try
+        if (com is var (reserved, inUse))
         {
-            var (reserved, inUse) = UsbCleaner.ComStatus();
             string R(IEnumerable<int> l) => l.Any() ? string.Join(", ", l.Select(n => $"COM{n}")) : "nenhum";
             UsbComDb.Text = $"{reserved.Count} reservados: {R(reserved)}\nEm uso agora: {R(inUse)}";
         }
-        catch (Exception ex) { UsbComDb.Text = ex.Message; }
+        else UsbComDb.Text = comError ?? "";
         BtnComDbRestore.IsEnabled = _settings.ComDbBackup != null;
     }
 

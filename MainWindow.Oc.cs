@@ -75,7 +75,7 @@ public partial class MainWindow
         double sumGpuW = 0.0;
         int nCpuW = 0;
         int nGpuW = 0;
-        string fail = null;
+        string? fail = null;
         StressTester stress = new StressTester();
         GpuBurn burn = new GpuBurn();
         try
@@ -100,7 +100,7 @@ public partial class MainWindow
                 _gpuBenchActive = true;
                 using (ct.Register(gb.Cancel))
                 {
-                    GpuGameResult gpuGameResult = await Task.Factory.StartNew((Func<GpuGameResult>)gb.Run, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    GpuGameResult? gpuGameResult = await Task.Factory.StartNew((Func<GpuGameResult?>)gb.Run, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                     if (gpuGameResult != null)
                     {
                         gpuScore = gpuGameResult.Score;
@@ -282,37 +282,8 @@ public partial class MainWindow
         OcResult.ItemsSource = list;
         OcResult.Foreground = (flag4 ? Fg : Ink);
         OcVerdictCard.Visibility = Visibility.Visible;
-        string[] obj = new string[5]
-        {
-            flag4 ? "estável" : "INSTÁVEL",
-            " · ",
-            label,
-            null,
-            null
-        };
-        object obj2;
-        if (cpuScore.HasValue)
-        {
-            double valueOrDefault5 = cpuScore.GetValueOrDefault();
-            obj2 = $" · CPU {valueOrDefault5:N0}";
-        }
-        else
-        {
-            obj2 = "";
-        }
-        obj[3] = (string)obj2;
-        object obj3;
-        if (gpuScore.HasValue)
-        {
-            double valueOrDefault6 = gpuScore.GetValueOrDefault();
-            obj3 = $" · GPU {valueOrDefault6:N0}";
-        }
-        else
-        {
-            obj3 = "";
-        }
-        obj[4] = (string)obj3;
-        string summary = string.Concat(obj);
+        string summary = (flag4 ? "estável" : "INSTÁVEL") + " · " + label +
+                         (cpuScore is double cs ? $" · CPU {cs:N0}" : "") + (gpuScore is double gs ? $" · GPU {gs:N0}" : "");
         _settings.BenchRecords.Insert(0, new BenchRecord(DateTime.Now, "oc", flag4 ? 1.0 : 0.15, summary));
         _settings.Save();
         UpdateOcHistory();

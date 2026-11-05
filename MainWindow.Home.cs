@@ -13,7 +13,6 @@ namespace ResetExplode;
 public partial class MainWindow
 {
     private StackPanel? _homeResults;
-    private readonly List<FrameworkElement> _advancedOnly = new();
 
     private bool Advanced => _settings.AdvancedMode;
 
@@ -148,13 +147,6 @@ public partial class MainWindow
         Resources["ModeAccentSoft"] = soft;
     }
 
-    /// <summary>Partes de página que só aparecem no modo avançado (ex.: scripts completos).</summary>
-    private void AdvancedOnly(FrameworkElement el)
-    {
-        _advancedOnly.Add(el);
-        el.Visibility = Advanced ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     private void ApplyMode()
     {
         bool adv = Advanced;
@@ -167,7 +159,6 @@ public partial class MainWindow
                 bool any = items.Children.OfType<RadioButton>().Any(r => r.Visibility == Visibility.Visible);
                 g.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
             }
-        foreach (var el in _advancedOnly) el.Visibility = adv ? Visibility.Visible : Visibility.Collapsed;
         DrvTabNpi.Visibility = adv ? Visibility.Visible : Visibility.Collapsed;
         if (!adv && DrvTabNpi.IsChecked == true) DrvTabDrivers.IsChecked = true;
         FilterBloat();

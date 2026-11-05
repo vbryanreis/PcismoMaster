@@ -6,11 +6,16 @@ namespace ResetExplode;
 /// <summary>Aba FERRAMENTAS · Inicialização: programas que abrem junto com o Windows.</summary>
 public partial class MainWindow
 {
-    private void ScanStartup()
+    private int _startupScan;
+
+    /// <summary>Lê as entradas fora da thread da tela (registro, pastas de inicialização e tarefas); a última leitura pedida é a que vale.</summary>
+    private async void ScanStartup()
     {
+        int id = ++_startupScan;
         List<StartupEntry> list;
-        try { list = StartupManager.List(); }
+        try { list = await Task.Run(StartupManager.List); }
         catch (Exception ex) { StartupResult.Text = $"Não foi possível listar: {ex.Message}"; return; }
+        if (id != _startupScan) return;
 
         StartupList.ItemsSource = list;
         int on = list.Count(e => e.Enabled);

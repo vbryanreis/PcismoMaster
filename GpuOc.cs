@@ -95,12 +95,6 @@ public sealed class GpuOc
     public IReadOnlyList<(int Mv, int Mhz)>? StockCurve { get; set; }
 
     /// <summary>Offsets aplicados hoje (para mostrar nos sliders ao abrir a aba).</summary>
-    public (int CoreMhz, int MemMhz, int VoltagePercent) ReadOffsets()
-    {
-        var a = ReadApplied();
-        return (a.CoreMhz, a.MemMhz, a.VoltagePercent);
-    }
-
     /// <summary>O ajuste que está na placa agora, seja do PcismoMaster ou do Afterburner: offset do core (o delta mais
     /// comum abaixo do teto), teto de undervolt (onde a curva efetiva fica plana até o fim), memória e tensão.</summary>
     public (int CoreMhz, int MemMhz, int VoltagePercent, int? CapMv, int? CapMhz) ReadApplied()
