@@ -74,6 +74,8 @@ public partial class MainWindow
 
     private void ScriptLog(string line)
     {
+        // Pode chegar de uma tarefa em segundo plano: a caixa de texto só pode ser mexida pela tela.
+        if (!Dispatcher.CheckAccess()) { Dispatcher.BeginInvoke(() => ScriptLog(line)); return; }
         foreach (var (log, _) in _scriptOutputs)
         {
             if (log.Text.Length > 60000) log.Text = log.Text[^40000..];

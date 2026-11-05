@@ -574,7 +574,8 @@ public partial class MainWindow
     {
         var cats = Cleanup.Categories.Where(c => c.DefaultOn && !c.RecycleBin).ToList();
         ScriptLog("Limpando temporários…");
-        long freed = await Task.Run(() => CleanCategories(cats, new Progress<string>(ScriptLog)));
+        var progress = new Progress<string>(ScriptLog); // criado na tela: as linhas voltam para a tela
+        long freed = await Task.Run(() => CleanCategories(cats, progress));
         ScriptLog($"✔ Limpeza: {Cleanup.Size(freed)} liberados.");
     }
 
@@ -659,7 +660,8 @@ public partial class MainWindow
                     MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             analyze.IsEnabled = clean.IsEnabled = false;
             foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ Limpeza  ({DateTime.Now:HH:mm:ss})";
-            long freed = await Task.Run(() => CleanCategories(cats, new Progress<string>(ScriptLog)));
+            var progress = new Progress<string>(ScriptLog); // criado na tela: as linhas voltam para a tela
+            long freed = await Task.Run(() => CleanCategories(cats, progress));
             ScriptLog($"✔ {Cleanup.Size(freed)} liberados.");
             await Analyze();
         });
