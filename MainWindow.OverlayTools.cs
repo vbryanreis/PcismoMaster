@@ -567,15 +567,36 @@ public partial class MainWindow
 
     private static readonly string[] OvPalette = { "#A66BFF", "#4FA3FF", "#22D3EE", "#4ADE80", "#FBBF24", "#FB923C", "#F87171", "#FF79C6", "#F5F5F5", "#8C8C8C" };
     private static readonly string[] OvFonts = { "Segoe UI", "Bahnschrift", "Consolas", "Arial", "Verdana", "Tahoma" };
+    /// <summary>Sub-opções de cor abertas pelo triângulo (começam fechadas a cada abertura do app).</summary>
+    private bool _ovColValOpen, _ovColLblOpen, _ovColFpsOpen;
 
     private void BuildAppearance()
     {
         var host = _ovAppearance!;
         while (host.Children.Count > 2) host.Children.RemoveAt(2);
-        void Colors(string label, string current, Action<string> set)
+        var s = _settings;
+        // level: 0 = grupo (VALORES/RÓTULOS), 1 = FPS/GPU/CPU/RAM, 2 = sub-opção de FPS. A coluna do nome tem largura fixa,
+        // com o recuo dentro dela, para as bolinhas ficarem alinhadas em todas as linhas. toggle = linha com triângulo que abre/fecha.
+        void Colors(string label, string current, Action<string> set, int level = 1, bool? open = null, Action? toggle = null, string? hint = null)
         {
+            const double nameCol = 200;
             var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 8) };
-            row.Children.Add(new TextBlock { Text = label, Width = 120, VerticalAlignment = VerticalAlignment.Center, Foreground = (Brush)FindResource("Fg") });
+            var name = new StackPanel { Orientation = Orientation.Horizontal, Width = nameCol, VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.Transparent }; // fundo transparente: a linha toda responde ao clique
+            name.Children.Add(new Border { Width = level * 18 });
+            name.Children.Add(new TextBlock { Text = toggle == null ? "" : open == true ? "▾" : "▸", Width = 16, FontFamily = new FontFamily("Segoe UI Symbol"),
+                FontSize = 12, Foreground = (Brush)FindResource("Muted"), VerticalAlignment = VerticalAlignment.Center });
+            name.Children.Add(level == 0
+                ? new TextBlock { Text = label, Style = (Style)FindResource("Label"), Margin = new Thickness(0), VerticalAlignment = VerticalAlignment.Center }
+                : new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center, FontSize = level == 2 ? 12 : 13,
+                    Foreground = (Brush)FindResource(level == 2 ? "Muted" : "Fg") });
+            if (toggle != null)
+            {
+                name.Cursor = Cursors.Hand;
+                name.ToolTip = open == true ? "Esconder as opções" : "Mostrar mais opções";
+                name.MouseLeftButtonUp += (_, _) => { toggle(); BuildAppearance(); };
+            }
+            row.Children.Add(name);
             foreach (var hex in OvPalette)
             {
                 bool sel = string.Equals(hex, current, StringComparison.OrdinalIgnoreCase);
@@ -585,11 +606,43 @@ public partial class MainWindow
                 sw.MouseLeftButtonUp += (_, _) => { set(hex); _settings.Save(); BuildAppearance(); UpdateOverlay(); };
                 row.Children.Add(sw);
             }
+            if (hint != null)
+                row.Children.Add(new TextBlock { Text = hint, FontSize = 11, Foreground = (Brush)FindResource("Faint"), VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(4, 0, 0, 0) });
             host.Children.Add(row);
         }
-        Colors("FPS", _settings.OverlayFpsColor, h => _settings.OverlayFpsColor = h);
-        Colors("Valores", _settings.OverlayValueColor, h => _settings.OverlayValueColor = h);
-        Colors("Rótulos", _settings.OverlayLabelColor, h => _settings.OverlayLabelColor = h);
+
+        // Dois grupos (Valores e Rótulos). Fechados (padrão), a cor do grupo vale para FPS, GPU, CPU e RAM de uma vez;
+        // o triângulo abre uma cor para cada um, e o de FPS (Valores) abre a sub-opção de FPS/FRAME/1% LOW.
+        // Cada cor cai na cor do grupo quando ainda não foi escolhida, então a migração das cores antigas é transparente.
+        bool valCustom = new[] { s.OverlayColFpsVal, s.OverlayColGpuVal, s.OverlayColCpuVal, s.OverlayColRamVal }.Any(c => c != null);
+        Colors("VALORES", s.OverlayValueColor, h =>
+        {
+            s.OverlayValueColor = h; // pinta os quatro grupos: tira as cores próprias de cada um
+            s.OverlayColFpsVal = s.OverlayColGpuVal = s.OverlayColCpuVal = s.OverlayColRamVal = null;
+        }, level: 0, open: _ovColValOpen, toggle: () => _ovColValOpen = !_ovColValOpen,
+            hint: valCustom && !_ovColValOpen ? "cores próprias por grupo" : null);
+        if (_ovColValOpen)
+        {
+            Colors("FPS", s.OverlayColFpsVal ?? s.OverlayValueColor, h => s.OverlayColFpsVal = h, open: _ovColFpsOpen, toggle: () => _ovColFpsOpen = !_ovColFpsOpen);
+            if (_ovColFpsOpen) Colors("FPS, FRAME e 1% LOW", s.OverlayColFpsHead ?? s.OverlayFpsColor, h => s.OverlayColFpsHead = h, level: 2);
+            Colors("GPU", s.OverlayColGpuVal ?? s.OverlayValueColor, h => s.OverlayColGpuVal = h);
+            Colors("CPU", s.OverlayColCpuVal ?? s.OverlayValueColor, h => s.OverlayColCpuVal = h);
+            Colors("RAM", s.OverlayColRamVal ?? s.OverlayValueColor, h => s.OverlayColRamVal = h);
+        }
+        bool lblCustom = new[] { s.OverlayColFpsLbl, s.OverlayColGpuLbl, s.OverlayColCpuLbl, s.OverlayColRamLbl }.Any(c => c != null);
+        Colors("RÓTULOS", s.OverlayLabelColor, h =>
+        {
+            s.OverlayLabelColor = h;
+            s.OverlayColFpsLbl = s.OverlayColGpuLbl = s.OverlayColCpuLbl = s.OverlayColRamLbl = null;
+        }, level: 0, open: _ovColLblOpen, toggle: () => _ovColLblOpen = !_ovColLblOpen,
+            hint: lblCustom && !_ovColLblOpen ? "cores próprias por grupo" : null);
+        if (_ovColLblOpen)
+        {
+            Colors("FPS", s.OverlayColFpsLbl ?? s.OverlayLabelColor, h => s.OverlayColFpsLbl = h);
+            Colors("GPU", s.OverlayColGpuLbl ?? s.OverlayLabelColor, h => s.OverlayColGpuLbl = h);
+            Colors("CPU", s.OverlayColCpuLbl ?? s.OverlayLabelColor, h => s.OverlayColCpuLbl = h);
+            Colors("RAM", s.OverlayColRamLbl ?? s.OverlayLabelColor, h => s.OverlayColRamLbl = h);
+        }
         host.Children.Add(new TextBlock { Text = "FONTE", Style = (Style)FindResource("Label"), Margin = new Thickness(0, 6, 0, 6) });
         host.Children.Add(OvChips("OvFont", OvFonts.Select(f => (f, f)), _settings.OverlayFont, f => { _settings.OverlayFont = f; _settings.Save(); UpdateOverlay(); }));
         var shadow = new CheckBox { Content = "Contorno no texto (lê melhor com o fundo transparente)", IsChecked = _settings.OverlayShadow, Margin = new Thickness(0, 6, 0, 8) };
@@ -598,6 +651,8 @@ public partial class MainWindow
         var reset = TweakButton("Voltar ao padrão", false, (_, _) =>
         {
             _settings.OverlayFpsColor = "#A66BFF"; _settings.OverlayValueColor = "#F5F5F5"; _settings.OverlayLabelColor = "#8C8C8C";
+            _settings.OverlayColFpsHead = _settings.OverlayColFpsVal = _settings.OverlayColGpuVal = _settings.OverlayColCpuVal = _settings.OverlayColRamVal = null;
+            _settings.OverlayColFpsLbl = _settings.OverlayColGpuLbl = _settings.OverlayColCpuLbl = _settings.OverlayColRamLbl = null;
             _settings.OverlayFont = "Segoe UI"; _settings.OverlayShadow = false; _settings.Save();
             BuildAppearance(); UpdateOverlay();
         });
