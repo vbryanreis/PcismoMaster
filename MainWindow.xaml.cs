@@ -62,8 +62,7 @@ public partial class MainWindow : Window
 
     // OTIMIZAÇÃO
     private List<BackgroundApp> _apps = new();
-    private readonly List<Tweak> _tweaks = WindowsTweaks.All(); // só as definições; o estado é lido ao abrir a página
-    private bool _optInit;
+    private readonly List<Tweak> _tweaks = WindowsTweaks.All(); // Modo de Jogo e Game DVR na Saúde do PC; e desfazer o que a antiga aba Otimização alterou
 
     // Stress de GPU (estilo FurMark)
     private readonly GpuBurn _burn = new();
@@ -124,9 +123,10 @@ public partial class MainWindow : Window
             CollectDashSample();
             UpdateBottleneck();
             if (PageBench.IsVisible) UpdateBenchLive();
-            if (PageOptimize.IsVisible) UpdateRamStatus();
+            if (PageOptClean.IsVisible) UpdateRamStatus();
         };
         _timer.Start();
+        ApplyPageLayout();
 
         StateChanged += (_, _) =>
         {
@@ -295,17 +295,17 @@ public partial class MainWindow : Window
             case "PageApps": InitApps(); break;
             case "PageMakerPorts": ScanUsb(); break;
             case "PageMakerDrv": InitMakerDrivers(); break;
-            case "PageOptimize": InitOptimize(); break;
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
             case "PageMaint": InitMaint(); break;
-            case "PageOptFormat" or "PageOptDebloat" or "PageOptWindows" or "PageOptInput" or "PageOptGpu" or "PageOptProfiles" or "PageOptClean": InitOpt(page); break;
+            case "PageOptFormat" or "PageOptDebloat" or "PageOptWindows" or "PageOptInput" or "PageOptGpu" or "PageOptProfiles": InitOpt(page); break;
+            case "PageOptClean": InitOpt(page); InitMemory(); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageHome, PageOptFormat, PageOptDebloat, PageOptWindows, PageOptInput, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageOptFormat, PageOptDebloat, PageOptWindows, PageOptInput, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -477,10 +477,11 @@ public partial class MainWindow : Window
 
     private void InitGames()
     {
+        // Nome da CPU pelo registro (instantâneo); a consulta WMI travava a tela por um instante ao abrir a página.
         try
         {
-            using var s = new System.Management.ManagementObjectSearcher("SELECT Name FROM Win32_Processor");
-            foreach (System.Management.ManagementObject mo in s.Get()) { _cpuName = mo["Name"]?.ToString()?.Trim() ?? ""; break; }
+            using var k = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
+            _cpuName = (k?.GetValue("ProcessorNameString") as string ?? "").Trim();
         }
         catch { }
         _gpuName = _gpus.Count > 0 ? _gpus[0].Name : "";
@@ -852,102 +853,31 @@ public partial class MainWindow : Window
         }).ToList();
     }
 
-    // ---------------- OTIMIZAÇÃO ----------------
-
-    /// <summary>Carrega a página OTIMIZAÇÃO quando ela é aberta (os ajustes do Windows só na primeira vez).</summary>
-    private void InitOptimize()
-    {
-        if (!_optInit)
-        {
-            _optInit = true;
-            foreach (var t in _tweaks)
-                try { t.Refresh(); } catch (Exception ex) { t.Status = $"Não foi possível ler: {ex.Message}"; }
-            OptTweaks.ItemsSource = _tweaks;
-        }
-        RefreshApps();
-        UpdateRamStatus();
-    }
-
-    private void UpdateRamStatus()
-    {
-        var (total, avail) = Optimizer.MemoryStatus();
-        if (total == 0) return;
-        double used = total - avail;
-        OptRamText.Text = $"{used / 1073741824.0:0.0} de {total / 1073741824.0:0.0} GB · {used / total:P0}";
-        OptRamBar.ScaleX = used / total;
-    }
-
-    /// <summary>Lista os programas abertos fora da thread da janela (percorre todos os processos do Windows).</summary>
-    private async void RefreshApps()
-    {
-        _apps = await Task.Run(Optimizer.ListApps);
-        OptApps.ItemsSource = _apps;
-    }
-
-    private void BtnRefreshApps_Click(object sender, RoutedEventArgs e) => RefreshApps();
-
-    private async void BtnOptimize_Click(object sender, RoutedEventArgs e)
-    {
-        var toClose = _apps.Where(a => a.Selected).ToList();
-        string list = toClose.Count == 0 ? "nenhum programa marcado"
-                                         : string.Join("\n", toClose.Select(a => $"  • {a.Title}"));
-        var r = MessageBox.Show("A OTIMIZAÇÃO vai:\n\n" +
-                                "1. Limpar a memória em espera e enxugar a RAM dos programas.\n" +
-                                $"2. Fechar os programas marcados:\n{list}\n\n" +
-                                "Salve o que estiver aberto nesses programas antes. Continuar?",
-                                "OTIMIZAÇÃO", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (r != MessageBoxResult.Yes) return;
-
-        BtnOptimize.IsEnabled = false;
-        BtnOptimize.Content = "OTIMIZANDO…";
-        OptResult.Text = "";
-        var closeResult = await Task.Run(() => Optimizer.CloseApps(toClose));
-        var mem = await Task.Run(Optimizer.CleanMemory); // depois de fechar, para contar a memória liberada por eles também
-        BtnOptimize.IsEnabled = true;
-        BtnOptimize.Content = "OTIMIZAÇÃO";
-
-        var parts = new List<string> { $"Memória liberada: {mem.FreedBytes / 1048576.0:N0} MB" };
-        parts.Add(mem.StandbyPurged ? "memória em espera limpa" : $"memória em espera não limpa ({mem.StandbyError})");
-        if (closeResult.Closed.Count > 0) parts.Add($"fechados: {string.Join(", ", closeResult.Closed)}");
-        if (closeResult.NotClosed.Count > 0)
-            parts.Add($"não fecharam (podem ter algo não salvo ou pedir confirmação): {string.Join(", ", closeResult.NotClosed)}");
-        OptResult.Text = string.Join(" · ", parts) + ".";
-        RefreshApps();
-        UpdateRamStatus();
-    }
-
-    private void Tweak_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not CheckBox { Tag: Tweak t } box) return;
-        bool turnOn = box.IsChecked == true;
-        try
-        {
-            t.Write(turnOn, _settings);
-            _settings.Save();
-            t.Refresh();
-            t.Status = t.IsOn == turnOn
-                ? (turnOn ? "Aplicado." : "Desligado.") + (t.NeedsRestart ? " Reinicie o PC para valer." : "")
-                : "O Windows não aceitou a mudança (pode exigir administrador).";
-        }
-        catch (Exception ex)
-        {
-            t.Refresh();
-            t.Status = $"Falhou: {ex.Message}";
-        }
-        box.IsChecked = t.IsOn; // o binding é só leitura: volta ao estado real
-    }
-
     // ----- USB e portas COM -----
 
     private List<UsbDevice> _usb = new();
 
-    private void ScanUsb()
+    private int _usbScan;
+
+    /// <summary>Varre os dispositivos (inclusive os ausentes) e as reservas COM fora da thread da tela.</summary>
+    private async void ScanUsb()
     {
+        int id = ++_usbScan;
+        List<UsbDevice> devices;
+        (List<int> Reserved, List<int> InUse)? com = null;
+        string? comError = null;
         try
         {
-            _usb = UsbCleaner.List();
+            (devices, com, comError) = await Task.Run(() =>
+            {
+                var d = UsbCleaner.List();
+                try { var (r, u) = UsbCleaner.ComStatus(); return (d, ((List<int>, List<int>)?)(r.ToList(), u.ToList()), (string?)null); }
+                catch (Exception ex) { return (d, null, ex.Message); }
+            });
         }
         catch (Exception ex) { UsbResult.Text = $"Não foi possível listar os dispositivos: {ex.Message}"; return; }
+        if (id != _usbScan) return;
+        _usb = devices;
 
         static bool Relevant(UsbDevice d) => d.Port != null || d.Maker != null;
         var connected = _usb.Where(d => d.Present && Relevant(d)).ToList();
@@ -961,13 +891,12 @@ public partial class MainWindow : Window
             ? "Nenhum registro antigo encontrado."
             : $"{shown.Count} registros antigos na lista ({ghosts} dispositivos ausentes no total).";
 
-        try
+        if (com is var (reserved, inUse))
         {
-            var (reserved, inUse) = UsbCleaner.ComStatus();
             string R(IEnumerable<int> l) => l.Any() ? string.Join(", ", l.Select(n => $"COM{n}")) : "nenhum";
             UsbComDb.Text = $"{reserved.Count} reservados: {R(reserved)}\nEm uso agora: {R(inUse)}";
         }
-        catch (Exception ex) { UsbComDb.Text = ex.Message; }
+        else UsbComDb.Text = comError ?? "";
         BtnComDbRestore.IsEnabled = _settings.ComDbBackup != null;
     }
 
@@ -1040,23 +969,6 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) { UsbResult.Text = $"Falhou: {ex.Message}"; }
         ScanUsb();
-    }
-
-    private void BtnRestoreTweaks_Click(object sender, RoutedEventArgs e)
-    {
-        if (_settings.TweakBackup.Count == 0)
-        {
-            MessageBox.Show("Nenhum ajuste foi alterado pelo PcismoMaster ainda.", "OTIMIZAÇÃO",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-        var r = MessageBox.Show("Voltar todos os ajustes do Windows para como estavam antes do PcismoMaster alterá-los?",
-                                "OTIMIZAÇÃO", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (r != MessageBoxResult.Yes) return;
-        bool restart = _tweaks.Any(t => t.NeedsRestart && _settings.TweakBackup.ContainsKey(t.Id));
-        WindowsTweaks.RestoreAll(_tweaks, _settings);
-        foreach (var t in _tweaks) { t.Refresh(); t.Status = "Restaurado."; }
-        if (restart) MessageBox.Show("Alguns ajustes só voltam ao original depois de reiniciar o PC.", "OTIMIZAÇÃO");
     }
 
     // ---------------- BENCH: benchmarks de jogo ----------------

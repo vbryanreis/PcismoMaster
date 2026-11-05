@@ -75,7 +75,7 @@ public partial class MainWindow
         double sumGpuW = 0.0;
         int nCpuW = 0;
         int nGpuW = 0;
-        string fail = null;
+        string? fail = null;
         StressTester stress = new StressTester();
         GpuBurn burn = new GpuBurn();
         try
@@ -100,7 +100,7 @@ public partial class MainWindow
                 _gpuBenchActive = true;
                 using (ct.Register(gb.Cancel))
                 {
-                    GpuGameResult gpuGameResult = await Task.Factory.StartNew((Func<GpuGameResult>)gb.Run, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    GpuGameResult? gpuGameResult = await Task.Factory.StartNew((Func<GpuGameResult?>)gb.Run, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                     if (gpuGameResult != null)
                     {
                         gpuScore = gpuGameResult.Score;
@@ -282,37 +282,8 @@ public partial class MainWindow
         OcResult.ItemsSource = list;
         OcResult.Foreground = (flag4 ? Fg : Ink);
         OcVerdictCard.Visibility = Visibility.Visible;
-        string[] obj = new string[5]
-        {
-            flag4 ? "estável" : "INSTÁVEL",
-            " · ",
-            label,
-            null,
-            null
-        };
-        object obj2;
-        if (cpuScore.HasValue)
-        {
-            double valueOrDefault5 = cpuScore.GetValueOrDefault();
-            obj2 = $" · CPU {valueOrDefault5:N0}";
-        }
-        else
-        {
-            obj2 = "";
-        }
-        obj[3] = (string)obj2;
-        object obj3;
-        if (gpuScore.HasValue)
-        {
-            double valueOrDefault6 = gpuScore.GetValueOrDefault();
-            obj3 = $" · GPU {valueOrDefault6:N0}";
-        }
-        else
-        {
-            obj3 = "";
-        }
-        obj[4] = (string)obj3;
-        string summary = string.Concat(obj);
+        string summary = (flag4 ? "estável" : "INSTÁVEL") + " · " + label +
+                         (cpuScore is double cs ? $" · CPU {cs:N0}" : "") + (gpuScore is double gs ? $" · GPU {gs:N0}" : "");
         _settings.BenchRecords.Insert(0, new BenchRecord(DateTime.Now, "oc", flag4 ? 1.0 : 0.15, summary));
         _settings.Save();
         UpdateOcHistory();
@@ -331,7 +302,7 @@ public partial class MainWindow
         string text = GameCatalog.ShortCpuName(_cpuName);
         bool num = _cpuName.Contains("Ryzen", StringComparison.OrdinalIgnoreCase);
         string text2 = ((flag ? "Gigabyte" : (item.Split(' ').FirstOrDefault() ?? "")) + " " + item2).Trim();
-        OcGuideTitle.Text = "GUIA: OVERCLOCK NA BIOS · " + text2.ToUpperInvariant() + " · " + text.ToUpperInvariant();
+        OcGuideTitle.Subtitle = $"Placa {text2} com {text}";
         OcGuideIntro.Text = "Faça uma mudança por vez e rode o verificador depois de cada uma. Os menus podem mudar um pouco com a versão da BIOS. Valores são pontos de partida seguros, não garantia: cada chip é diferente.";
         string text3 = (flag ? "Tweaker → Advanced CPU Settings → Precision Boost Overdrive  (ou Settings → AMD Overclocking)" : (flag2 ? "Advanced → AMD Overclocking → Precision Boost Overdrive  (ou AI Tweaker → PBO)" : (flag3 ? "OC → Advanced CPU Configuration → AMD Overclocking → Precision Boost Overdrive" : "Advanced → AMD Overclocking → Precision Boost Overdrive")));
         string where = (flag ? "Tweaker → Extreme Memory Profile (X.M.P.) → EXPO1" : (flag2 ? "AI Tweaker → Ai Overclock Tuner → EXPO I" : (flag3 ? "OC → A-XMP/EXPO → Profile 1" : "procure EXPO / XMP no menu de memória")));

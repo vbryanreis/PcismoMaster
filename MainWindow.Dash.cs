@@ -93,7 +93,7 @@ public partial class MainWindow
     private void DashOption_Checked(object sender, RoutedEventArgs e) { if (DashChart != null) DrawDashChart(); }
     private void DashChart_SizeChanged(object sender, SizeChangedEventArgs e) => DrawDashChart();
     private void DashBench_Click(object sender, RoutedEventArgs e) => NavBench.IsChecked = true;
-    private void DashOptimize_Click(object sender, RoutedEventArgs e) => NavOptimize.IsChecked = true;
+    private void DashOptimize_Click(object sender, RoutedEventArgs e) => NavOptClean.IsChecked = true; // memória e programas em segundo plano ficam na Limpeza
 
     private void DashGo_Click(object sender, RoutedEventArgs e)
     {
@@ -243,7 +243,7 @@ public partial class MainWindow
         {
             double v = yMin + (yMax - yMin) * k / 2, y = Y(v);
             DashChart.Children.Add(new Line { X1 = left, X2 = w, Y1 = y, Y2 = y, Stroke = (Brush)FindResource("Line"), StrokeDashArray = new DoubleCollection { 5, 5 } });
-            var lbl = new TextBlock { Text = $"{v:0}{unit.Trim()}", FontSize = 11, Foreground = faint, FontFamily = mono };
+            var lbl = new TextBlock { Text = $"{v:0}{unit.Trim()}", FontSize = 12, Foreground = faint, FontFamily = mono };
             Canvas.SetLeft(lbl, 0); Canvas.SetTop(lbl, y - 8);
             DashChart.Children.Add(lbl);
         }
@@ -251,7 +251,7 @@ public partial class MainWindow
         string[] xs = { range >= 60 ? $"-{range / 60} min" : $"-{range} s", range >= 120 ? $"-{range / 120} min" : $"-{range / 2} s", "agora" };
         for (int k = 0; k < 3; k++)
         {
-            var t = new TextBlock { Text = xs[k], FontSize = 11, Foreground = faint };
+            var t = new TextBlock { Text = xs[k], FontSize = 12, Foreground = faint };
             t.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             Canvas.SetLeft(t, Math.Clamp(left + plotW * k / 2 - t.DesiredSize.Width / 2, left, w - t.DesiredSize.Width));
             Canvas.SetTop(t, h - 16);
@@ -404,7 +404,7 @@ public partial class MainWindow
         var gm = _tweaks.FirstOrDefault(t => t.Id == "gamemode");
         var dvr = _tweaks.FirstOrDefault(t => t.Id == "gamedvr");
         try { gm?.Refresh(); dvr?.Refresh(); } catch { }
-        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em OTIMIZAÇÃO."));
+        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em Tweaking › Windows."));
         if (dvr != null) list.Add(Item(dvr.IsOn, "Gravação em segundo plano desligada", "O Game Bar não grava o tempo todo.",
                                        "O Game DVR está gravando: custa FPS."));
 

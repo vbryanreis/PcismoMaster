@@ -5,7 +5,7 @@ using Microsoft.Win32;
 namespace ResetExplode;
 
 /// <summary>
-/// FERRAMENTAS · Drivers · "Instalar driver e configurações": um cartão só, com instalação Normal (driver completo,
+/// TWEAKING · Drivers · "Instalar driver e configurações": um cartão só, com instalação Normal (driver completo,
 /// silencioso e limpo) ou Enxuta (debloat). Nas duas, as configurações marcadas no cartão são aplicadas logo depois.
 /// </summary>
 public partial class MainWindow
@@ -74,12 +74,9 @@ public partial class MainWindow
             int code = await GraphicsTweaks.InstallNvidiaSilentAsync(file, CancellationToken.None);
             string settings = "";
             if (code == 0) { DebloatStatus.Text = "Driver instalado. Aplicando as configurações marcadas…"; settings = " " + await ApplyAfterInstallAsync(); }
-            string panel = "";
-            if (!GraphicsTweaks.HasNvidiaControlPanel())
-            {
-                try { Process.Start(new ProcessStartInfo(GraphicsTweaks.NvidiaControlPanelStore) { UseShellExecute = true }); } catch { }
-                panel = " A página do Painel de Controle NVIDIA na Microsoft Store foi aberta: clique em Obter.";
-            }
+            DebloatStatus.Text = "Instalando o Painel de Controle NVIDIA e o Profile Inspector mais recente…";
+            string panel = " " + await NvidiaTools.AfterDriverInstallAsync(CancellationToken.None);
+            UpdateNvToolsInfo();
             DebloatStatus.Text = (code == 0 ? $"Driver {version} instalado." : $"O instalador terminou com o código {code}; confira se o driver aparece no Gerenciador de Dispositivos.")
                                  + settings + panel + " Reinicie para terminar. " + GpuDriverStatus.NvidiaAppTips;
             BtnGfxReboot.Visibility = Visibility.Visible;

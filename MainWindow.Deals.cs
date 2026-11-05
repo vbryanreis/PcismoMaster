@@ -302,15 +302,15 @@ public partial class MainWindow
 
         var low = d.HistoryLow ?? deal.HistoryLow;
         if (low != null)
-            info.Children.Add(new TextBlock { Text = "Menor da história: " + ItadClient.FormatPrice(low), FontSize = 11, Foreground = (Brush)FindResource("Muted"), Margin = new Thickness(0, 3, 0, 0) });
+            info.Children.Add(new TextBlock { Text = "Menor da história: " + ItadClient.FormatPrice(low), FontSize = 12, Foreground = (Brush)FindResource("Muted"), Margin = new Thickness(0, 3, 0, 0) });
         if (ItadClient.FormatExpiry(deal.Expiry, DateTimeOffset.Now) is string exp)
-            info.Children.Add(new TextBlock { Text = exp, FontSize = 11, Margin = new Thickness(0, 2, 0, 0),
+            info.Children.Add(new TextBlock { Text = exp, FontSize = 12, Margin = new Thickness(0, 2, 0, 0),
                 Foreground = (Brush)FindResource(deal.Expiry - DateTimeOffset.Now < TimeSpan.FromDays(2) ? "TempWarn" : "Muted") });
         if (!string.IsNullOrWhiteSpace(deal.Voucher))
-            info.Children.Add(new TextBlock { Text = "Cupom: " + deal.Voucher, FontSize = 11, Foreground = (Brush)FindResource("AccentCyan"), Margin = new Thickness(0, 2, 0, 0) });
+            info.Children.Add(new TextBlock { Text = "Cupom: " + deal.Voucher, FontSize = 12, Foreground = (Brush)FindResource("AccentCyan"), Margin = new Thickness(0, 2, 0, 0) });
 
         var compare = new Button { Content = "Comparar lojas", Style = (Style)FindResource("OutlineButton"), Padding = new Thickness(10, 4, 10, 4),
-            FontSize = 11, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 8, 0, 0) };
+            FontSize = 12, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 8, 0, 0) };
         compare.Click += (_, _) => _ = CompareStoresAsync(d);
         info.Children.Add(compare);
 
@@ -427,12 +427,12 @@ public partial class MainWindow
 
         foreach (var x in deals.Take(12)) info.Children.Add(StorePriceLine(x, best: x == deals[0]));
         if (deals.Count > 12)
-            info.Children.Add(new TextBlock { Text = $"+ {deals.Count - 12} loja(s) mais caras", FontSize = 11, Foreground = (Brush)FindResource("Faint"), Margin = new Thickness(8, 2, 0, 0) });
+            info.Children.Add(new TextBlock { Text = $"+ {deals.Count - 12} loja(s) mais caras", FontSize = 12, Foreground = (Brush)FindResource("Faint"), Margin = new Thickness(8, 2, 0, 0) });
         if (slug.Length > 0)
         {
             var link = new Hyperlink(new Run("Ver o histórico de preços no IsThereAnyDeal")) { Foreground = (Brush)FindResource("Muted") };
             link.Click += (_, _) => OpenDealUrl($"https://isthereanydeal.com/game/{slug}/info/");
-            info.Children.Add(new TextBlock(link) { FontSize = 11, Margin = new Thickness(8, 6, 0, 0) });
+            info.Children.Add(new TextBlock(link) { FontSize = 12, Margin = new Thickness(8, 6, 0, 0) });
         }
 
         var grid = new Grid();
@@ -584,7 +584,7 @@ public partial class MainWindow
         var info = new StackPanel { Margin = new Thickness(10, 8, 10, 12) };
         info.Children.Add(new TextBlock { Text = f.Title, FontWeight = FontWeights.SemiBold, FontSize = 12.5, TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = f.Title });
         info.Children.Add(new TextBlock { Text = drmFiltered ? "Nenhuma loja com os DRMs marcados vende este jogo agora." : "Sem preço nas lojas cobertas agora.",
-            FontSize = 11, Foreground = (Brush)FindResource("Muted"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
+            FontSize = 12, Foreground = (Brush)FindResource("Muted"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
 
         var body = new StackPanel();
         body.Children.Add(top);
@@ -633,7 +633,7 @@ public partial class MainWindow
         info.Children.Add(new TextBlock { Text = exp, FontSize = 11.5,
             Foreground = (Brush)FindResource(gw.Expiry - now < TimeSpan.FromDays(2) ? "TempWarn" : "Muted") });
         if (!string.IsNullOrWhiteSpace(gw.Note))
-            info.Children.Add(new TextBlock { Text = gw.Note, FontSize = 11, Foreground = (Brush)FindResource("Faint"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 2, 0, 0) });
+            info.Children.Add(new TextBlock { Text = gw.Note, FontSize = 12, Foreground = (Brush)FindResource("Faint"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 2, 0, 0) });
 
         var get = new Button { Content = "PEGAR GRÁTIS", Style = (Style)FindResource("PrimaryButton"), Padding = new Thickness(16, 8, 16, 8), VerticalAlignment = VerticalAlignment.Center };
         get.Click += (_, _) => OpenDealUrl(gw.Url);

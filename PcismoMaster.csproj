@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.9.0</Version>
+    <Version>0.10.0</Version>
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -42,7 +42,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Drivers\**\*" Exclude="Drivers\*.md;Drivers\*.txt" LogicalName="Drivers/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Catálogo de configurações do driver NVIDIA (nomes, grupos e valores) do nvidiaProfileInspector, licença MIT -->
-    <EmbeddedResource Include="Npi\*.xml" LogicalName="Npi/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- iCUE SDK da Corsair (INTEGRAÇÃO): se a DLL estiver em Native\, ela vai junto do .exe. Não é versionada no git. -->

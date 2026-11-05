@@ -13,7 +13,6 @@ namespace ResetExplode;
 public partial class MainWindow
 {
     private StackPanel? _homeResults;
-    private readonly List<FrameworkElement> _advancedOnly = new();
 
     private bool Advanced => _settings.AdvancedMode;
 
@@ -51,7 +50,7 @@ public partial class MainWindow
         row.Children.Add(toggle);
         var help = new Button { Style = (Style)FindResource("OutlineButton"), Padding = new Thickness(16, 8, 16, 8), Content = "Mostrar as explicações no topo das páginas" };
         help.Click += (_, _) => { _settings.HidePageHelp = false; _settings.Save(); help.Visibility = Visibility.Collapsed; };
-        help.Visibility = _settings.HidePageHelp ? Visibility.Visible : Visibility.Collapsed;
+        help.Visibility = _settings.HidePageHelp && !Advanced ? Visibility.Visible : Visibility.Collapsed;
         row.Children.Add(help);
         mc.Children.Add(row);
         modeCard.Child = mc;
@@ -148,13 +147,6 @@ public partial class MainWindow
         Resources["ModeAccentSoft"] = soft;
     }
 
-    /// <summary>Partes de página que só aparecem no modo avançado (ex.: scripts completos).</summary>
-    private void AdvancedOnly(FrameworkElement el)
-    {
-        _advancedOnly.Add(el);
-        el.Visibility = Advanced ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     private void ApplyMode()
     {
         bool adv = Advanced;
@@ -167,22 +159,21 @@ public partial class MainWindow
                 bool any = items.Children.OfType<RadioButton>().Any(r => r.Visibility == Visibility.Visible);
                 g.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
             }
-        foreach (var el in _advancedOnly) el.Visibility = adv ? Visibility.Visible : Visibility.Collapsed;
-        DrvTabNpi.Visibility = adv ? Visibility.Visible : Visibility.Collapsed;
-        if (!adv && DrvTabNpi.IsChecked == true) DrvTabDrivers.IsChecked = true;
         FilterBloat();
 
         ApplyModeAccent();
         BtnMode.Content = adv ? "Modo Avançado" : "Modo Simples";
         if (_homeModeText != null)
             _homeModeText.Text = adv
-                ? "Você está no modo avançado: aparecem todas as páginas, incluindo sensores, overclock, stress test, ajustes de hardware, scripts completos e o Profile Inspector. Use com calma: alguns mexem fundo no PC."
+                ? "Você está no modo avançado: aparecem todas as páginas, incluindo sensores, overclock, stress test, ajustes de hardware, scripts completos e os ajustes avançados de GPU. Use com calma: alguns mexem fundo no PC."
                 : "Você está no modo simples: aparece só o essencial e o que é seguro. Sensores detalhados, overclock, stress test, ajustes técnicos e os scripts completos ficam escondidos até você ligar o modo avançado.";
         if (_homeModeButton != null) _homeModeButton.Content = adv ? "Voltar para o modo simples" : "Ligar o modo avançado";
 
         // Se a página aberta sumiu, volta para o Início.
         var current = PageCatalog.Pages.FirstOrDefault(p => FindName(p.Nav) is RadioButton { IsChecked: true });
         if (current is { Advanced: true } && !adv) NavHome.IsChecked = true;
+        UpdatePageHelp(current?.Nav);
+        if (_homeHelpButton != null) _homeHelpButton.Visibility = _settings.HidePageHelp && !adv ? Visibility.Visible : Visibility.Collapsed;
     }
 
     // ---------------- Explicação no topo da página ----------------
@@ -190,7 +181,8 @@ public partial class MainWindow
     private void UpdatePageHelp(string? nav)
     {
         var info = nav == null ? null : PageCatalog.ByNav(nav);
-        bool show = info != null && nav != "NavHome" && !_settings.HidePageHelp;
+        // No modo avançado a faixa some: o subtítulo da página já diz o mesmo. No simples, ajuda quem está começando.
+        bool show = info != null && nav != "NavHome" && !_settings.HidePageHelp && !Advanced;
         PageHelp.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         if (show) PageHelpText.Text = info!.Description;
     }

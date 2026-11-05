@@ -51,8 +51,6 @@ internal static class Nvml
     [DllImport(Dll)] private static extern int nvmlDeviceGetDecoderUtilization(IntPtr device, out uint util, out uint periodUs);
     [DllImport(Dll)] private static extern int nvmlDeviceGetUtilizationRates(IntPtr device, out Utilization util);
     [DllImport(Dll)] private static extern int nvmlDeviceSetPowerManagementLimit(IntPtr device, uint mw);
-    [DllImport(Dll)] private static extern int nvmlDeviceSetGpuLockedClocks(IntPtr device, uint minMhz, uint maxMhz);
-    [DllImport(Dll)] private static extern int nvmlDeviceResetGpuLockedClocks(IntPtr device);
 
     private static bool? _ok;
 
@@ -107,8 +105,6 @@ internal static class Nvml
     public static uint? Temperature(IntPtr h) { uint v = 0; return Call(() => nvmlDeviceGetTemperature(h, 0, out v)) ? v : null; }
     public static uint? TempThreshold(IntPtr h, int type) { uint v = 0; return Call(() => nvmlDeviceGetTemperatureThreshold(h, type, out v)) ? v : null; }
     public static int SetTempThreshold(IntPtr h, int type, int celsius) => Raw(() => nvmlDeviceSetTemperatureThreshold(h, type, ref celsius));
-    public static int LockGpuClocks(IntPtr h, uint min, uint max) => Raw(() => nvmlDeviceSetGpuLockedClocks(h, min, max));
-    public static int ResetGpuClocks(IntPtr h) => Raw(() => nvmlDeviceResetGpuLockedClocks(h));
 
     private static int Raw(Func<int> f)
     {

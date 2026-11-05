@@ -39,7 +39,7 @@ public partial class MainWindow
             var b = new Button
             {
                 Content = label, Tag = token, Style = (Style)FindResource("OutlineButton"),
-                Padding = new Thickness(10, 4, 10, 4), FontSize = 11, Margin = new Thickness(0, 0, 6, 6),
+                Padding = new Thickness(10, 4, 10, 4), FontSize = 12, Margin = new Thickness(0, 0, 6, 6),
                 ToolTip = hint,
             };
             b.Click += (_, _) =>

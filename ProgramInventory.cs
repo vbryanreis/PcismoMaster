@@ -10,7 +10,7 @@ public sealed record InstalledProgram(
     string UninstallCmd, bool Quiet, RegistryHive Hive, RegistryView View, string KeyPath, long SizeKb) : INotifyPropertyChanged
 {
     public string SizeText => SizeKb <= 0 ? "" : SizeKb >= 1048576 ? $"{SizeKb / 1048576.0:0.0} GB" : $"{SizeKb / 1024.0:0} MB";
-    public string Meta => string.Join("   ·   ", new[] { Publisher, Version, SizeText, DateText }.Where(s => s.Length > 0));
+    public string Meta => string.Join("   ·   ", new[] { NoUninstaller ? "desinstalador ausente: use a remoção forçada" : "", Publisher, Version, SizeText, DateText }.Where(s => s.Length > 0));
     public string DateText => InstallDate.Length == 8 && InstallDate.All(char.IsDigit)
         ? $"instalado em {InstallDate[6..8]}/{InstallDate[4..6]}/{InstallDate[..4]}" : "";
 
@@ -18,6 +18,10 @@ public sealed record InstalledProgram(
     public string DisplayIcon { get; init; } = "";
     /// <summary>Data de instalação (InstallDate, aaaammdd), quando o instalador grava.</summary>
     public string InstallDate { get; init; } = "";
+    /// <summary>Entrada que sobrou de um programa já removido: o desinstalador e a pasta sumiram (ou o MSI não está mais instalado).</summary>
+    public bool Orphan { get; init; }
+    /// <summary>O desinstalador oficial sumiu, mas a pasta do programa continua: só a remoção forçada resolve.</summary>
+    public bool NoUninstaller { get; init; }
     public string Initial => Name.Length > 0 ? Name[..1].ToUpperInvariant() : "?";
 
     private object? _icon;
@@ -80,10 +84,10 @@ public static class ProgramInventory
                         if (IsUpdateName(name)) continue;
 
                         string ver = (k.GetValue("DisplayVersion") as string ?? "").Trim();
-                        if (!seen.Add(name + "|" + ver)) continue; // dedupe (mesma entrada em 64/32 bits)
-
                         string pub = (k.GetValue("Publisher") as string ?? "").Trim();
                         string loc = (k.GetValue("InstallLocation") as string ?? "").Trim();
+                        var (orphan, noUninstaller) = Check(quietCmd.Length > 0 ? quietCmd : unCmd, loc, subName);
+                        if (!orphan && !seen.Add(name + "|" + ver)) continue; // dedupe (mesma entrada em 64/32 bits); órfã não esconde a de verdade
                         long sizeKb = ToLong(k.GetValue("EstimatedSize"));
                         bool quiet = quietCmd.Length > 0;
 
@@ -92,6 +96,8 @@ public static class ProgramInventory
                         {
                             DisplayIcon = (k.GetValue("DisplayIcon") as string ?? "").Trim(),
                             InstallDate = (k.GetValue("InstallDate") as string ?? "").Trim(),
+                            Orphan = orphan,
+                            NoUninstaller = noUninstaller,
                         });
                     }
                     catch { }
@@ -101,6 +107,48 @@ public static class ProgramInventory
         }
         return list.OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase).ToList();
     }
+
+    /// <summary>
+    /// Confere se a entrada ainda aponta para algo instalado. Órfã = o programa já foi removido e só a chave de registro
+    /// ficou (desinstalador que não limpou, pasta apagada à mão): o desinstalador e a pasta sumiram, ou o MSI não está
+    /// mais instalado. NoUninstaller = o desinstalador sumiu, mas a pasta continua.
+    /// </summary>
+    internal static (bool Orphan, bool NoUninstaller) Check(string cmd, string installLocation, string keyName)
+    {
+        try
+        {
+            string loc = Environment.ExpandEnvironmentVariables(installLocation.Trim().Trim('"'));
+            bool? locExists = loc.Length > 2 && Path.IsPathRooted(loc) ? Directory.Exists(loc) || File.Exists(loc) : null;
+
+            var (exe, args) = Uninstaller.ParseCommand(cmd);
+            exe = Environment.ExpandEnvironmentVariables(exe.Trim('"'));
+            string file = Path.GetFileNameWithoutExtension(exe);
+            if (file.Equals("msiexec", StringComparison.OrdinalIgnoreCase))
+            {
+                var m = System.Text.RegularExpressions.Regex.Match(args + " " + keyName, @"\{[0-9A-Fa-f-]{36}\}");
+                if (!m.Success) return (false, false);
+                int state = MsiQueryProductState(m.Value);
+                return (state == -1 && locExists != true, false); // -1 = produto desconhecido para o Windows Installer
+            }
+            // Comandos sem caminho (rundll32, steam://, cmd /c…) não dão para conferir: vale só a pasta.
+            if (exe.Length < 3 || !Path.IsPathRooted(exe) || IsSystemTool(exe))
+                return (locExists == false, false);
+            bool exeExists = File.Exists(exe);
+            if (exeExists) return (false, false);
+            return locExists == true ? (false, true) : (true, false);
+        }
+        catch { return (false, false); }
+    }
+
+    private static bool IsSystemTool(string exe)
+    {
+        string win = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        return exe.StartsWith(win, StringComparison.OrdinalIgnoreCase) &&
+               !exe.Contains(@"\Installer\", StringComparison.OrdinalIgnoreCase); // C:\Windows\Installer\… é do app, pode sumir
+    }
+
+    [System.Runtime.InteropServices.DllImport("msi.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int MsiQueryProductState(string product);
 
     private static bool IsUpdateName(string name)
     {

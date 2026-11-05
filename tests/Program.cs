@@ -547,6 +547,82 @@ Test("Friendly UI: home tasks and search lead to real pages, and simple mode hid
     Assert(PageCatalog.Search("overclock", false).Count == 0 && PageCatalog.Search("overclock", true).First().Nav == "NavOc");
     Assert(PageCatalog.Search("  ", true).Count == 0 && PageCatalog.Search("driver", false).First().Nav == "NavDriver");
 });
+Test("Uninstall list: entries of apps already removed are orphans; a vanished uninstaller with the folder still there is not", () => {
+    string dir = Path.Combine(temp, "orphan-app");
+    Directory.CreateDirectory(dir);
+    string gone = Path.Combine(temp, "nao-existe", "unins000.exe");
+    Assert(ProgramInventory.Check($"\"{gone}\" /SILENT", "", "x_is1") == (true, false));
+    Assert(ProgramInventory.Check($"\"{gone}\"", dir, "x_is1") == (false, true));
+    string exe = Path.Combine(dir, "uninstall.exe");
+    File.WriteAllText(exe, "");
+    Assert(ProgramInventory.Check(exe + " /S", Path.Combine(temp, "sumiu"), "x") == (false, false));
+    Assert(ProgramInventory.Check("steam://uninstall/123", Path.Combine(temp, "sumiu"), "Steam App 123") == (true, false));
+    Assert(ProgramInventory.Check("rundll32.exe something", "", "x") == (false, false));
+    Assert(ProgramInventory.Check("MsiExec.exe /X{00000000-1111-2222-3333-444444444444}", "", "{00000000-1111-2222-3333-444444444444}") == (true, false));
+});
+Test("NVIDIA release notes: Game Ready title, fixed bugs and article link are read, headings translated", () => {
+    const string html = "<b>Game Ready for World of Warcraft: Forever</b><br />This new Game Ready Driver provides the best gaming experience.<br />  <br />  " +
+        "<b>Fixed Gaming Bugs</b><br />  <ul><li>Call of Duty: Modern Warfare 4: Game may display incorrect visual colors [6972531]</li></ul>      <br />      " +
+        "<b>Fixed General Bugs</b><br />      <ul><li>Video playback may freeze &amp; black screen. [6979343]</li><li>Second &quot;item&quot;</li></ul> <br /> " +
+        "<a href=\"https://www.nvidia.com/en-us/geforce/news/wow-game-ready-driver\">Learn more in our Game Ready Driver article here</a>. <br />" +
+        "<p align=\"justify\"><img title=\"Game Ready Driver\" src=\"https://images.nvidia.com/x.jpg\" /></p>";
+    var s = NvidiaNotes.Parse(html, out string title, out string article);
+    Assert(title == "Game Ready para World of Warcraft: Forever");
+    Assert(article == "https://www.nvidia.com/en-us/geforce/news/wow-game-ready-driver");
+    Assert(s.Count == 3 && s[0].Text.StartsWith("This new Game Ready") && s[0].Items.Count == 0);
+    Assert(s[1].Heading == "Correções em jogos" && s[1].Items.Single().EndsWith("[6972531]"));
+    Assert(s[2].Heading == "Correções gerais" && s[2].Items.Count == 2 && s[2].Items[0].Contains("freeze & black") && s[2].Items[1] == "Second \"item\"");
+    Assert(!s.Any(x => x.Text.Contains("Learn more")));
+    Assert(NvidiaNotes.Translate("Game Ready for Phantom Blade Zero & Call of Duty") == "Game Ready para Phantom Blade Zero e Call of Duty");
+    Assert(NvidiaNotes.ParseDate("Wed Nov 04, 2026") == new DateTime(2026, 11, 4));
+    Assert(NvidiaNotes.Parse("", out _, out _).Count == 0);
+});
+Test("Motherboard: ASUS list keeps the newest of each driver and compares it with what is installed", () => {
+    string F(string t, string v, string d, string u) => $"{{\"Title\":\"{t}\",\"Version\":\"{v}\",\"ReleaseDate\":\"{d}\",\"DownloadUrl\":{{\"Global\":\"{u}\"}}}}";
+    string json = "{\"Result\":{\"Obj\":[" +
+        "{\"Name\":\"Chipset\",\"Files\":[" + F("AMD Chipset driver v7.09.23.2230 for Windows 10/11 64-bit.", "7.09.23.2230", "2025/12/31", "https://dlcdnets.asus.com/a.zip") + "," +
+                                              F("AMD Chipset driver v6.05.16.221 for Windows 10/11 64-bit.", "6.05.16.221", "2024/07/03", "https://dlcdnets.asus.com/b.zip") + "]}," +
+        "{\"Name\":\"Audio\",\"Files\":[" + F("Realtek Audio Driver v6.0.9888.1 for windows 11 64-bit.", "6.0.9888.1", "2025/12/18", "https://dlcdnets.asus.com/c.zip") + "]}," +
+        "{\"Name\":\"LAN\",\"Files\":[" + F("Intel I225/I226 LAN driver v2.1.5.7 for Windows 11 64-bit.", "2.1.5.7", "2025/12/31", "https://dlcdnets.asus.com/d.zip") + "]}," +
+        "{\"Name\":\"BlueTooth\",\"Files\":[" + F("Intel Bluetooth driver for Windows 11", "23.60.0.1", "2025/01/01", "https://dlcdnets.asus.com/e.zip") + "]}," +
+        "{\"Name\":\"Software and Utility\",\"Files\":[" + F("WinRAR v7.13.0 for Windows 10/11 64-bit", "7.13.0", "2025/08/27", "http://insecure/f.zip") + "]}]}}";
+    var files = BoardSupport.ParseAsus(json);
+    Assert(files.Count == 5 && files[0].Version == "7.09.23.2230" && files[0].Date == new DateTime(2025, 12, 31)); // o http:// ficou de fora
+    var newest = BoardSupport.Newest(files);
+    Assert(newest.Count == 4 && newest[0].Category == "Chipset" && newest[0].Version == "7.09.23.2230");
+    var installed = new List<DriverRow>
+    {
+        new() { Device = "Realtek High Definition Audio", Class = "MEDIA", Vendor = "Realtek", Version = "6.0.9888.1", Date = "10/11/2025" },
+        new() { Device = "Intel(R) Ethernet Controller I225-V", Class = "NET", Vendor = "Intel", Version = "2.1.4.3", Date = "01/01/2024" },
+        new() { Device = "WAN Miniport (IP)", Class = "NET", Vendor = "Intel", Version = "9.9.9.9" },
+    };
+    var programs = new Dictionary<string, string> { ["AMD Chipset Software"] = "6.10.17.152" };
+    var rows = BoardSupport.Compare(newest, installed, programs);
+    Assert(rows.Single(r => r.Category == "Chipset").Status == BoardStatus.Newer);
+    Assert(rows.Single(r => r.Category == "Áudio").Status == BoardStatus.UpToDate);
+    var lan = rows.Single(r => r.Category == "Rede (cabo)");
+    Assert(lan.Status == BoardStatus.Newer && lan.Installed == "2.1.4.3");
+    Assert(rows.Single(r => r.Category == "Bluetooth").Status == BoardStatus.NotInstalled);
+    Assert(BoardSupport.CompareVersions("6.0.10000.1", "6.0.9888.1") > 0 && !BoardSupport.Comparable("31.0.1", "6.0.1"));
+    Assert(BoardSupport.CompareBios("3402", "3646") == false && BoardSupport.CompareBios("3646", "3646") == true && BoardSupport.CompareBios("FHd", "F18") == null);
+    Assert(BoardSupport.BiosVersion("3646 (12/03/2025)") == "3646");
+    Assert(BoardSupport.CleanModel("MAG B550 TOMAHAWK (MS-7C91)") == "MAG B550 TOMAHAWK" && BoardSupport.CleanModel("Default string") == "");
+    Assert(BoardSupport.Pages("MSI", "MAG B550 TOMAHAWK").Bios == "https://www.msi.com/Motherboard/MAG-B550-TOMAHAWK/support#bios");
+    Assert(BoardSupport.Pages("Gigabyte", "B550M AORUS ELITE").Drivers == "https://www.gigabyte.com/Search?kw=B550M%20AORUS%20ELITE");
+    Assert(BoardSupport.Pages("ASUS", "ROG STRIX B550-F GAMING").Bios.StartsWith("https://www.asus.com/supportonly/ROG%20STRIX%20B550-F%20GAMING/"));
+});
+Test("Motherboard: AMD chipset page gives version, date and the official installer", () => {
+    var pages = BoardSupport.AmdChipsetPages("B550M AORUS ELITE");
+    Assert(pages[0] == "https://www.amd.com/en/support/downloads/drivers.html/chipsets/am4/b550.html" && pages.Count == 2);
+    Assert(BoardSupport.AmdChipsetPages("X870E AORUS MASTER")[0].EndsWith("/am5/x870.html") && BoardSupport.AmdChipsetPages("")[0].EndsWith("/am5/b650.html"));
+    string html = "<div><div>AMD Chipset Drivers</div><div>Revision Number</div><div>8.09.28.1124</div><div>File Size</div><div>79 MB</div>" +
+                  "<div>Release Date</div><div>\n 2026-10-21\n</div><a href=\"https://drivers.amd.com/drivers/amd_chipset_software_8.09.28.1124.exe\">Download</a>" +
+                  "<a href=\"https://drivers.amd.com/drivers/amd_raid_software_2.20.19.037.exe\">RAID</a></div>";
+    var info = BoardSupport.ParseAmdChipset(html, pages[0])!;
+    Assert(info.Version == "8.09.28.1124" && info.Date == new DateTime(2026, 10, 21) && info.Url.EndsWith("amd_chipset_software_8.09.28.1124.exe"));
+    Assert(BoardSupport.ParseAmdChipset("<html>nada</html>", pages[0]) == null);
+    Assert(BoardSupport.CompareVersions("8.09.28.1124", "7.01.08.129") > 0 && BoardSupport.Comparable("8.09.28.1124", "7.01.08.129"));
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 

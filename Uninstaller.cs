@@ -244,7 +244,9 @@ public static class Uninstaller
         found.AddRange(ScanRegistry(m, mode));
 
         // 6) A entrada de desinstalação que ficou (ou remoção forçada).
-        if ((includeUninstallEntry || UninstallKeyExists(p)) && IsSafeRegPath(p.KeyPath))
+        // Depois do desinstalador oficial, a entrada só entra se ficou órfã (o programa sumiu): se ele foi cancelado, o app continua instalado.
+        if (UninstallKeyExists(p) && IsSafeRegPath(p.KeyPath) &&
+            (includeUninstallEntry || ProgramInventory.Check(p.UninstallCmd, p.InstallLocation, Path.GetFileName(p.KeyPath)).Orphan))
             found.Add(new Leftover("Registro", $"{HiveLabel(p.Hive, p.View)}\\{p.KeyPath}", 0, null, p.Hive, p.View, p.KeyPath)
                       { Reason = "entrada em Programas e Recursos" });
 
@@ -986,6 +988,6 @@ public static class Uninstaller
         return Denied.Any(d => n == d || n.Contains(d)) || n.Contains(AppName.ToLowerInvariant()) || ProtectedNames.Contains(name);
     }
 
-    private static string HiveLabel(RegistryHive hive, RegistryView view) =>
+    internal static string HiveLabel(RegistryHive hive, RegistryView view) =>
         (hive == RegistryHive.CurrentUser ? "HKCU" : "HKLM") + (view == RegistryView.Registry32 ? " (32 bits)" : "");
 }
