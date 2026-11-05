@@ -143,6 +143,8 @@ public partial class MainWindow : Window
             _stress.Stop(); _burn.Stop(); _benchCts?.Cancel();
             _overlay?.Close();
             _toast?.Close();
+            _rec.Abort();
+            if (_fgHook != IntPtr.Zero) UnhookWinEvent(_fgHook);
             _frames.Dispose();
             UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HotkeyId);
             ShutdownInteg();
@@ -605,6 +607,7 @@ public partial class MainWindow : Window
         OvOpacity.Value = _settings.OverlayOpacity;
         ShowOverlayHotkey();
         BuildOverlayPicker();
+        BuildOverlayTools();
         _overlayReady = true;
         UpdateOverlayStatus(null);
     }
@@ -1310,15 +1313,18 @@ public partial class MainWindow : Window
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         System.Windows.Interop.HwndSource.FromHwnd(hwnd)?.AddHook(HotkeyHook);
         RegisterOverlayHotkey(_settings.OverlayHotkeyMods, _settings.OverlayHotkeyVk);
+        RegisterToolHotkeys();
     }
 
     private IntPtr HotkeyHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
         if (msg == 0x0312 && wParam.ToInt32() == HotkeyId) // WM_HOTKEY
         {
+            _ovAutoShown = false; // a pessoa decidiu: o perfil do jogo não desliga mais sozinho
             ChkOverlay.IsChecked = ChkOverlay.IsChecked != true;
             handled = true;
         }
+        else if (msg == 0x0312 && OnToolHotkey(wParam.ToInt32())) handled = true;
         else if (msg == 0x0219) // WM_DEVICECHANGE
             OnDeviceChange(wParam.ToInt32(), lParam);
         return IntPtr.Zero;
@@ -1351,8 +1357,9 @@ public partial class MainWindow : Window
     private void ApplyOverlayOptions()
     {
         if (_overlay == null) return;
-        _overlay.Corner = _settings.OverlayCorner;
-        _overlay.Horizontal = _settings.OverlayLayout == "H";
+        _overlay.Corner = OvActiveCorner;
+        _overlay.Horizontal = OvActiveLayout == "H";
+        _overlay.SetCaptureVisible(_settings.OverlayInCaptures);
         _overlay.SetScale(_settings.OverlayScale);
         _overlay.SetBackgroundOpacity(_settings.OverlayOpacity);
         _overlay.Reposition();
@@ -1362,16 +1369,20 @@ public partial class MainWindow : Window
     {
         _frames.Start(); // liga a escuta de FPS na primeira vez que o overlay precisa dela
         var f = _frames.GetForegroundStats();
+        var live = OverlayTick(f); // benchmark e mín/méd/máx contam mesmo com o overlay escondido
         bool onPage = PageOverlay.IsVisible;
-        if (!onPage && (_overlay == null || !_overlay.IsVisible)) return;
+        bool shown = _overlay != null && _overlay.IsVisible;
+        if (!onPage && !shown) { if (!OvBackgroundWork) _overlayTimer?.Stop(); return; }
+        var show = OvActiveShow;
         var parts = BuildOverlayParts(f);
-        string? hour = OvShow.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null;
-        if (_overlay != null && _overlay.IsVisible)
+        string? hour = show.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null;
+        var style = OverlayStyle.From(_settings);
+        if (shown)
         {
-            _overlay.Update(f, parts, OvShow, hour);
+            _overlay!.Update(f, live, parts, show, hour, style);
             _overlay.KeepOnTop(); // o jogo pode ter passado na frente (janela sem borda "sempre no topo")
         }
-        if (onPage) UpdateOverlayPreview(f, parts, hour);
+        if (onPage) { UpdateOverlayPreview(f, live, parts, hour, style); RefreshOverlayTools(); }
         UpdateOverlayStatus(f);
     }
 

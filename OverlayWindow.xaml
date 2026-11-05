@@ -8,14 +8,14 @@
         <Border.LayoutTransform>
             <ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/>
         </Border.LayoutTransform>
-        <Grid TextElement.FontFamily="Segoe UI" TextElement.FontSize="12" TextElement.Foreground="#F5F5F5">
+        <Grid x:Name="Root" TextElement.FontFamily="Segoe UI" TextElement.FontSize="12" TextElement.Foreground="#F5F5F5">
             <!-- Formato vertical: tabela com rótulo à esquerda e valor à direita -->
             <StackPanel x:Name="VPanel" MinWidth="200">
                 <ItemsControl x:Name="VRows">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <DockPanel Margin="0,3">
-                                <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="13" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                                <TextBlock Text="{Binding Label}" Foreground="{Binding LabelFg}" FontSize="13" VerticalAlignment="Center" Margin="0,0,24,0"/>
                                 <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </DockPanel>
                         </DataTemplate>
@@ -23,6 +23,7 @@
                 </ItemsControl>
                 <!-- Gráfico de frametime -->
                 <Canvas x:Name="OGraph" Height="30" Margin="0,8,0,2" ClipToBounds="True"/>
+                <Canvas x:Name="OGraphFps" Height="30" Margin="0,4,0,2" ClipToBounds="True" Visibility="Collapsed"/>
             </StackPanel>
             <!-- Formato horizontal (barra): rótulo pequeno + valor, lado a lado -->
             <ItemsControl x:Name="HRow" Visibility="Collapsed">
@@ -34,7 +35,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0,0,14,0">
-                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="9" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Label}" Foreground="{Binding LabelFg}" FontSize="9" VerticalAlignment="Center" Margin="0,0,5,0"/>
                             <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontWeight="Bold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>

@@ -6,7 +6,7 @@ using Microsoft.Diagnostics.Tracing.Session;
 namespace ResetExplode;
 
 public sealed record FrameStats(int ProcessId, string ProcessName, double Fps, double FrameTimeMs, double Low1Fps,
-                                IReadOnlyList<double> RecentFrameTimes);
+                                IReadOnlyList<double> RecentFrameTimes, double Low01Fps = 0, double JitterMs = 0);
 
 /// <summary>
 /// Mede o FPS de qualquer processo sem injetar código, como o PresentMon: escuta via ETW os eventos
@@ -70,6 +70,7 @@ public sealed class FrameMonitor : IDisposable
             q.Enqueue(t);
             while (q.Count > 0 && q.Peek() < t - HistoryMs) q.Dequeue();
             _lastSeen[e.ProcessID] = Stopwatch.GetTimestamp();
+            if (_rec != null && e.ProcessID == _recPid && _rec.Count < MaxRecordedFrames) _rec.Add(t);
         }
     }
 
@@ -85,8 +86,7 @@ public sealed class FrameMonitor : IDisposable
         }
 
         double last = ts[^1];
-        var frameTimes = new List<double>(ts.Length);
-        for (int i = 1; i < ts.Length; i++) frameTimes.Add(ts[i] - ts[i - 1]);
+        var frameTimes = FrameMath.FrameTimes(ts);
 
         // FPS do último segundo (pelo relógio dos eventos, imune ao atraso de entrega do ETW).
         int first = Array.FindIndex(ts, x => x >= last - 1000);
@@ -95,28 +95,50 @@ public sealed class FrameMonitor : IDisposable
         double fps = span > 0 ? frames * 1000 / span : 0;
 
         // 1% low: FPS equivalente ao percentil 99 do frametime nos últimos 10 s.
-        var sorted = frameTimes.OrderBy(x => x).ToArray();
-        double p99 = sorted[(int)Math.Min(sorted.Length - 1, Math.Floor(sorted.Length * 0.99))];
-        double low1 = p99 > 0 ? 1000 / p99 : 0;
+        // 0,1% low = percentil 99,9; variação = desvio padrão do frametime, ambos na mesma janela.
+        var sorted = (double[])frameTimes.Clone();
+        Array.Sort(sorted);
+        double low1 = FrameMath.LowFps(sorted, 0.99), low01 = FrameMath.LowFps(sorted, 0.999);
 
-        var recent = frameTimes.Skip(Math.Max(0, frameTimes.Count - 120)).ToList();
-        return new FrameStats(pid, ProcessName(pid), fps, fps > 0 ? 1000 / fps : 0, low1, recent);
+        var recent = frameTimes.Skip(Math.Max(0, frameTimes.Length - 120)).ToList();
+        return new FrameStats(pid, ProcessName(pid), fps, fps > 0 ? 1000 / fps : 0, low1, recent, low01, FrameMath.Jitter(frameTimes));
+    }
+
+    // ---------------- gravação para benchmark ----------------
+
+    private const int MaxRecordedFrames = 2_000_000; // ~3 h a 165 FPS (16 MB); depois para de guardar
+    private List<double>? _rec;
+    private int _recPid;
+
+    public bool Recording { get { lock (_lock) return _rec != null; } }
+
+    /// <summary>Começa a guardar o instante de cada frame do processo (para o benchmark).</summary>
+    public void StartRecording(int pid) { lock (_lock) { _rec = new List<double>(16384); _recPid = pid; } }
+
+    /// <summary>Para a gravação e devolve os instantes (ms); null se não estava gravando.</summary>
+    public List<double>? StopRecording() { lock (_lock) { var r = _rec; _rec = null; return r; } }
+
+    /// <summary>Processo da janela ativa (0 = nenhum ou o próprio app).</summary>
+    public static int ForegroundPid()
+    {
+        var hwnd = GetForegroundWindow();
+        if (hwnd == IntPtr.Zero) return 0;
+        GetWindowThreadProcessId(hwnd, out uint pid);
+        return pid == Environment.ProcessId ? 0 : (int)pid;
     }
 
     /// <summary>Estatísticas do programa em primeiro plano (o jogo que está na tela).</summary>
     public FrameStats? GetForegroundStats()
     {
         if (Stopwatch.GetElapsedTime(_lastPrune).TotalSeconds > 30) { _lastPrune = Stopwatch.GetTimestamp(); Prune(); }
-        var hwnd = GetForegroundWindow();
-        if (hwnd == IntPtr.Zero) return null;
-        GetWindowThreadProcessId(hwnd, out uint pid);
-        return pid == 0 || pid == Environment.ProcessId ? null : GetStats((int)pid);
+        int pid = ForegroundPid();
+        return pid == 0 ? null : GetStats(pid);
     }
 
     private readonly Dictionary<int, string> _names = new();
 
     /// <summary>Nome do processo, guardado por PID (antes abria um Process novo, sem liberar, várias vezes por segundo).</summary>
-    private string ProcessName(int pid)
+    public string ProcessName(int pid)
     {
         lock (_names)
         {

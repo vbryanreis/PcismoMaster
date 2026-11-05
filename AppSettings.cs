@@ -124,6 +124,25 @@ public sealed class AppSettings
     public uint OverlayHotkeyVk { get; set; } = 0x4F;
     /// <summary>Itens escolhidos para o overlay (chaves de OverlayMetrics); null = padrão.</summary>
     public List<string>? OverlayItems { get; set; }
+    // Aparência do overlay (cores em #RRGGBB)
+    public string OverlayFpsColor { get; set; } = "#A66BFF";
+    public string OverlayValueColor { get; set; } = "#F5F5F5";
+    public string OverlayLabelColor { get; set; } = "#8C8C8C";
+    public string OverlayFont { get; set; } = "Segoe UI";
+    /// <summary>Contorno escuro no texto (legível sem fundo).</summary>
+    public bool OverlayShadow { get; set; }
+    /// <summary>false = o overlay não aparece em capturas, gravações e transmissões (como o RivaTuner).</summary>
+    public bool OverlayInCaptures { get; set; }
+    /// <summary>Atalhos extras: "bench", "limit", "shot", "rec" → [modificadores, tecla]. Sem entrada = sem atalho.</summary>
+    public Dictionary<string, uint[]>? OverlayHotkeys { get; set; }
+    /// <summary>Benchmark: duração em segundos (0 = até apertar o atalho de novo).</summary>
+    public int BenchSeconds { get; set; }
+    public List<BenchSummary>? BenchHistory { get; set; }
+    /// <summary>Último limite global usado, para o atalho de ligar/desligar o limitador.</summary>
+    public uint LimiterLastFps { get; set; }
+    public int RecordFps { get; set; } = 60;
+    /// <summary>Perfis por jogo (nome do executável em minúsculas, sem .exe).</summary>
+    public Dictionary<string, OverlayGameProfile>? OverlayGames { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore] // nunca gravar a chave em texto puro
     public string? HowManyFpsKey

@@ -10,6 +10,15 @@ A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs
   - O estado de cada ajuste é lido em segundo plano, num PowerShell só para tudo que não é registro. Serviços que não existem no PC aparecem como "não se aplica" em vez de criar chave falsa.
   - Não repete o que já existe em outras abas (Game DVR, aceleração do mouse e plano de energia em Ferramentas › Otimização; limpar RAM e DNS; Inicialização; Instalar apps) e não desliga proteções do Windows (Defender, UAC, Isolamento de Núcleo, firewall).
   - Ponto de restauração uma vez por sessão, antes da primeira mudança. O Explorer reinicia sozinho quando algum ajuste precisa.
+- **Overlay com as funções do RivaTuner** (JOGOS · Overlay), sem injetar nada no jogo (seguro com anti-cheat):
+  - **Limitador de FPS** pelo driver NVIDIA: global, em segundo plano e por jogo. Fica gravado no driver; "Desligado" desfaz.
+  - Itens novos: **0,1% low**, **FPS mínimo, médio e máximo** desde que o jogo abriu, **variação do frametime** e **gráfico de FPS**.
+  - **Benchmark** por botão ou atalho, com duração fixa ou até parar: FPS médio, mínimo e máximo de 1 s, 1% e 0,1% low, e um **CSV por frame** (formato do PresentMon/CapFrameX) em DocumentosPcismoMasterBenchmarks. Os últimos resultados ficam na aba.
+  - **Captura de tela** (PNG, em ImagensPcismoMaster) e **gravação de vídeo** (MP4, em VídeosPcismoMaster) do monitor do jogo, pelo ffmpeg com NVENC na NVIDIA. O overlay some das capturas e transmissões, a não ser que você marque para aparecer.
+  - **Mais atalhos**: benchmark, ligar/desligar o limitador, captura e gravação (sem atalho até você escolher, para não roubar teclas de outros programas).
+  - **Aparência**: cor do FPS, dos valores e dos rótulos, fonte e contorno no texto.
+  - **Perfis por jogo**: itens, posição e formato salvos para cada executável, aplicados quando o jogo fica na tela; cada perfil pode ligar o overlay sozinho e ter o próprio limite de FPS.
+  - Fora do escopo (precisariam injetar código no jogo): scanline sync, limitador Reflex, limitador em AMD/Intel e overlay sobre tela cheia exclusiva antiga.
 
 ## 0.8.2
 

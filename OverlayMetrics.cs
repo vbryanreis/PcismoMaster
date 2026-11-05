@@ -14,7 +14,13 @@ public static class OverlayMetrics
         new("fps", "FPS", "FPS", true),
         new("frametime", "FPS", "Frametime (ms)", true),
         new("low1", "FPS", "1% low", true),
+        new("low01", "FPS", "0,1% low", false),
+        new("fpsmin", "FPS", "FPS mínimo", false),
+        new("fpsavg", "FPS", "FPS médio", false),
+        new("fpsmax", "FPS", "FPS máximo", false),
+        new("jitter", "FPS", "Variação do frametime", false),
         new("graph", "FPS", "Gráfico de frametime", true),
+        new("fpsgraph", "FPS", "Gráfico de FPS", false),
 
         new("gpu_load", "GPU", "Uso", true),
         new("gpu_temp", "GPU", "Temperatura", true),
@@ -59,6 +65,37 @@ public sealed record OverlayPart(string Group, string Short, string Text, string
 {
     /// <summary>0 = normal, 1 = fria (verde), 2 = morna (âmbar), 3 = quente (vermelha).</summary>
     public int Level => Temp is not float t ? 0 : t >= 85 ? 3 : t >= 75 ? 2 : 1;
+}
+
+/// <summary>Perfil do overlay para um jogo: o que mostrar, onde, e se aparece sozinho quando o jogo abre.</summary>
+public sealed class OverlayGameProfile
+{
+    public List<string>? Items { get; set; }
+    public string? Corner { get; set; }
+    public string? Layout { get; set; }
+    /// <summary>Liga o overlay sozinho quando o jogo fica na tela (e desliga quando sai).</summary>
+    public bool AutoShow { get; set; }
+    /// <summary>Limite de FPS gravado no driver para este jogo (0 = usa o global).</summary>
+    public uint FpsLimit { get; set; }
+
+    /// <summary>Chave do perfil: nome do executável em minúsculas, sem ".exe".</summary>
+    public static string Key(string exeOrName)
+    {
+        string n = System.IO.Path.GetFileName(exeOrName.Trim()).ToLowerInvariant();
+        return n.EndsWith(".exe") ? n[..^4] : n;
+    }
+}
+
+/// <summary>Ações com atalho próprio além de ligar/desligar o overlay.</summary>
+public static class OverlayActions
+{
+    public static readonly (string Key, string Label)[] All =
+    {
+        ("bench", "Benchmark (começar/parar)"),
+        ("limit", "Limitador de FPS (ligar/desligar)"),
+        ("shot", "Captura de tela (PNG)"),
+        ("rec", "Gravar vídeo (começar/parar)"),
+    };
 }
 
 /// <summary>Tecla de atalho do overlay (modificadores de RegisterHotKey + código virtual).</summary>

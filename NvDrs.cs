@@ -210,6 +210,22 @@ public static class NvDrs
         finally { Marshal.FreeHGlobal(buf); }
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate int FnFindApp(IntPtr s, string name, ref IntPtr p, IntPtr app);
+
+    /// <summary>Perfil a que o executável (ex.: "game.exe") pertence; null se nenhum perfil o tem.</summary>
+    public static IntPtr? FindAppProfile(IntPtr s, string exe)
+    {
+        IntPtr buf = Alloc(AppSize);
+        try
+        {
+            Marshal.WriteInt32(buf, (int)Ver(AppSize, 4));
+            IntPtr p = IntPtr.Zero;
+            int st = Fn<FnFindApp>(0xEEE566B2)!(s, exe, ref p, buf);
+            return st == OK && p != IntPtr.Zero ? p : null;
+        }
+        finally { Marshal.FreeHGlobal(buf); }
+    }
+
     public static void RemoveApp(IntPtr s, IntPtr p, string exe) => Check(Fn<FnPtrPtrStr>(0x2C694BC6)!(s, p, exe), "DRS_DeleteApplication");
 
     // ---------------- Configurações ----------------

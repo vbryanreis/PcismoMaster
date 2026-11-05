@@ -2261,12 +2261,12 @@
                                     <Grid>
                                         <Border x:Name="OvPreviewBox" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="10" Padding="14,10"
                                                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,18">
-                                            <Grid TextElement.FontFamily="Segoe UI">
+                                            <Grid x:Name="OvPreviewRoot" TextElement.FontFamily="Segoe UI">
                                             <ItemsControl x:Name="OvPreviewV" MinWidth="200">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <DockPanel Margin="0,3">
-                                                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="13" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                                                            <TextBlock Text="{Binding Label}" Foreground="{Binding LabelFg}" FontSize="13" VerticalAlignment="Center" Margin="0,0,24,0"/>
                                                             <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                                         </DockPanel>
                                                     </DataTemplate>
@@ -2281,7 +2281,7 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Horizontal" Margin="0,1,14,1">
-                                                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C" FontSize="9" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                            <TextBlock Text="{Binding Label}" Foreground="{Binding LabelFg}" FontSize="9" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                                             <TextBlock Text="{Binding Value}" Foreground="{Binding Fg}" FontWeight="Bold" VerticalAlignment="Center"/>
                                                         </StackPanel>
                                                     </DataTemplate>
@@ -2357,6 +2357,9 @@
                                 <StackPanel x:Name="OvItemsPanel"/>
                             </StackPanel>
                         </Border>
+
+                        <!-- Limitador, benchmark, capturas, atalhos, aparência e perfis por jogo (montados em MainWindow.OverlayTools.cs) -->
+                        <StackPanel x:Name="OvToolsPanel"/>
 
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>

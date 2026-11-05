@@ -94,7 +94,7 @@ public static class PageCatalog
         new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja favorito favoritos coracao drm steam epic xbox gog", false, ""),
         new("NavGames", "FPS estimado", "JOGOS", "Quanto FPS os jogos devem rodar no seu PC.", "fps jogos rodar requisitos", false, ""),
         new("NavBottleneck", "Gargalo", "JOGOS", "Se a CPU ou a placa de vídeo está segurando o desempenho.", "gargalo bottleneck", true, ""),
-        new("NavOverlay", "Overlay", "JOGOS", "Mostrar FPS e temperatura por cima dos jogos.", "overlay fps tela jogo", false, ""),
+        new("NavOverlay", "Overlay", "JOGOS", "Mostrar FPS e temperatura por cima dos jogos, limitar o FPS, medir e gravar.", "overlay fps tela jogo rivatuner limitador limite benchmark frametime captura print gravar video", false, ""),
         new("NavBench", "Benchmark", "DESEMPENHO", "Medir a velocidade do PC e comparar.", "benchmark teste pontuacao velocidade", true, ""),
         new("NavStress", "Stress test", "DESEMPENHO", "Testar estabilidade e temperatura no máximo.", "stress teste estabilidade temperatura", true, ""),
         new("NavOc", "Overclock", "DESEMPENHO", "Overclock e undervolt da placa de vídeo.", "overclock undervolt afterburner clock", true, ""),

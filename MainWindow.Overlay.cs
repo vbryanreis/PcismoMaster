@@ -90,7 +90,7 @@ public partial class MainWindow
     /// <summary>Monta os valores escolhidos de GPU / VRAM / CPU / RAM; o overlay junta em linhas (vertical) ou células (barra).</summary>
     private List<OverlayPart> BuildOverlayParts(FrameStats? f)
     {
-        var show = OvShow;
+        var show = OvActiveShow;
         var s = BottleneckAnalyzer.Sample(_monitor, _gpus.FirstOrDefault(), f);
         var parts = new List<OverlayPart>();
         string T(float? v) => v is float x ? $"{x:0} °C" : "—";
@@ -157,7 +157,7 @@ public partial class MainWindow
     /// <summary>O timer de 500 ms só roda com o overlay ligado ou com a aba Overlay aberta (prévia); fora disso, nada é lido.</summary>
     private void SyncOverlayTimer()
     {
-        bool need = ChkOverlay.IsChecked == true || PageOverlay.IsVisible;
+        bool need = ChkOverlay.IsChecked == true || PageOverlay.IsVisible || OvBackgroundWork;
         if (need)
         {
             _overlayTimer ??= new System.Windows.Threading.DispatcherTimer(TimeSpan.FromMilliseconds(500),
@@ -173,20 +173,25 @@ public partial class MainWindow
     private void PageOverlay_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) => SyncOverlayTimer();
 
     /// <summary>Prévia na aba com os números reais deste PC, no formato e na opacidade escolhidos.</summary>
-    private void UpdateOverlayPreview(FrameStats? f, IReadOnlyList<OverlayPart> parts, string? hour)
+    private void UpdateOverlayPreview(FrameStats? f, OverlayLive live, IReadOnlyList<OverlayPart> parts, string? hour, OverlayStyle style)
     {
-        bool h = _settings.OverlayLayout == "H";
-        var cells = OverlayWindow.Cells(f, parts, OvShow, hour);
+        bool h = OvActiveLayout == "H";
+        var cells = OverlayWindow.Cells(f, live, parts, OvActiveShow, hour, style);
+        if (_ovPreviewFont != style.Font) { _ovPreviewFont = style.Font; OvPreviewRoot.SetValue(System.Windows.Documents.TextElement.FontFamilyProperty, new System.Windows.Media.FontFamily(style.Font)); }
+        if ((OvPreviewRoot.Effect != null) != style.Shadow)
+            OvPreviewRoot.Effect = style.Shadow ? new System.Windows.Media.Effects.DropShadowEffect { ShadowDepth = 1, BlurRadius = 3, Opacity = 1, Color = System.Windows.Media.Colors.Black } : null;
         OvPreview.ItemsSource = h ? cells : null;
         OvPreviewV.ItemsSource = h ? null : cells;
         OvPreview.Visibility = h ? Visibility.Visible : Visibility.Collapsed;
         OvPreviewV.Visibility = h ? Visibility.Collapsed : Visibility.Visible;
         OvPreviewBox.Background = new System.Windows.Media.SolidColorBrush(
             System.Windows.Media.Color.FromArgb((byte)Math.Round(_settings.OverlayOpacity * 255), 0, 0, 0));
-        OvPreviewBox.HorizontalAlignment = _settings.OverlayCorner.EndsWith("R") ? HorizontalAlignment.Right
-                                         : _settings.OverlayCorner.EndsWith("C") ? HorizontalAlignment.Center : HorizontalAlignment.Left;
-        OvPreviewBox.VerticalAlignment = _settings.OverlayCorner.StartsWith("B") ? VerticalAlignment.Bottom : VerticalAlignment.Top;
+        OvPreviewBox.HorizontalAlignment = OvActiveCorner.EndsWith("R") ? HorizontalAlignment.Right
+                                         : OvActiveCorner.EndsWith("C") ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+        OvPreviewBox.VerticalAlignment = OvActiveCorner.StartsWith("B") ? VerticalAlignment.Bottom : VerticalAlignment.Top;
     }
+
+    private string? _ovPreviewFont;
 
     private bool RegisterOverlayHotkey(uint mods, uint vk)
     {

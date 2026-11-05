@@ -234,6 +234,28 @@ Test("Overlay: linhas por componente, cor da temperatura e texto do atalho", () 
     Assert(parts[0].Level == 0 && parts[1].Level == 1 && parts[2].Level == 3 && new OverlayPart("X", "X", "", "", 78).Level == 2);
     Assert(OverlayHotkey.Describe(OverlayHotkey.Ctrl | OverlayHotkey.Shift, "O") == "Ctrl + Shift + O" && OverlayHotkey.Describe(0, "F5") == "F5" && OverlayHotkey.Describe(OverlayHotkey.Alt, "D5") == "Alt + 5");
 });
+Test("Overlay: benchmark (média, mín/máx por segundo, 1% e 0,1% low), variação e CSV", () => {
+    // 3 s: 1º segundo a 100 FPS (10 ms), 2º a 50 FPS (20 ms), 3º a 100 FPS, com um engasgo de 100 ms no fim.
+    var ts = new List<double> { 0 };
+    void Run(double ms, double until) { while (ts[^1] + ms <= until + 1e-9) ts.Add(ts[^1] + ms); }
+    Run(10, 1000); Run(20, 2000); Run(10, 2900); ts.Add(ts[^1] + 100);
+    var s = FrameMath.Summarize("jogo", DateTime.Now, ts)!;
+    Assert(s.Frames == ts.Count - 1 && Math.Abs(s.Seconds - 3) < 1e-6);
+    Assert(Math.Abs(s.Avg - s.Frames / 3.0) < 1e-6);
+    Assert(Math.Abs(s.Max - 100) < 0.01 && Math.Abs(s.Min - 50) < 0.01);
+    Assert(Math.Abs(s.Low1 - 50) < 0.01 && Math.Abs(s.Low01 - 10) < 0.01);
+    Assert(FrameMath.Summarize("x", DateTime.Now, new List<double> { 0, 10, 20 }) == null);
+    Assert(FrameMath.Jitter(new[] { 10.0, 10, 10 }) == 0 && Math.Abs(FrameMath.Jitter(new[] { 8.0, 12 }) - 2) < 1e-9);
+    var csv = FrameMath.Csv("jogo", new List<double> { 0, 16.5, 33.25 }).Split("\r\n");
+    Assert(csv[0] == "Application,Frame,TimeInSeconds,MsBetweenPresents" && csv[1] == "jogo,1,0.016500,16.500" && csv[2] == "jogo,2,0.033250,16.750");
+    var live = new LiveFps();
+    live.Add(1, 100); live.Add(1, 140); live.Add(1, 0); live.Add(1, 120);
+    Assert(live.Min == 100 && live.Max == 140 && live.Avg == 120);
+    live.Add(2, 60); // outro jogo: zera
+    Assert(live.Min == 60 && live.Max == 60 && live.Avg == 60);
+    Assert(OverlayGameProfile.Key(@" C:\Games\CS2.EXE ") == "cs2" && OverlayGameProfile.Key("Valorant") == "valorant");
+    Assert(OverlayMetrics.All.Select(m => m.Key).Distinct().Count() == OverlayMetrics.All.Length);
+});
 Test("Tweaking: .reg parser reads every value type, deletes and continuation lines", () => {
     var r = RegFile.Parse("Windows Registry Editor Version 5.00\r\n\r\n[HKEY_CURRENT_USER\\Software\\T]\r\n\"S\"=\"a \\\"b\\\" c\\\\d\"\r\n\"D\"=dword:ffffffff\r\n" +
         "\"B\"=hex:01,02,\\\r\n  03\r\n\"E\"=hex(2):25,00,41,00,25,00,00,00\r\n\"M\"=hex(7):61,00,00,00,62,00,00,00,00,00\r\n\"Q\"=hex(b):01,00,00,00,00,00,00,00\r\n" +

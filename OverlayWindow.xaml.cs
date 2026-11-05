@@ -30,6 +30,7 @@ public partial class OverlayWindow : Window
             _hwnd = new WindowInteropHelper(this).Handle;
             int ex = GetWindowLong(_hwnd, GWL_EXSTYLE);
             SetWindowLong(_hwnd, GWL_EXSTYLE, ex | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE);
+            SetWindowDisplayAffinity(_hwnd, _captureVisible ? WDA_NONE : WDA_EXCLUDEFROMCAPTURE);
         };
         SizeChanged += (_, _) => Reposition();
         // Só escuta a troca de janela ativa enquanto o overlay está na tela.
@@ -92,52 +93,90 @@ public partial class OverlayWindow : Window
     }
 
     /// <summary>Atualiza o overlay. <paramref name="show"/> = itens escolhidos (chaves de OverlayMetrics).</summary>
-    public void Update(FrameStats? f, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? extra)
+    public void Update(FrameStats? f, OverlayLive? live, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? hour, OverlayStyle st)
     {
+        ApplyStyle(st);
         VPanel.Visibility = Horizontal ? Visibility.Collapsed : Visibility.Visible;
         HRow.Visibility = Horizontal ? Visibility.Visible : Visibility.Collapsed;
-        var cells = Cells(f, parts, show, extra);
+        var cells = Cells(f, live, parts, show, hour, st);
         if (Horizontal) { HRow.ItemsSource = cells; return; }
-        // Vertical: tabela (rótulo à esquerda, valor à direita) e, se escolhido, o gráfico de frametime embaixo.
+        // Vertical: tabela (rótulo à esquerda, valor à direita) e, se escolhidos, os gráficos de frametime e FPS embaixo.
         VRows.ItemsSource = cells;
-        bool graph = show.Contains("graph");
+        bool graph = show.Contains("graph"), fpsGraph = show.Contains("fpsgraph");
         OGraph.Visibility = graph ? Visibility.Visible : Visibility.Collapsed;
-        if (graph) DrawGraph(f?.RecentFrameTimes);
+        OGraphFps.Visibility = fpsGraph ? Visibility.Visible : Visibility.Collapsed;
+        if (graph) DrawGraph(OGraph, f?.RecentFrameTimes, false, st.Fps);
+        if (fpsGraph) DrawGraph(OGraphFps, f?.RecentFrameTimes, true, st.Value);
     }
 
-    private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Accent = Frozen(0xA6, 0x6B, 0xFF),
+    private OverlayStyle? _style;
+
+    /// <summary>Fonte e contorno do texto; só mexe na árvore visual quando mudam.</summary>
+    private void ApplyStyle(OverlayStyle st)
+    {
+        if (_style is { } old && old.Font == st.Font && old.Shadow == st.Shadow) { _style = st; return; }
+        _style = st;
+        Root.SetValue(System.Windows.Documents.TextElement.FontFamilyProperty, new FontFamily(st.Font));
+        Root.Effect = st.Shadow ? new System.Windows.Media.Effects.DropShadowEffect { ShadowDepth = 1, BlurRadius = 3, Opacity = 1, Color = Colors.Black } : null;
+    }
+
+    /// <summary>false = some de capturas de tela, gravações e transmissões (Windows 10 2004 ou mais novo).</summary>
+    public void SetCaptureVisible(bool visible)
+    {
+        _captureVisible = visible;
+        if (_hwnd == IntPtr.Zero) return;
+        SetWindowDisplayAffinity(_hwnd, visible ? WDA_NONE : WDA_EXCLUDEFROMCAPTURE);
+    }
+    private bool _captureVisible;
+
+    private static readonly Brush Plain = Frozen(0xF5, 0xF5, 0xF5), Rec = Frozen(0xF8, 0x71, 0x71),
         Cool = Frozen(0x4A, 0xDE, 0x80), Warm = Frozen(0xFB, 0xBF, 0x24), Hot = Frozen(0xF8, 0x71, 0x71);
     private static Brush Frozen(byte r, byte g, byte b) { var x = new SolidColorBrush(Color.FromRgb(r, g, b)); x.Freeze(); return x; }
 
-    /// <summary>Células do formato horizontal (também usadas na prévia da aba Overlay): FPS, frame, 1% low, sensores e jogo.</summary>
-    public static List<OverlayCell> Cells(FrameStats? f, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show, string? extra)
+    /// <summary>Células do overlay (também usadas na prévia da aba Overlay): estado, FPS, estatísticas, sensores e jogo.</summary>
+    public static List<OverlayCell> Cells(FrameStats? f, OverlayLive? live, IReadOnlyList<OverlayPart> parts, IReadOnlySet<string> show,
+                                          string? hour, OverlayStyle st)
     {
         var cells = new List<OverlayCell>();
-        if (show.Contains("fps")) cells.Add(new("FPS", f != null ? $"{f.Fps:0}" : "—", Accent));
-        if (show.Contains("frametime")) cells.Add(new("FRAME", f != null ? $"{f.FrameTimeMs:0.0} ms" : "—", Plain));
-        if (show.Contains("low1")) cells.Add(new("1% LOW", f != null ? $"{f.Low1Fps:0}" : "—", Plain));
+        if (live?.Status is { Length: > 0 } status) cells.Add(new("●", status, Rec, Rec));
+        string N(double? v) => v is double x && x > 0 ? $"{x:0}" : "—";
+        if (show.Contains("fps")) cells.Add(new("FPS", N(f?.Fps), st.Fps, st.Label));
+        if (show.Contains("frametime")) cells.Add(new("FRAME", f != null ? $"{f.FrameTimeMs:0.0} ms" : "—", st.Value, st.Label));
+        if (show.Contains("low1")) cells.Add(new("1% LOW", N(f?.Low1Fps), st.Value, st.Label));
+        if (show.Contains("low01")) cells.Add(new("0,1% LOW", N(f?.Low01Fps), st.Value, st.Label));
+        if (show.Contains("fpsmin")) cells.Add(new("MÍN", f != null ? N(live?.Min) : "—", st.Value, st.Label));
+        if (show.Contains("fpsavg")) cells.Add(new("MÉD", f != null ? N(live?.Avg) : "—", st.Value, st.Label));
+        if (show.Contains("fpsmax")) cells.Add(new("MÁX", f != null ? N(live?.Max) : "—", st.Value, st.Label));
+        if (show.Contains("jitter")) cells.Add(new("VARIAÇÃO", f != null ? $"±{f.JitterMs:0.0} ms" : "—", st.Value, st.Label));
         foreach (var p in parts)
-            cells.Add(new(p.Short, p.Bare, p.Level switch { 1 => Cool, 2 => Warm, 3 => Hot, _ => Plain }));
-        if (show.Contains("game") && f != null) cells.Add(new("JOGO", f.ProcessName, Plain));
-        if (extra != null) cells.Add(new("HORA", extra, Plain));
+            cells.Add(new(p.Short, p.Bare, p.Level switch { 1 => Cool, 2 => Warm, 3 => Hot, _ => st.Value }, st.Label));
+        if (show.Contains("game") && f != null) cells.Add(new("JOGO", f.ProcessName, st.Value, st.Label));
+        if (hour != null) cells.Add(new("HORA", hour, st.Value, st.Label));
         return cells;
     }
 
-    /// <summary>Frametimes recentes: picos para cima = engasgos.</summary>
-    private void DrawGraph(IReadOnlyList<double>? ft)
+    private static readonly Brush GridLine = Frozen(0x40, 0x40, 0x40);
+
+    /// <summary>Frametimes recentes (picos para cima = engasgos) ou o FPS de cada frame (vales = quedas).</summary>
+    private static void DrawGraph(System.Windows.Controls.Canvas c, IReadOnlyList<double>? ft, bool asFps, Brush stroke)
     {
-        OGraph.Children.Clear();
-        double w = OGraph.ActualWidth > 0 ? OGraph.ActualWidth : 200, h = OGraph.Height;
-        OGraph.Children.Add(new Line { X1 = 0, X2 = w, Y1 = h - 0.5, Y2 = h - 0.5, Stroke = new SolidColorBrush(Color.FromArgb(0x30, 0xFF, 0xFF, 0xFF)) });
+        c.Children.Clear();
+        double w = c.ActualWidth > 0 ? c.ActualWidth : 200, h = c.Height;
+        c.Children.Add(new Line { X1 = 0, X2 = w, Y1 = h - 0.5, Y2 = h - 0.5, Stroke = GridLine });
         if (ft == null || ft.Count < 2) return;
 
-        double max = Math.Max(ft.Max(), ft.Average() * 2); // escala que mostra picos sem achatar o normal
-        var line = new Polyline { Stroke = Accent, StrokeThickness = 1.2 };
-        double step = w / (ft.Count - 1);
-        for (int i = 0; i < ft.Count; i++)
-            line.Points.Add(new Point(i * step, h - 1 - (h - 2) * Math.Min(1, ft[i] / max)));
-        OGraph.Children.Add(line);
+        var values = asFps ? ft.Select(x => x > 0 ? 1000 / x : 0).ToList() : (IReadOnlyList<double>)ft;
+        // Frametime: escala que mostra picos sem achatar o normal. FPS: até o maior valor, com folga.
+        double max = asFps ? Math.Max(1, values.Max() * 1.1) : Math.Max(values.Max(), values.Average() * 2);
+        var line = new Polyline { Stroke = stroke, StrokeThickness = 1.2 };
+        double step = w / (values.Count - 1);
+        for (int i = 0; i < values.Count; i++)
+            line.Points.Add(new Point(i * step, h - 1 - (h - 2) * Math.Min(1, values[i] / max)));
+        c.Children.Add(line);
     }
+
+    private const uint WDA_NONE = 0, WDA_EXCLUDEFROMCAPTURE = 0x11;
+    [DllImport("user32.dll")] private static extern bool SetWindowDisplayAffinity(IntPtr h, uint affinity);
 
     private const int GWL_EXSTYLE = -20;
     private const int WS_EX_TRANSPARENT = 0x20, WS_EX_LAYERED = 0x80000, WS_EX_TOOLWINDOW = 0x80, WS_EX_NOACTIVATE = 0x8000000;
@@ -167,4 +206,28 @@ public partial class OverlayWindow : Window
 }
 
 /// <summary>Célula do overlay em barra: rótulo pequeno, valor e a cor do valor.</summary>
-public sealed record OverlayCell(string Label, string Value, Brush Fg);
+public sealed record OverlayCell(string Label, string Value, Brush Fg, Brush LabelFg);
+
+/// <summary>Mínimo, média e máximo desde que o jogo abriu, e o aviso de benchmark/gravação em andamento.</summary>
+public sealed record OverlayLive(double Min, double Avg, double Max, string? Status);
+
+/// <summary>Aparência do overlay: cores do FPS, dos valores e dos rótulos, fonte e contorno no texto.</summary>
+public sealed record OverlayStyle(Brush Fps, Brush Value, Brush Label, string Font, bool Shadow)
+{
+    public static OverlayStyle From(AppSettings s) => new(Parse(s.OverlayFpsColor, "#A66BFF"), Parse(s.OverlayValueColor, "#F5F5F5"),
+        Parse(s.OverlayLabelColor, "#8C8C8C"), string.IsNullOrWhiteSpace(s.OverlayFont) ? "Segoe UI" : s.OverlayFont, s.OverlayShadow);
+
+    private static readonly Dictionary<string, Brush> Cache = new();
+    public static Brush Parse(string? hex, string fallback)
+    {
+        string key = string.IsNullOrWhiteSpace(hex) ? fallback : hex;
+        lock (Cache)
+        {
+            if (Cache.TryGetValue(key, out var b)) return b;
+            try { b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(key)); }
+            catch { b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(fallback)); }
+            b.Freeze();
+            return Cache[key] = b;
+        }
+    }
+}
