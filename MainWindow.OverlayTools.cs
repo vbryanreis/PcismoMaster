@@ -311,17 +311,17 @@ public partial class MainWindow
     private StackPanel? _ovBenchHistory, _ovLimiterBody, _ovProfilesList, _ovAppearance;
     private TextBox? _ovProfileName;
 
-    private StackPanel OvCard(string title, string intro)
+    private StackPanel OvCard(string tab, string icon, string title, string intro)
     {
         var body = new StackPanel();
-        body.Children.Add(new TextBlock { Text = title, Style = (Style)FindResource("Label") });
-        body.Children.Add(new TextBlock { Text = intro, Foreground = (Brush)FindResource("Faint"), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 10) });
-        OvToolsPanel.Children.Add(new Border { Style = (Style)FindResource("CardBorder"), Margin = new Thickness(0, 0, 0, 14), Child = body });
+        body.Children.Add(CardHeader(icon, title));
+        body.Children.Add(new TextBlock { Text = intro, Foreground = (Brush)FindResource("Faint"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 10) });
+        OvToolsPanel.Children.Add(new Border { Style = (Style)FindResource("CardBorder"), Margin = new Thickness(0, 0, 0, 14), Child = body, Tag = tab });
         return body;
     }
 
     private TextBlock OvSmall(string text = "", string brush = "Muted") =>
-        new() { Text = text, Foreground = (Brush)FindResource(brush), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) };
+        new() { Text = text, Foreground = (Brush)FindResource(brush), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) };
 
     private static void OpenFolder(string dir, string? select = null)
     {
@@ -362,16 +362,17 @@ public partial class MainWindow
     private void BuildOverlayTools()
     {
         OvToolsPanel.Children.Clear();
+        BuildOverlayTabs();
 
         // Limitador
-        _ovLimiterBody = OvCard("LIMITADOR DE FPS", "Pelo driver NVIDIA (a mesma \"Taxa Máxima de Quadros\" do Painel NVIDIA): nada é injetado no jogo. " +
+        _ovLimiterBody = OvCard("limit", "", "Limitador de FPS", "Pelo driver NVIDIA (a mesma \"Taxa Máxima de Quadros\" do Painel NVIDIA): nada é injetado no jogo. " +
             "Fica gravado no driver e vale mesmo com o PcismoMaster fechado. Com G-SYNC/FreeSync, 3 a 4 FPS abaixo da taxa do monitor dá a menor latência sem tearing. " +
-            "Limite por jogo: em Perfis por jogo, abaixo.");
+            "Limite por jogo: na sub-aba Perfis.");
         _ovLimiterInfo = OvSmall(OvNvidia ? "Lendo o driver…" : "Precisa de placa e driver NVIDIA.");
         _ovLimiterBody.Children.Add(_ovLimiterInfo);
 
         // Benchmark
-        var bench = OvCard("BENCHMARK", "Mede o jogo que está na tela e salva o resultado (FPS médio, mínimo e máximo de 1 s, 1% e 0,1% low) e um CSV " +
+        var bench = OvCard("bench", "", "Benchmark", "Mede o jogo que está na tela e salva o resultado (FPS médio, mínimo e máximo de 1 s, 1% e 0,1% low) e um CSV " +
             "com cada frame, que abre no CapFrameX ou no Excel. Pelo botão daqui, a medição começa sozinha quando você voltar ao jogo; pelo atalho, na hora.");
         bench.Children.Add(new TextBlock { Text = "DURAÇÃO", Style = (Style)FindResource("Label"), Margin = new Thickness(0, 0, 0, 6) });
         bench.Children.Add(OvChips("OvBenchDur", new[] { ("Até parar", "0"), ("30 s", "30"), ("60 s", "60"), ("2 min", "120"), ("5 min", "300") },
@@ -388,7 +389,7 @@ public partial class MainWindow
         bench.Children.Add(_ovBenchHistory);
 
         // Capturas
-        var cap = OvCard("CAPTURA DE TELA E VÍDEO", "Do monitor onde o jogo está. Fotos em PNG na pasta Imagens\\PcismoMaster; vídeos em MP4 na pasta Vídeos\\PcismoMaster, " +
+        var cap = OvCard("cap", "", "Captura de tela e vídeo", "Do monitor onde o jogo está. Fotos em PNG na pasta Imagens\\PcismoMaster; vídeos em MP4 na pasta Vídeos\\PcismoMaster, " +
             "gravados pelo ffmpeg (instale em Instalar apps) com a placa de vídeo (NVENC) quando é NVIDIA. O vídeo não grava o som. " +
             "Jogos em tela cheia exclusiva antiga podem sair pretos.");
         var inCap = new CheckBox { Content = "Mostrar o overlay nas capturas, gravações e transmissões", IsChecked = _settings.OverlayInCaptures, Margin = new Thickness(0, 0, 0, 10) };
@@ -406,7 +407,7 @@ public partial class MainWindow
         cap.Children.Add(_ovCaptureInfo);
 
         // Atalhos
-        var keys = OvCard("MAIS ATALHOS", "Clique na caixa e aperte a tecla ou combinação (Esc cancela). Funcionam com o jogo em primeiro plano; " +
+        var keys = OvCard("ov", "", "Mais atalhos", "Clique na caixa e aperte a tecla ou combinação (Esc cancela). Funcionam com o jogo em primeiro plano; " +
             "escolha teclas que o jogo não usa. O atalho de ligar/desligar o overlay fica no topo da aba.");
         foreach (var (key, label) in OverlayActions.All)
         {
@@ -452,11 +453,11 @@ public partial class MainWindow
         }
 
         // Aparência
-        _ovAppearance = OvCard("APARÊNCIA", "Cores, fonte e contorno do texto. O tamanho e a opacidade do fundo ficam em Posição, acima.");
+        _ovAppearance = OvCard("ov", "", "Aparência", "Cores, fonte e contorno do texto. O tamanho e a opacidade do fundo ficam em Posição, acima.");
         BuildAppearance();
 
         // Perfis por jogo
-        var prof = OvCard("PERFIS POR JOGO", "Salve o overlay atual (itens, posição e formato) para um jogo: quando ele estiver na tela, o perfil vale sozinho. " +
+        var prof = OvCard("prof", "", "Perfis por jogo", "Salve o overlay atual (itens, posição e formato) para um jogo: quando ele estiver na tela, o perfil vale sozinho. " +
             "Cada perfil pode ligar o overlay sozinho e ter o próprio limite de FPS no driver NVIDIA.");
         var add = new DockPanel { Margin = new Thickness(0, 0, 0, 4) };
         var save = TweakButton("Salvar perfil com o overlay atual", true, (_, _) =>
@@ -480,8 +481,32 @@ public partial class MainWindow
         BuildGameProfiles();
         BuildBenchHistory();
         RefreshOverlayTools();
+        ShowOverlayTab();
         SyncProfileWatcher();
         if (OvNvidia) _ = LoadLimiterAsync();
+    }
+
+    private string _ovTab = "ov";
+
+    /// <summary>Sub-abas da aba Overlay: cada cartão (do XAML ou montado aqui) tem a sub-aba no Tag.</summary>
+    private void BuildOverlayTabs()
+    {
+        var root = (StackPanel)PageOverlay.Content;
+        if (root.Children.OfType<WrapPanel>().Any(w => w.Tag as string == "ovtabs")) return;
+        foreach (var b in root.Children.OfType<Border>()) b.Tag ??= "ov"; // prévia, posição, o que mostrar e detecção
+        var tabs = OvChips("OvTab", new[] { ("Overlay", "ov"), ("Limitador de FPS", "limit"), ("Benchmark", "bench"), ("Captura e vídeo", "cap"), ("Perfis por jogo", "prof") },
+            _ovTab, t => { _ovTab = t; ShowOverlayTab(); });
+        tabs.Tag = "ovtabs";
+        tabs.Margin = new Thickness(0, 0, 0, 12);
+        root.Children.Insert(1, tabs);
+    }
+
+    private void ShowOverlayTab()
+    {
+        var root = (StackPanel)PageOverlay.Content;
+        foreach (var b in root.Children.OfType<Border>().Concat(OvToolsPanel.Children.OfType<Border>()))
+            b.Visibility = b.Tag as string == _ovTab ? Visibility.Visible : Visibility.Collapsed;
+        PageOverlay.ScrollToTop();
     }
 
     private async Task LoadLimiterAsync()
@@ -519,7 +544,7 @@ public partial class MainWindow
         };
         var customLabel = new StackPanel { Orientation = Orientation.Horizontal };
         customLabel.Children.Add(custom);
-        customLabel.Children.Add(new TextBlock { Text = "outro valor + Enter", Foreground = (Brush)FindResource("Faint"), FontSize = 11, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 8) });
+        customLabel.Children.Add(new TextBlock { Text = "outro valor + Enter", Foreground = (Brush)FindResource("Faint"), FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 8) });
         Grid.SetColumn(customLabel, 2);
         grid.Children.Add(customLabel);
 
@@ -653,7 +678,7 @@ public partial class MainWindow
             var head = new WrapPanel();
             head.Children.Add(new TextBlock { Text = key + ".exe", FontWeight = FontWeights.Bold, FontSize = 14, Foreground = (Brush)FindResource("Fg"), Margin = new Thickness(0, 0, 12, 0), VerticalAlignment = VerticalAlignment.Center });
             head.Children.Add(new TextBlock { Text = $"{p.Items?.Count ?? 0} itens · {where} · {(p.Layout == "H" ? "barra" : "lista")}" + (_ovProfileKey == key ? " · na tela agora" : ""),
-                Foreground = (Brush)FindResource("Muted"), FontSize = 11, VerticalAlignment = VerticalAlignment.Center });
+                Foreground = (Brush)FindResource("Muted"), FontSize = 12, VerticalAlignment = VerticalAlignment.Center });
             body.Children.Add(head);
 
             var opts = new WrapPanel { Margin = new Thickness(0, 8, 0, 0) };

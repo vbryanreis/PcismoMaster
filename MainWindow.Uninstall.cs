@@ -17,6 +17,7 @@ namespace ResetExplode;
 public partial class MainWindow
 {
     private List<InstalledProgram>? _programs;
+    private List<InstalledProgram> _orphans = new();
     private bool _unBusy;
     private List<LeftoverRow> _leftovers = new();
     private InstalledProgram? _unApp;
@@ -52,11 +53,16 @@ public partial class MainWindow
         UnStatus.Text = "Lendo os programas instalados…";
         try
         {
-            var list = await Task.Run(ProgramInventory.Read);
+            var all = await Task.Run(ProgramInventory.Read);
+            // Entradas de programas já removidos ficam fora da lista (era por isso que apps desinstalados continuavam aparecendo).
+            _orphans = all.Where(p => p.Orphan).ToList();
+            var list = all.Where(p => !p.Orphan).ToList();
             _programs = list;
             UninstallList.ItemsSource = list;
             CollectionViewSource.GetDefaultView(list).Filter = ProgramFilter;
-            UnStatus.Text = $"{list.Count} programas.";
+            UnStatus.Text = $"{list.Count} programas." + (_orphans.Count > 0 ? $" {_orphans.Count} já removido(s) deixaram a entrada no registro." : "");
+            BtnUnOrphans.Content = $"LIMPAR {_orphans.Count} ENTRADA(S) ÓRFÃ(S)";
+            BtnUnOrphans.Visibility = _orphans.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             // Ícones depois, fora da thread da UI (o DisplayIcon de cada programa)
             var icons = await Task.Run(() => list.Select(p => (p, icon: AppIcons.FromFile(p.DisplayIcon, 32))).ToList());
             if (!ReferenceEquals(_programs, list)) return; // a lista foi recarregada nesse meio-tempo
@@ -92,6 +98,30 @@ public partial class MainWindow
         _ => "Avançado: o Moderado + o que só bate com o nome do fabricante ou é parecido. Esses itens vêm desmarcados com CONFIRA: abra antes de remover.",
     };
 
+    /// <summary>Apaga (com backup do registro) as entradas de programas que já não existem mais no PC.</summary>
+    private async void BtnUnOrphans_Click(object sender, RoutedEventArgs e)
+    {
+        if (_unBusy || _orphans.Count == 0) return;
+        var items = _orphans.Where(p => Uninstaller.IsSafeRegPath(p.KeyPath))
+            .Select(p => new Leftover("Registro", $"{Uninstaller.HiveLabel(p.Hive, p.View)}\\{p.KeyPath}", 0, null, p.Hive, p.View, p.KeyPath)
+                         { Reason = "entrada órfã em Programas e Recursos" })
+            .ToList();
+        if (items.Count == 0) return;
+        string names = string.Join("\n", _orphans.Take(12).Select(p => $"  • {p.Name}")) + (_orphans.Count > 12 ? $"\n  … e mais {_orphans.Count - 12}" : "");
+        if (MessageBox.Show(this, $"Estes programas já foram removidos, mas a entrada deles ficou no registro:\n\n{names}\n\n" +
+                                  "Apagar as entradas? Sai com backup (RESTAURAR ÚLTIMA LIMPEZA devolve).",
+                "Desinstalar apps", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        SetUnBusy(true);
+        try
+        {
+            var res = await Task.Run(() => Uninstaller.DeleteLeftovers(items, "entradas-orfas"));
+            await LoadProgramsAsync();
+            UnStatus.Text = $"{res.Ok} entrada(s) órfã(s) apagada(s)" + (res.Fail > 0 ? $", {res.Fail} não puderam ser apagadas." : ".") + " " + UnStatus.Text;
+        }
+        catch (Exception ex) { UnStatus.Text = $"Falha ao limpar: {ex.Message}"; }
+        finally { SetUnBusy(false); }
+    }
+
     private void BtnUnRefresh_Click(object sender, RoutedEventArgs e)
     {
         if (_unBusy) return;
@@ -103,7 +133,7 @@ public partial class MainWindow
     private void SetUnBusy(bool busy)
     {
         _unBusy = busy;
-        BtnUninstall.IsEnabled = BtnUnForce.IsEnabled = BtnUnRefresh.IsEnabled = !busy;
+        BtnUninstall.IsEnabled = BtnUnForce.IsEnabled = BtnUnRefresh.IsEnabled = BtnUnOrphans.IsEnabled = !busy;
     }
 
     private async void BtnUninstall_Click(object sender, RoutedEventArgs e)
@@ -114,7 +144,7 @@ public partial class MainWindow
         var r = MessageBox.Show(
             $"Desinstalar \"{p.Name}\"?\n\nVou abrir o desinstalador oficial do programa. Conclua por ele; depois eu procuro sobras " +
             $"(varredura {ModeName(_unMode)}) para você revisar.",
-            "Desinstalar Apps", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            "Desinstalar apps", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
 
         SetUnBusy(true); UnLeftoverCard.Visibility = Visibility.Collapsed;
@@ -194,7 +224,7 @@ public partial class MainWindow
         var view = new ListCollectionView(_leftovers);
         view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(LeftoverRow.Group)));
         UnLeftoverList.ItemsSource = view;
-        UnLeftoverTitle.Text = $"Sobras de {_unApp?.Name}";
+        UnLeftoverTitle.Title = $"Sobras de {_unApp?.Name}";
         long size = _leftovers.Where(l => l.Item.Kind == "Pasta" || l.Item.Kind == "Arquivo").Sum(l => l.Item.SizeBytes);
         int Count(string g) => _leftovers.Count(l => l.Group == g);
         UnLeftoverSummary.Text = $"{Count("Pastas e arquivos")} pasta(s)/arquivo(s)" +

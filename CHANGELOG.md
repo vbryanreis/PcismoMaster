@@ -2,10 +2,35 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
-## 0.9.1
+## 0.10.1
 
 - **Cores do Overlay por grupo** (JOGOS · Overlay · Aparência): a seção de cores agora tem dois grupos, **Valores** e **Rótulos**. Fechados (o padrão), cada um tem uma cor só, que vale para tudo; o **triângulo ▸** ao lado abre uma cor para **FPS, GPU, CPU e RAM** — dá para pintar, por exemplo, tudo da GPU de verde e da CPU de azul. Dentro de **FPS** (Valores), outro triângulo abre a sub-opção **FPS, FRAME e 1% LOW**, que define a cor desses três juntos. Com o grupo fechado e cores próprias escolhidas, aparece o aviso "cores próprias por grupo"; escolher a cor do grupo volta todos para ela. A VRAM acompanha a cor da GPU e o nome do jogo/hora acompanha a de FPS. A cor automática por temperatura (verde/âmbar/vermelho) continua valendo por cima dos valores. Quem já tinha cores salvas as mantém; "Voltar ao padrão" zera tudo.
-- Versão atualizada para 0.9.1.
+- Versão atualizada para 0.10.1.
+
+## 0.10.0
+
+- **Interface mais limpa e legível**:
+  - Textos de apoio mais claros (contraste de leitura) e as letras de 11 px passaram para 12 px.
+  - Títulos das páginas todos no mesmo estilo (sem CAIXA ALTA); Biblioteca e FPS estimado não se chamam mais os dois "Jogos"; "Desinstalar apps" com a mesma grafia de "Instalar apps"; siglas como IA, CSV e PNG ficam em maiúsculas.
+  - No modo avançado sai a faixa de explicação do topo, que repetia o subtítulo da página (no modo simples continua).
+  - A caixa de andamento dos ajustes só aparece quando algo roda, em vez de ocupar espaço vazio no meio da página.
+  - Overlay dividido em sub-abas: Overlay, Limitador de FPS, Benchmark, Captura e vídeo e Perfis por jogo.
+  - Sistema, Discos, Energia, Rede e Utilidades com largura máxima de 1400 px; a lista do Desinstalar apps cresce com a janela.
+  - Abrir a categoria Manutenção já abre a página (ela só tem uma); títulos sem o ícone solto que só duas páginas tinham.
+- **Limpeza com a memória RAM em gráfico**: a limpeza de memória e o fechar programas saíram de Ferramentas › Otimização e foram para TWEAKING › Limpeza, com uma rosca da RAM (em uso, em espera, modificada e livre), o uso dos últimos 60 segundos e o resultado de cada limpeza.
+- **Aba Otimização removida**: os ajustes para jogos dela já existem nas outras abas; o Game DVR, que só existia lá, entrou em TWEAKING › Windows. Quem alterou algo pela aba antiga ainda pode restaurar em TWEAKING › Windows.
+- **Desinstalar apps**: programas já removidos que deixaram a entrada no registro (desinstalador e pasta sumiram, ou MSI que o Windows não conhece mais) não aparecem mais na lista; um botão apaga essas entradas órfãs com backup. Depois do desinstalador oficial, a entrada só é oferecida como sobra se o programa sumiu de verdade (se o desinstalador foi cancelado, o app continua instalado). Programas com o desinstalador sumido mas a pasta ainda lá mostram "use a remoção forçada".
+- **Drivers**:
+  - No topo, a versão do driver de vídeo instalada x a mais recente e **o que mudou** em cada versão nova, das notas oficiais da NVIDIA: jogos com suporte Game Ready, tecnologias, correções em jogos e gerais; versões anteriores sob demanda e link para as notas completas.
+  - **Bibliotecas**: botões para baixar e instalar o Visual C++ (pacote AIO do abbodi1406/vcredist, conferido pelo SHA-256 do GitHub) e o DirectX de junho de 2010 (site da Microsoft, assinatura conferida).
+  - O cartão "Placa de vídeo" de baixo saiu (repetia o de cima); o Driver Studio e os botões NVIDIA/AMD/Intel foram para o topo.
+  - **Placa-mãe**: BIOS instalada x mais recente e todos os drivers do modelo (chipset, áudio, rede, Wi-Fi, Bluetooth, SATA/RAID, USB, utilitários) comparados ao instalado, com download do site oficial — automático na ASUS. Gigabyte, MSI e ASRock bloqueiam programas no site: o app mostra os drivers da placa instalados e abre direto as páginas de BIOS e drivers do modelo. A BIOS nunca é gravada pelo app.
+- **Drivers foi para TWEAKING e ganhou visual novo**: no topo, um resumo com o logo de cada fabricante (placa de vídeo, placa-mãe/BIOS e chipset) e se cada um está em dia; cartões com logos (NVIDIA, AMD, Intel, ASUS, Gigabyte, MSI, ASRock, Microsoft), Windows Update e backup lado a lado e a lista completa de drivers recolhida.
+  - **Ajustes novos da placa NVIDIA** (todos com desfazer): desligar os logs do driver, o write combining, a preempção, a economia de energia escondida e o clock gating, e desligar serviços da NVIDIA que não servem para jogar (telemetria, FrameView, contêineres do NVIDIA App/Broadcast; o do Painel de Controle fica). O "P0" que já existia agora se chama "Fixar a placa no estado P0".
+  - **Painel NVIDIA e Profile Inspector saíram de dentro do app**: toda instalação do driver NVIDIA por esta página instala o Painel de Controle NVIDIA pela Microsoft Store (se faltar) e baixa o NVIDIA Profile Inspector mais novo do GitHub oficial (SHA-256 conferido), com atalhos na Área de Trabalho. Também dá para fazer isso com um botão.
+  - **Chipset AMD comparado com o site da AMD**: a versão do AMD Chipset Software instalada x a mais nova publicada na página oficial do chipset da placa, com link direto.
+- **Cabeçalho com ícone em todas as páginas**: os cartões principais (TWEAKING, Integração, Limpeza, Placa de vídeo, Gargalo, Overlay, Benchmark, Inicialização, Utilidades, Desinstalar apps, Maker, Overclock e Stress test) seguem o padrão da aba Drivers: ícone, título sem caixa alta e uma linha explicando o cartão. Na aba Drivers, a limpeza com o DDU passou a ser o primeiro cartão.
+- **Desempenho**: Inicialização, Portas COM e Biblioteca de jogos não travam mais a tela ao abrir (leituras em segundo plano); código sem uso removido (janela antiga do ResetExplode, o Profile Inspector embutido e as funções NVAPI/NVML e auxiliares que ninguém mais chamava).
 
 ## 0.9.0
 

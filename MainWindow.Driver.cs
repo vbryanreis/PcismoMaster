@@ -14,6 +14,7 @@ public partial class MainWindow
 
     private void InitDriver()
     {
+        InitDriverLook();
         InitDdu();
         InitGfxTweaks();
         if (_drvInit) return;
@@ -34,7 +35,7 @@ public partial class MainWindow
         BtnDrvScan.IsEnabled = !busy;
         BtnDrvBackup.IsEnabled = !busy;
         BtnDrvWuSearch.IsEnabled = !busy;
-        BtnDrvInstall.IsEnabled = !busy && _drvGpus.Any(g => g.CanAutoInstall);
+        BtnBoardCheck.IsEnabled = !busy;
         BtnDrvWuInstall.IsEnabled = !busy && _drvWu.Count > 0;
     }
 
@@ -48,11 +49,14 @@ public partial class MainWindow
             DrvSet("Lendo drivers instalados…", 0.1);
             var inv = await Task.Run(DriverManager.Inventory);
             DrvList.ItemsSource = inv;
+            DrvListCount.Subtitle = $"{inv.Count} drivers: versão, data e assinatura de cada um";
 
             DrvSet("Lendo placa de vídeo e placa-mãe…", 0.3);
             _drvGpus = await Task.Run(DriverManager.ReadGpus);
             _drvBoardInfo = await Task.Run(DriverManager.ReadBoard);
             ShowBoard();
+            _drvInventory = inv;
+            var boardTask = CheckBoardAsync(_drvCts.Token); // em paralelo com a consulta da placa de vídeo
 
             bool studio = DrvStudio.IsChecked == true;
             int i = 0;
@@ -65,8 +69,8 @@ public partial class MainWindow
                 else g.Message = "Fabricante não reconhecido.";
                 i++;
             }
-            DrvGpus.ItemsSource = null;
-            DrvGpus.ItemsSource = _drvGpus;
+            ShowDriverVersion();
+            await boardTask;
             DrvSet($"Pronto às {DateTime.Now:HH:mm:ss}.", 1);
         }
         catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
@@ -76,9 +80,10 @@ public partial class MainWindow
     private void ShowBoard()
     {
         var b = _drvBoardInfo;
-        DrvBoard.Text = $"{b.Maker} {b.Model}\nBIOS: {(b.Bios.Length > 0 ? b.Bios : "—")}" +
-                        (b.Brand.Length > 0 ? $"\nFabricante reconhecido: {b.Brand}" : "\nFabricante não reconhecido");
+        DrvBoard.Text = $"{b.Maker} {b.Model}".Trim() + (b.Brand.Length > 0 ? "" : "  (fabricante não reconhecido)");
+        BoardBiosLine.Text = $"Instalada: {(b.Bios.Length > 0 ? b.Bios : "—")}";
         BtnDrvBoardPage.IsEnabled = b.SupportUrl.Length > 0;
+        ShowBoardTiles();
     }
 
     private static void OpenUrl(string url)
@@ -93,28 +98,6 @@ public partial class MainWindow
     }
 
     private void BtnDrvBoardPage_Click(object sender, RoutedEventArgs e) => OpenUrl(_drvBoardInfo.SupportUrl);
-
-    private async void BtnDrvInstall_Click(object sender, RoutedEventArgs e)
-    {
-        var g = _drvGpus.FirstOrDefault(x => x.CanAutoInstall);
-        if (g == null || _drvBusy) return;
-        string msg = g.Vendor == "AMD"
-            ? $"Baixar e abrir o instalador AMD Software {g.Latest}?\nO arquivo vem do servidor oficial da AMD."
-            : g.UpdateAvailable
-            ? $"Instalar o driver NVIDIA {g.Latest} ({g.SizeText})?\nO instalador oficial será baixado e aberto."
-            : $"Você já está com a versão {g.Installed}. Baixar e abrir o instalador {g.Latest} mesmo assim (reinstalação)?";
-        if (MessageBox.Show(this, msg, "DRIVER", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
-
-        DrvBusy(true);
-        _drvCts = new CancellationTokenSource();
-        try
-        {
-            string r = await DriverManager.DownloadAndLaunchAsync(g, (t, f) => Dispatcher.BeginInvoke(new Action(() => DrvSet(t, f))), _drvCts.Token);
-            DrvSet(r + (g.Vendor == "NVIDIA" ? "\n" + GpuDriverStatus.NvidiaAppTips : ""), 1);
-        }
-        catch (Exception ex) { DrvSet("Falhou: " + ex.Message, 0); }
-        finally { DrvBusy(false); }
-    }
 
     /// <summary>Instalar o driver mais recente escolhendo o fabricante (quando a placa não é reconhecida, como logo depois do DDU).</summary>
     private async void BtnDrvVendor_Click(object sender, RoutedEventArgs e)

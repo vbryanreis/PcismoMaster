@@ -570,7 +570,7 @@ public partial class MainWindow
         if (_vfSel is int s && s < _vfStock.Count && s != CapIndex)
         {
             var c = Pt(_vfStock[s].Mv, target[s]);
-            var tag = new TextBlock { Text = $"{_vfStock[s].Mv} mV · {target[s]} MHz", FontSize = 11, Foreground = curve };
+            var tag = new TextBlock { Text = $"{_vfStock[s].Mv} mV · {target[s]} MHz", FontSize = 12, Foreground = curve };
             Canvas.SetLeft(tag, Math.Max(VfLeft, c.X - 120)); Canvas.SetTop(tag, Math.Max(VfTop, c.Y - 22));
             canvas.Children.Add(tag);
         }
@@ -638,7 +638,7 @@ public partial class MainWindow
         if (_vfWindow != null) { _vfWindow.Close(); return; }
         if (_oc?.CurveSupported != true) { OcVfInfo.Text = "Editor de curva indisponível nesta placa ou driver."; return; }
         var canvas = new Canvas { ClipToBounds = true, Background = Brushes.Transparent, Margin = new Thickness(8, 6, 8, 4) };
-        _vfWindowInfo = new TextBlock { Foreground = (Brush)FindResource("Muted"), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(12, 0, 12, 10) };
+        _vfWindowInfo = new TextBlock { Foreground = (Brush)FindResource("Muted"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(12, 0, 12, 10) };
         var root = new Grid();
         root.RowDefinitions.Add(new RowDefinition());
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });

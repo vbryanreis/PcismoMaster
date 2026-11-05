@@ -101,6 +101,7 @@ public partial class MainWindow
         _optBusy = true;
         foreach (var views in _optViews.Values) foreach (var v in views) v();
         foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ {title}  ({DateTime.Now:HH:mm:ss})";
+        ShowScriptOutputs();
         try
         {
             if (!undo && !await EnsureRestorePointAsync(title)) { ScriptLog("Cancelado."); return false; }
@@ -160,7 +161,7 @@ public partial class MainWindow
         var text = new StackPanel { Margin = new Thickness(0, 0, 16, 0) };
         text.Children.Add(OptBadges(t));
         text.Children.Add(OptText(t.Description, "Muted", 12));
-        if (t.Warning != null) text.Children.Add(new TextBlock { Text = "⚠ " + t.Warning, Foreground = (Brush)FindResource("TempWarn"), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
+        if (t.Warning != null) text.Children.Add(new TextBlock { Text = "⚠ " + t.Warning, Foreground = (Brush)FindResource("TempWarn"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
         return text;
     }
 
@@ -173,7 +174,7 @@ public partial class MainWindow
         grid.Children.Add(OptTexts(t));
         var right = new StackPanel { VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Right };
         var sw = new CheckBox { HorizontalAlignment = HorizontalAlignment.Right, IsEnabled = false };
-        var status = new TextBlock { FontSize = 11, Foreground = (Brush)FindResource("Faint"), Margin = new Thickness(0, 6, 0, 0), HorizontalAlignment = HorizontalAlignment.Right };
+        var status = new TextBlock { FontSize = 12, Foreground = (Brush)FindResource("Faint"), Margin = new Thickness(0, 6, 0, 0), HorizontalAlignment = HorizontalAlignment.Right };
         right.Children.Add(sw);
         right.Children.Add(status);
         Grid.SetColumn(right, 1);
@@ -202,8 +203,10 @@ public partial class MainWindow
 
     private Border OptOutputCard(Panel host)
     {
-        var card = TweakCard(host, "ANDAMENTO", null, out var body);
+        var card = TweakCard(host, "", "Andamento", null, out var body);
         AddScriptOutput(body, "O que for aplicado aparece aqui.");
+        card.Tag = "output-card";
+        if (!_scriptShown) card.Visibility = Visibility.Collapsed;
         return card;
     }
 
@@ -211,7 +214,7 @@ public partial class MainWindow
 
     private void BuildOptDebloat(Panel host)
     {
-        TweakCard(host, "COMO FUNCIONA",
+        TweakCard(host, "", "Como funciona",
             "Marque o que quer tirar e clique em APLICAR SELECIONADOS. Essencial e Recomendado já vêm marcados; Avançado fica escondido porque " +
             "tem efeitos colaterais (cada item diz qual). Tudo guarda o estado de antes: o botão DESFAZER de cada item volta exatamente como estava. " +
             "Antes da primeira mudança o PcismoMaster cria um ponto de restauração.", out _);
@@ -237,7 +240,7 @@ public partial class MainWindow
                 OptLevel.Recomendado => "Mais desempenho e privacidade. Pode remover apps de IA (voltam pela Store) e mudar serviços.",
                 _ => "Ganhos menores e com efeito colateral: leia o aviso de cada um. Nada aqui vem marcado.",
             };
-            var card = TweakCard(host, $"{OptCatalog.LevelText(level).ToUpperInvariant()} · {items.Count} ITENS", intro, out var body);
+            var card = TweakCard(host, level switch { OptLevel.Essencial => "", OptLevel.Recomendado => "", _ => "" }, $"{OptCatalog.LevelText(level)} · {items.Count} itens", intro, out var body);
             var rows = new StackPanel();
             var tools = new WrapPanel();
             tools.Children.Add(TweakButton("MARCAR TODOS", false, (_, _) => { foreach (var t in items) if (checks[t.Id].IsEnabled) checks[t.Id].IsChecked = true; Count(); }));
@@ -262,7 +265,7 @@ public partial class MainWindow
             foreach (var t in items) rows.Children.Add(DebloatRow(t, checks, Count));
         }
 
-        var actions = TweakCard(host, "APLICAR", null, out var ab);
+        var actions = TweakCard(host, "", "Aplicar", null, out var ab);
         var bar = new WrapPanel();
         bar.Children.Add(apply);
         bar.Children.Add(TweakButton("DESFAZER TUDO DO DEBLOAT", false, async (_, _) =>
@@ -294,7 +297,7 @@ public partial class MainWindow
         Grid.SetColumn(text, 1);
         grid.Children.Add(text);
         var right = new StackPanel { VerticalAlignment = VerticalAlignment.Top };
-        var status = new TextBlock { FontSize = 11, Foreground = (Brush)FindResource("Faint"), HorizontalAlignment = HorizontalAlignment.Right };
+        var status = new TextBlock { FontSize = 12, Foreground = (Brush)FindResource("Faint"), HorizontalAlignment = HorizontalAlignment.Right };
         var undo = TweakButton("DESFAZER", false, async (_, _) => await ApplyOptAsync(new[] { t }, "Desfazer · " + t.Title, undo: true));
         undo.Margin = new Thickness(0, 6, 0, 0);
         undo.Padding = new Thickness(10, 4, 10, 4);
@@ -321,9 +324,9 @@ public partial class MainWindow
     private void BuildOptWindows(Panel host)
     {
         var items = OptCatalog.For(OptPage.Windows).ToList();
-        var tools = TweakCard(host, "AJUSTES DO WINDOWS",
+        var tools = TweakCard(host, "", "Ajustes do Windows",
             "Ligue um ajuste para aplicar; desligue para voltar exatamente como estava. O selo RECOMENDADO marca o que serve para quase todo mundo; " +
-            "o ⚠ diz quando evitar. Ajustes do plano de energia, de jogos (Game DVR, otimização de janela) e de aceleração do mouse ficam em Ferramentas › Otimização.", out var tb);
+            "o ⚠ diz quando evitar. A aceleração do mouse fica em Mouse e teclado; o plano de energia de alto desempenho é ligado por jogo no Launcher.", out var tb);
         var search = new TextBox { Margin = new Thickness(0, 0, 0, 10), ToolTip = "Pesquisar ajustes" };
         tb.Children.Add(OptText("Pesquisar", "Faint", 11, 4));
         tb.Children.Add(search);
@@ -353,6 +356,7 @@ public partial class MainWindow
         bar.Children.Add(TweakButton("SALVAR COMO PERFIL", false, (_, _) => SaveActiveAsProfile()));
         tb.Children.Add(bar);
         AddScriptOutput(tb, "O que for aplicado aparece aqui.");
+        AddLegacyTweakRestore(tb);
 
         foreach (var t in items) cards.Children.Add(OptCard(t));
         host.Children.Add(cards);
@@ -379,18 +383,18 @@ public partial class MainWindow
         OptOutputCard(host);
         foreach (var (page, title, intro) in new[]
                  {
-                     (OptPage.Mouse, "MOUSE", "A aceleração do mouse sozinha também está em Ferramentas › Otimização; aqui é o pacote completo de resposta do mouse."),
-                     (OptPage.Teclado, "TECLADO", "Atalhos de acessibilidade e de idioma que costumam disparar no meio do jogo, e a resposta das teclas."),
+                     (OptPage.Mouse, "Mouse", "Pacote completo de resposta do mouse (inclui o 1:1 sem aceleração)."),
+                     (OptPage.Teclado, "Teclado", "Atalhos de acessibilidade e de idioma que costumam disparar no meio do jogo, e a resposta das teclas."),
                  })
         {
-            TweakCard(host, title, intro, out _);
+            TweakCard(host, page == OptPage.Mouse ? "" : "", title, intro, out _);
             foreach (var t in OptCatalog.For(page)) host.Children.Add(OptCard(t));
         }
     }
 
     private void BuildOptGpu(Panel host)
     {
-        TweakCard(host, "GPU E MONITOR", "Os ajustes do driver da placa de vídeo (perfil NVIDIA, MPO e afins) ficam em Ferramentas › Drivers.", out _);
+        TweakCard(host, "", "GPU e monitor", "Os ajustes do driver da placa de vídeo (perfil NVIDIA, P0, preempção e afins) ficam em TWEAKING › Drivers.", out _);
         OptOutputCard(host);
         foreach (var t in OptCatalog.For(OptPage.Gpu)) host.Children.Add(OptCard(t));
     }
@@ -402,12 +406,12 @@ public partial class MainWindow
         OptOutputCard(host);
         foreach (var p in OptCatalog.Profiles)
         {
-            TweakCard(host, p.Title.ToUpperInvariant(), null, out var body);
+            TweakCard(host, "", p.Title, null, out var body);
             foreach (var line in p.Lines) body.Children.Add(OptText("• " + line, "Muted", 12, 2));
             body.Children.Add(OptText($"{p.Tweaks.Length} ajustes" + (p.Cleanup ? " + limpeza de temporários" : ""), "Faint", 11, 10));
             body.Children.Add(TweakButton("APLICAR", true, async (_, _) => await ApplyProfileAsync(p.Title, p.Tweaks, p.Cleanup)));
         }
-        TweakCard(host, "PADRÃO DO WINDOWS", "Desfaz tudo o que o PcismoMaster aplicou nas páginas do TWEAKING, voltando cada valor ao que era antes.", out var def);
+        TweakCard(host, "", "Padrão do Windows", "Desfaz tudo o que o PcismoMaster aplicou nas páginas do TWEAKING, voltando cada valor ao que era antes.", out var def);
         def.Children.Add(TweakButton("VOLTAR AO PADRÃO", false, async (_, _) =>
         {
             var ours = OptCatalog.All.Where(Opt.Ours).ToList();
@@ -416,7 +420,7 @@ public partial class MainWindow
             await ApplyOptAsync(ours, "Voltar ao padrão do Windows", undo: true);
         }));
 
-        TweakCard(host, "MEUS PERFIS", "Salve o que está aplicado agora como um perfil para repetir em outro PC ou depois de formatar. Dá para exportar e importar o arquivo.", out var mine);
+        TweakCard(host, "", "Meus perfis", "Salve o que está aplicado agora como um perfil para repetir em outro PC ou depois de formatar. Dá para exportar e importar o arquivo.", out var mine);
         var bar = new WrapPanel();
         bar.Children.Add(TweakButton("CRIAR A PARTIR DO QUE ESTÁ ATIVO", true, (_, _) => SaveActiveAsProfile()));
         bar.Children.Add(TweakButton("IMPORTAR", false, (_, _) => ImportProfile()));
@@ -536,12 +540,12 @@ public partial class MainWindow
     private void BuildOptFormat(Panel host)
     {
         var boost = FullBoost();
-        TweakCard(host, "WINDOWS RECÉM-INSTALADO",
+        TweakCard(host, "", "Windows recém-instalado",
             "Para rodar logo depois de formatar. Aplica de uma vez o pacote completo de otimização (o mesmo das outras páginas, então cada item " +
             "pode ser desfeito depois em Debloat, Windows, Mouse e teclado ou GPU). Programas e jogos para instalar ficam em Instalar apps.", out var intro);
         intro.Children.Add(OptText($"Pacote completo: {boost.Count} ajustes · {boost.Count(t => t.Restart)} pedem reiniciar · {boost.Count(t => t.Warning != null)} com aviso", "Muted", 12));
 
-        TweakCard(host, "O QUE INCLUIR", null, out var body);
+        TweakCard(host, "", "O que incluir", null, out var body);
         var cBoost = new CheckBox { Content = $"Pacote completo de otimização ({boost.Count} ajustes)", IsChecked = true, Margin = new Thickness(0, 0, 0, 8) };
         var cPhoto = new CheckBox { Content = "Visualizador de Fotos clássico do Windows", IsChecked = true, Margin = new Thickness(0, 0, 0, 8) };
         var cOne = new CheckBox { Content = "Remover o OneDrive", IsChecked = false, Margin = new Thickness(0, 0, 0, 8) };
@@ -609,9 +613,9 @@ public partial class MainWindow
 
     private void BuildOptClean(Panel host)
     {
-        TweakCard(host, "LIMPEZA",
+        TweakCard(host, "", "Limpeza",
             "Clique em ANALISAR para ver quanto cada tipo ocupa. Só arquivos que o Windows e os programas recriam sozinhos; nada pessoal. " +
-            "Arquivos em uso são pulados. Limpar a memória RAM e o cache de DNS fica em Ferramentas › Otimização e Reparos do Windows.", out var body);
+            "Arquivos em uso são pulados. A memória RAM fica no cartão acima; o cache de DNS, em Manutenção.", out var body);
         var checks = new Dictionary<string, (CheckBox Box, TextBlock Size)>();
         foreach (var c in Cleanup.Categories)
         {
@@ -660,6 +664,7 @@ public partial class MainWindow
                     MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             analyze.IsEnabled = clean.IsEnabled = false;
             foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ Limpeza  ({DateTime.Now:HH:mm:ss})";
+            ShowScriptOutputs();
             var progress = new Progress<string>(ScriptLog); // criado na tela: as linhas voltam para a tela
             long freed = await Task.Run(() => CleanCategories(cats, progress));
             ScriptLog($"✔ {Cleanup.Size(freed)} liberados.");

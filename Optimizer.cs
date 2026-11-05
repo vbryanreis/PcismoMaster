@@ -26,6 +26,7 @@ public sealed class BackgroundApp : INotifyPropertyChanged
 }
 
 public sealed record CleanupResult(long FreedBytes, int Trimmed, bool StandbyPurged, string? StandbyError);
+public sealed record MemoryBreakdown(long Total, long InUse, long Modified, long Standby, long Free);
 public sealed record CloseResult(List<string> Closed, List<string> NotClosed);
 
 /// <summary>Limpeza de memória e fechamento de programas em segundo plano.</summary>
@@ -177,6 +178,31 @@ public static class Optimizer
 
     private static long AvailableBytes() => MemoryStatus().Available;
 
+    private static bool _listPrivilege;
+
+    /// <summary>
+    /// Divide a RAM como o Monitor de Recursos: em uso (programas), modificada (esperando ir para o disco), em espera
+    /// (cache que o Windows libera sozinho) e livre. Null se o Windows não deixar ler (precisa de administrador).
+    /// </summary>
+    public static MemoryBreakdown? Breakdown()
+    {
+        var (total, _) = MemoryStatus();
+        if (total == 0) return null;
+        try
+        {
+            if (!_listPrivilege) { EnablePrivilege("SeProfileSingleProcessPrivilege"); _listPrivilege = true; }
+            var info = new long[22]; // SYSTEM_MEMORY_LIST_INFORMATION (x64): 5 contadores + 8 em espera por prioridade + 8 reaproveitadas + 1
+            int status = NtQuerySystemInformation(80, info, info.Length * 8, out _);
+            if (status != 0) return null;
+            const long page = 4096;
+            long free = (info[0] + info[1]) * page, modified = (info[2] + info[3]) * page, standby = 0;
+            for (int i = 5; i < 13; i++) standby += info[i] * page;
+            long inUse = Math.Max(0, total - free - modified - standby);
+            return new MemoryBreakdown(total, inUse, modified, standby, free);
+        }
+        catch { return null; }
+    }
+
     private static void EnablePrivilege(string name)
     {
         if (!OpenProcessToken(Process.GetCurrentProcess().Handle, 0x0020 | 0x0008, out var token)) // ADJUST | QUERY
@@ -202,6 +228,7 @@ public static class Optimizer
 
     [DllImport("psapi.dll")] private static extern bool EmptyWorkingSet(IntPtr hProcess);
     [DllImport("ntdll.dll")] private static extern int NtSetSystemInformation(int infoClass, ref int info, int length);
+    [DllImport("ntdll.dll")] private static extern int NtQuerySystemInformation(int infoClass, [Out] long[] info, int length, out int returned);
     [DllImport("kernel32.dll")] private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX m);
     [DllImport("kernel32.dll")] private static extern bool CloseHandle(IntPtr h);
     [DllImport("advapi32.dll", SetLastError = true)] private static extern bool OpenProcessToken(IntPtr process, uint access, out IntPtr token);

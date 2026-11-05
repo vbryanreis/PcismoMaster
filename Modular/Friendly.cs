@@ -23,7 +23,7 @@ public static class FriendlyText
     {
         "PC", "CPU", "GPU", "RAM", "VRAM", "USB", "SSD", "HD", "DDU", "NVIDIA", "AMD", "OC", "BIOS", "UEFI", "DNS", "IP", "RGB", "MSI", "XMP", "EXPO",
         "DEP", "MPO", "HDR", "FPS", "VRR", "API", "DLSS", "FSR", "PDF", "ZIP", "EXE", "MSR", "SMT", "HAGS", "TPM", "UAC", "VBS", "HVCI", "ITAD", "COM",
-        "LED", "SDK", "MFT", "NTFS", "VPN", "TCP", "UDP", "OK", "GB", "MB", "KB", "TB", "SATA", "M.2", "CH340", "CP210X", "FTDI", "ESP32", "ESP8266", "W", "V",
+        "LED", "SDK", "MFT", "NTFS", "VPN", "TCP", "UDP", "OK", "GB", "MB", "KB", "TB", "SATA", "M.2", "CH340", "CP210X", "FTDI", "ESP32", "ESP8266", "W", "V", "IA", "CSV", "PNG", "MP4", "ETW", "NVENC", "DRS", "SFC", "DISM",
     };
 
     /// <summary>Converte só quando o texto inteiro está em caixa alta (o resto já foi escrito do jeito certo).</summary>
@@ -88,8 +88,9 @@ public static class PageCatalog
         new("NavOptWindows", "Otimizar Windows", "TWEAKING", "Mais de cem ajustes de desempenho, privacidade, aparência, rede e IA, cada um com desfazer.", "otimizar tweak ajustes desempenho privacidade explorer menu contexto ipv6 edge brave rede", false, ""),
         new("NavOptInput", "Mouse e teclado", "TWEAKING", "Mouse sem atraso, teclado mais rápido e sem atalhos que atrapalham no jogo.", "mouse teclado aderencia shift numlock alt shift narrador atraso", false, ""),
         new("NavOptGpu", "GPU e monitor", "TWEAKING", "Monitor na taxa máxima, agendamento de GPU e energia do PCI Express.", "gpu hags hz taxa atualizacao monitor pcie aspm", false, ""),
+        new("NavDriver", "Drivers", "TWEAKING", "Driver de vídeo, BIOS, chipset e drivers da placa-mãe comparados com o site oficial, ajustes do driver e limpeza com o DDU.", "driver drivers atualizar nvidia amd intel ddu limpar painel bios chipset placa mae profile inspector preempcao p0 clock gating", false, ""),
         new("NavOptProfiles", "Perfis de otimização", "TWEAKING", "Pacotes prontos (Básico, Sem IA, Padrão do Windows) e os seus perfis salvos.", "perfil perfis pacote basico sem ia padrao exportar importar", false, ""),
-        new("NavOptClean", "Limpeza", "TWEAKING", "Ver e apagar temporários, lixeira, cache de atualização, de shaders e dos navegadores.", "limpeza limpar temporarios lixo cache shader navegador lixeira espaco", false, ""),
+        new("NavOptClean", "Limpeza", "TWEAKING", "Liberar a memória RAM, fechar programas em segundo plano e apagar temporários, lixeira e caches.", "limpeza limpar temporarios lixo cache shader navegador lixeira espaco memoria ram otimizacao otimizar fechar programas", false, ""),
         new("NavLauncher", "Meus jogos", "JOGOS", "Todos os seus jogos num lugar só, com perfil de abertura.", "jogos biblioteca steam epic launcher abrir", false, ""),
         new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja favorito favoritos coracao drm steam epic xbox gog", false, ""),
         new("NavGames", "FPS estimado", "JOGOS", "Quanto FPS os jogos devem rodar no seu PC.", "fps jogos rodar requisitos", false, ""),
@@ -98,11 +99,9 @@ public static class PageCatalog
         new("NavBench", "Benchmark", "DESEMPENHO", "Medir a velocidade do PC e comparar.", "benchmark teste pontuacao velocidade", true, ""),
         new("NavStress", "Stress test", "DESEMPENHO", "Testar estabilidade e temperatura no máximo.", "stress teste estabilidade temperatura", true, ""),
         new("NavOc", "Overclock", "DESEMPENHO", "Overclock e undervolt da placa de vídeo.", "overclock undervolt afterburner clock", true, ""),
-        new("NavOptimize", "Otimização rápida", "FERRAMENTAS", "Ajustes rápidos do Windows num clique.", "otimizacao rapida", true, ""),
         new("NavStartup", "Inicialização", "FERRAMENTAS", "Programas que abrem junto com o Windows.", "inicializacao startup abrir junto lento ligar", false, ""),
         new("NavApps", "Instalar apps", "FERRAMENTAS", "Instalar programas populares com um clique.", "instalar programas apps winget baixar", false, ""),
         new("NavUninstall", "Desinstalar apps", "FERRAMENTAS", "Desinstalar programas e limpar o que eles deixam para trás.", "desinstalar remover programas sobras revo", false, ""),
-        new("NavDriver", "Drivers", "FERRAMENTAS", "Atualizar e limpar o driver da placa de vídeo.", "driver atualizar nvidia amd ddu limpar painel", false, ""),
         new("NavInteg", "Integrações", "FERRAMENTAS", "Iluminação RGB e programas de terceiros.", "rgb icue iluminacao integracao", true, ""),
         new("NavUtil", "Utilidades", "FERRAMENTAS", "Baixar vídeos e achar arquivos na hora.", "baixar video youtube buscar arquivo finder", false, ""),
         new("NavMakerPorts", "Portas", "MAKER", "Portas USB/serial de Arduino e ESP.", "arduino esp serial com porta", true, ""),

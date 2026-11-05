@@ -10,18 +10,6 @@ using System.Xml.Linq;
 
 namespace ResetExplode;
 
-/// <summary>Uma linha do inventário de drivers instalados.</summary>
-public sealed class DriverRow
-{
-    public string Device { get; init; } = "";
-    public string Class { get; init; } = "";
-    public string Vendor { get; init; } = "";
-    public string Version { get; init; } = "";
-    public string Date { get; init; } = "";
-    public bool Signed { get; init; }
-    public string SignedText => Signed ? "assinado" : "sem assinatura";
-}
-
 /// <summary>Resultado da consulta de um driver de vídeo.</summary>
 public sealed class GpuDriverStatus
 {
@@ -37,6 +25,10 @@ public sealed class GpuDriverStatus
     public bool NoDriver { get; set; }
     /// <summary>Código PCI do modelo (DEV_xxxx), lido mesmo sem driver; 0 se desconhecido.</summary>
     public int DeviceId { get; set; }
+    /// <summary>Drivers NVIDIA mais recentes (o primeiro é o atual), com as notas de cada um. Vazio fora da NVIDIA.</summary>
+    public List<NvRelease> Releases { get; set; } = new();
+    /// <summary>Versões mais novas que a instalada (o que o usuário ganha ao atualizar).</summary>
+    public List<NvRelease> NewerReleases => Releases.Where(r => NoDriver || Installed.Length == 0 || CompareVersions(r.Version, Installed) > 0).ToList();
     public bool CanAutoInstall => Vendor is "NVIDIA" or "AMD" && DownloadUrl.Length > 0;
     public bool UpdateAvailable =>
         Vendor == "NVIDIA" && Latest.Length > 0 && (NoDriver || Installed.Length > 0 && CompareVersions(Latest, Installed) > 0);
@@ -53,16 +45,6 @@ public sealed class GpuDriverStatus
         static double V(string s) => double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : 0;
         return V(a).CompareTo(V(b));
     }
-}
-
-/// <summary>Placa-mãe / fabricante e as páginas oficiais de suporte.</summary>
-public sealed class BoardInfo
-{
-    public string Maker { get; set; } = "";
-    public string Model { get; set; } = "";
-    public string Bios { get; set; } = "";
-    public string Brand { get; set; } = "";   // ASUS / MSI / Gigabyte / outro
-    public string SupportUrl { get; set; } = "";
 }
 
 /// <summary>Um driver disponível no Windows Update.</summary>
@@ -190,6 +172,7 @@ public static class DriverManager
     /// <summary>Consulta a versão mais recente na NVIDIA (mesmo serviço da página oficial de drivers).</summary>
     public static async Task CheckNvidiaAsync(GpuDriverStatus g, bool studio, CancellationToken ct)
     {
+        g.Releases = new();
         g.Latest = ""; g.DownloadUrl = ""; g.SizeText = "";
         try
         {
@@ -202,11 +185,12 @@ public static class DriverManager
             var (psid, pfid) = ids;
             string url = "https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php" +
                          $"?func=DriverManualLookup&psid={psid}&pfid={pfid}&osID=57&languageCode=1033&beta=0&isWHQL=1&dch=1" +
-                         $"&upCRD={(studio ? 1 : 0)}&qnf=0&sort1=1&numberOfResults=1";
+                         $"&upCRD={(studio ? 1 : 0)}&qnf=0&sort1=1&numberOfResults=10"; // 10 versões: as notas de cada uma mostram o que mudou
             string json = await Http.GetStringAsync(url, ct);
             using var doc = JsonDocument.Parse(json);
             string? ver = null, dl = null, size = null;
             Find(doc.RootElement, ref ver, ref dl, ref size);
+            g.Releases = ReadReleases(doc.RootElement);
             if (string.IsNullOrEmpty(ver) || string.IsNullOrEmpty(dl))
             {
                 g.Message = "A NVIDIA não devolveu um driver para esta placa. Use a página oficial.";
@@ -272,6 +256,29 @@ public static class DriverManager
         var v = Regex.Match(hit.Value, @"edition-([\d.]+)", RegexOptions.IgnoreCase);
         g.Latest = v.Success ? v.Groups[1].Value : "mais recente";
         g.Message = $"AMD Software Adrenalin {g.Latest} (instalador que detecta a placa sozinho).";
+    }
+
+    /// <summary>As versões da resposta (IDS[].downloadInfo), com as notas oficiais de cada uma já lidas.</summary>
+    internal static List<NvRelease> ReadReleases(JsonElement root)
+    {
+        var list = new List<NvRelease>();
+        if (!root.TryGetProperty("IDS", out var ids) || ids.ValueKind != JsonValueKind.Array) return list;
+        foreach (var item in ids.EnumerateArray())
+        {
+            try
+            {
+                if (!item.TryGetProperty("downloadInfo", out var d)) continue;
+                string S(string name) => d.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
+                string ver = S("Version").Trim();
+                if (ver.Length == 0) continue;
+                var sections = NvidiaNotes.Parse(S("ReleaseNotes"), out string title, out string article);
+                if (title.Length == 0) title = Uri.UnescapeDataString(S("Name")).Trim();
+                list.Add(new NvRelease(ver, NvidiaNotes.ParseDate(Uri.UnescapeDataString(S("ReleaseDateTime"))), title, sections,
+                                       S("DetailsURL"), article));
+            }
+            catch { }
+        }
+        return list;
     }
 
     private static void Find(JsonElement e, ref string? ver, ref string? dl, ref string? size)
