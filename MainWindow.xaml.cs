@@ -127,6 +127,7 @@ public partial class MainWindow : Window
             if (PageOptimize.IsVisible) UpdateRamStatus();
         };
         _timer.Start();
+        ApplyPageLayout();
 
         StateChanged += (_, _) =>
         {

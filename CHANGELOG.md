@@ -2,6 +2,17 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## Em desenvolvimento
+
+- **Interface mais limpa e legível**:
+  - Textos de apoio mais claros (contraste de leitura) e as letras de 11 px passaram para 12 px.
+  - Títulos das páginas todos no mesmo estilo (sem CAIXA ALTA); Biblioteca e FPS estimado não se chamam mais os dois "Jogos"; "Desinstalar apps" com a mesma grafia de "Instalar apps"; siglas como IA, CSV e PNG ficam em maiúsculas.
+  - No modo avançado sai a faixa de explicação do topo, que repetia o subtítulo da página (no modo simples continua).
+  - A caixa de andamento dos ajustes só aparece quando algo roda, em vez de ocupar espaço vazio no meio da página.
+  - Overlay dividido em sub-abas: Overlay, Limitador de FPS, Benchmark, Captura e vídeo e Perfis por jogo.
+  - Sistema, Discos, Energia, Rede e Utilidades com largura máxima de 1400 px; a lista do Desinstalar apps cresce com a janela.
+  - Abrir a categoria Manutenção já abre a página (ela só tem uma); títulos sem o ícone solto que só duas páginas tinham.
+
 ## 0.9.0
 
 - **TWEAKING refeito do zero** no estilo da aba Otimizar do Galdino Control (escrito do zero: as funções vêm das configurações documentadas do Windows, sem copiar código). As sub-abas antigas (Iniciar, Windows, Hardware, Avançado) e os scripts completos do Ultimate saíram; ficou o bloatware app por app, agora dentro de Debloat.

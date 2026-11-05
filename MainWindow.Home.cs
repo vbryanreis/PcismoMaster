@@ -51,7 +51,7 @@ public partial class MainWindow
         row.Children.Add(toggle);
         var help = new Button { Style = (Style)FindResource("OutlineButton"), Padding = new Thickness(16, 8, 16, 8), Content = "Mostrar as explicações no topo das páginas" };
         help.Click += (_, _) => { _settings.HidePageHelp = false; _settings.Save(); help.Visibility = Visibility.Collapsed; };
-        help.Visibility = _settings.HidePageHelp ? Visibility.Visible : Visibility.Collapsed;
+        help.Visibility = _settings.HidePageHelp && !Advanced ? Visibility.Visible : Visibility.Collapsed;
         row.Children.Add(help);
         mc.Children.Add(row);
         modeCard.Child = mc;
@@ -183,6 +183,8 @@ public partial class MainWindow
         // Se a página aberta sumiu, volta para o Início.
         var current = PageCatalog.Pages.FirstOrDefault(p => FindName(p.Nav) is RadioButton { IsChecked: true });
         if (current is { Advanced: true } && !adv) NavHome.IsChecked = true;
+        UpdatePageHelp(current?.Nav);
+        if (_homeHelpButton != null) _homeHelpButton.Visibility = _settings.HidePageHelp && !adv ? Visibility.Visible : Visibility.Collapsed;
     }
 
     // ---------------- Explicação no topo da página ----------------
@@ -190,7 +192,8 @@ public partial class MainWindow
     private void UpdatePageHelp(string? nav)
     {
         var info = nav == null ? null : PageCatalog.ByNav(nav);
-        bool show = info != null && nav != "NavHome" && !_settings.HidePageHelp;
+        // No modo avançado a faixa some: o subtítulo da página já diz o mesmo. No simples, ajuda quem está começando.
+        bool show = info != null && nav != "NavHome" && !_settings.HidePageHelp && !Advanced;
         PageHelp.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         if (show) PageHelpText.Text = info!.Description;
     }

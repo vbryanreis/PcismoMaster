@@ -12,7 +12,7 @@
     <SolidColorBrush x:Key="LineStrong" Color="#3F3866"/>
     <SolidColorBrush x:Key="Fg" Color="#F4F2FF"/>
     <SolidColorBrush x:Key="Muted" Color="#9B95B8"/>
-    <SolidColorBrush x:Key="Faint" Color="#4C466B"/>
+    <SolidColorBrush x:Key="Faint" Color="#7A7499"/>
     <SolidColorBrush x:Key="Ink" Color="#07060D"/>
     <SolidColorBrush x:Key="ThumbBrush" Color="#2C2746"/>
     <SolidColorBrush x:Key="ThumbHover" Color="#5A5290"/>

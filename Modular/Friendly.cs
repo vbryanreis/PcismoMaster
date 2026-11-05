@@ -23,7 +23,7 @@ public static class FriendlyText
     {
         "PC", "CPU", "GPU", "RAM", "VRAM", "USB", "SSD", "HD", "DDU", "NVIDIA", "AMD", "OC", "BIOS", "UEFI", "DNS", "IP", "RGB", "MSI", "XMP", "EXPO",
         "DEP", "MPO", "HDR", "FPS", "VRR", "API", "DLSS", "FSR", "PDF", "ZIP", "EXE", "MSR", "SMT", "HAGS", "TPM", "UAC", "VBS", "HVCI", "ITAD", "COM",
-        "LED", "SDK", "MFT", "NTFS", "VPN", "TCP", "UDP", "OK", "GB", "MB", "KB", "TB", "SATA", "M.2", "CH340", "CP210X", "FTDI", "ESP32", "ESP8266", "W", "V",
+        "LED", "SDK", "MFT", "NTFS", "VPN", "TCP", "UDP", "OK", "GB", "MB", "KB", "TB", "SATA", "M.2", "CH340", "CP210X", "FTDI", "ESP32", "ESP8266", "W", "V", "IA", "CSV", "PNG", "MP4", "ETW", "NVENC", "DRS", "SFC", "DISM",
     };
 
     /// <summary>Converte só quando o texto inteiro está em caixa alta (o resto já foi escrito do jeito certo).</summary>

@@ -114,7 +114,7 @@ public partial class MainWindow
         var r = MessageBox.Show(
             $"Desinstalar \"{p.Name}\"?\n\nVou abrir o desinstalador oficial do programa. Conclua por ele; depois eu procuro sobras " +
             $"(varredura {ModeName(_unMode)}) para você revisar.",
-            "Desinstalar Apps", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            "Desinstalar apps", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
 
         SetUnBusy(true); UnLeftoverCard.Visibility = Visibility.Collapsed;

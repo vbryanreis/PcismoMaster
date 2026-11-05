@@ -101,6 +101,7 @@ public partial class MainWindow
         _optBusy = true;
         foreach (var views in _optViews.Values) foreach (var v in views) v();
         foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ {title}  ({DateTime.Now:HH:mm:ss})";
+        ShowScriptOutputs();
         try
         {
             if (!undo && !await EnsureRestorePointAsync(title)) { ScriptLog("Cancelado."); return false; }
@@ -160,7 +161,7 @@ public partial class MainWindow
         var text = new StackPanel { Margin = new Thickness(0, 0, 16, 0) };
         text.Children.Add(OptBadges(t));
         text.Children.Add(OptText(t.Description, "Muted", 12));
-        if (t.Warning != null) text.Children.Add(new TextBlock { Text = "⚠ " + t.Warning, Foreground = (Brush)FindResource("TempWarn"), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
+        if (t.Warning != null) text.Children.Add(new TextBlock { Text = "⚠ " + t.Warning, Foreground = (Brush)FindResource("TempWarn"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
         return text;
     }
 
@@ -173,7 +174,7 @@ public partial class MainWindow
         grid.Children.Add(OptTexts(t));
         var right = new StackPanel { VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Right };
         var sw = new CheckBox { HorizontalAlignment = HorizontalAlignment.Right, IsEnabled = false };
-        var status = new TextBlock { FontSize = 11, Foreground = (Brush)FindResource("Faint"), Margin = new Thickness(0, 6, 0, 0), HorizontalAlignment = HorizontalAlignment.Right };
+        var status = new TextBlock { FontSize = 12, Foreground = (Brush)FindResource("Faint"), Margin = new Thickness(0, 6, 0, 0), HorizontalAlignment = HorizontalAlignment.Right };
         right.Children.Add(sw);
         right.Children.Add(status);
         Grid.SetColumn(right, 1);
@@ -204,6 +205,8 @@ public partial class MainWindow
     {
         var card = TweakCard(host, "ANDAMENTO", null, out var body);
         AddScriptOutput(body, "O que for aplicado aparece aqui.");
+        card.Tag = "output-card";
+        if (!_scriptShown) card.Visibility = Visibility.Collapsed;
         return card;
     }
 
@@ -294,7 +297,7 @@ public partial class MainWindow
         Grid.SetColumn(text, 1);
         grid.Children.Add(text);
         var right = new StackPanel { VerticalAlignment = VerticalAlignment.Top };
-        var status = new TextBlock { FontSize = 11, Foreground = (Brush)FindResource("Faint"), HorizontalAlignment = HorizontalAlignment.Right };
+        var status = new TextBlock { FontSize = 12, Foreground = (Brush)FindResource("Faint"), HorizontalAlignment = HorizontalAlignment.Right };
         var undo = TweakButton("DESFAZER", false, async (_, _) => await ApplyOptAsync(new[] { t }, "Desfazer · " + t.Title, undo: true));
         undo.Margin = new Thickness(0, 6, 0, 0);
         undo.Padding = new Thickness(10, 4, 10, 4);
@@ -660,6 +663,7 @@ public partial class MainWindow
                     MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             analyze.IsEnabled = clean.IsEnabled = false;
             foreach (var (log, _) in _scriptOutputs) log.Text = $"▶ Limpeza  ({DateTime.Now:HH:mm:ss})";
+            ShowScriptOutputs();
             var progress = new Progress<string>(ScriptLog); // criado na tela: as linhas voltam para a tela
             long freed = await Task.Run(() => CleanCategories(cats, progress));
             ScriptLog($"✔ {Cleanup.Size(freed)} liberados.");

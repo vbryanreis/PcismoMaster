@@ -44,7 +44,7 @@
         <DataTemplate x:Key="GpuTile">
             <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,10,18,10">
                 <StackPanel>
-                    <TextBlock Text="{Binding Header}" Foreground="{DynamicResource Muted}" FontSize="11"/>
+                    <TextBlock Text="{Binding Header}" Foreground="{DynamicResource Muted}" FontSize="12"/>
                     <TextBlock Text="{Binding Value}" FontSize="14" TextWrapping="Wrap" Margin="0,3,0,0"/>
                 </StackPanel>
             </Border>
@@ -146,8 +146,8 @@
                                 CornerRadius="12" Padding="12,10" Margin="0,0,0,12">
                             <StackPanel>
                                 <TextBlock Text="Sem temperatura e consumo da CPU" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock x:Name="CpuSensorWarnText" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,8"/>
-                                <Button Style="{StaticResource PrimaryButton}" Content="CORRIGIR" Padding="10,5" FontSize="11"
+                                <TextBlock x:Name="CpuSensorWarnText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,8"/>
+                                <Button Style="{StaticResource PrimaryButton}" Content="CORRIGIR" Padding="10,5" FontSize="12"
                                         Click="BtnFixCpuSensors_Click"/>
                             </StackPanel>
                         </Border>
@@ -173,7 +173,7 @@
                                 <TextBlock x:Name="SideStress" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="parado" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                             </Grid>
                         </Border>
-                        <TextBlock x:Name="SideVersion" Text="v0.2.5" Foreground="{DynamicResource Faint}" FontSize="11" Margin="4,10,0,0"/>
+                        <TextBlock x:Name="SideVersion" Text="v0.2.5" Foreground="{DynamicResource Faint}" FontSize="12" Margin="4,10,0,0"/>
                     </StackPanel>
 
                     <!-- Navegação por categorias -->
@@ -361,7 +361,7 @@
                             <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Desinstalar Apps" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Desinstalar apps" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
@@ -462,9 +462,9 @@
                                     <Canvas x:Name="DashChart" Height="210" ClipToBounds="True" SizeChanged="DashChart_SizeChanged"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                         <Rectangle Width="14" Height="2" Fill="{DynamicResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
+                                        <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,0,16,0"/>
                                         <Line X1="0" X2="14" Stroke="{DynamicResource ChartGpu}" StrokeThickness="1.5" StrokeDashArray="3 2" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="11"/>
+                                        <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
@@ -481,7 +481,7 @@
                                             <TextBlock x:Name="DashScoreDelta" Foreground="{DynamicResource Muted}" FontSize="12"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
-                                        <TextBlock x:Name="DashScoreSub" Text="multi-core · nenhum teste ainda" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,0"/>
+                                        <TextBlock x:Name="DashScoreSub" Text="multi-core · nenhum teste ainda" Foreground="{DynamicResource Faint}" FontSize="12" Margin="0,2,0,0"/>
                                         <Border Height="1" Background="{DynamicResource Line}" Margin="0,16"/>
                                         <ItemsControl x:Name="DashScores" ItemTemplate="{StaticResource KeyValueRow}"/>
                                         <!-- Caixa interna, como o widget de troca da referência -->
@@ -543,7 +543,7 @@
                                                         </Border>
                                                         <StackPanel VerticalAlignment="Center">
                                                             <TextBlock Text="{Binding Name}" FontSize="13"/>
-                                                            <TextBlock Text="{Binding Model}" Foreground="{DynamicResource Faint}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                                            <TextBlock Text="{Binding Model}" Foreground="{DynamicResource Faint}" FontSize="12" TextTrimming="CharacterEllipsis"/>
                                                         </StackPanel>
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="1" Text="{Binding Temp}" FontFamily="{StaticResource Mono}" VerticalAlignment="Center"/>
@@ -575,7 +575,7 @@
                                 <StackPanel>
                                     <TextBlock Text="MEMÓRIA E DISCO" Style="{StaticResource Label}" Margin="0,0,0,4"/>
                                     <TextBlock x:Name="DashMemHero" Text="—" Style="{StaticResource Hero}" Foreground="{DynamicResource Accent}" FontFamily="{StaticResource Mono}" FontSize="28"/>
-                                    <TextBlock x:Name="DashMemSub" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,8"/>
+                                    <TextBlock x:Name="DashMemSub" Foreground="{DynamicResource Faint}" FontSize="12" Margin="0,2,0,8"/>
                                     <Canvas x:Name="DashRings" Width="190" Height="190" HorizontalAlignment="Center" Margin="0,4,0,8"/>
                                     <ItemsControl x:Name="DashRingLegend">
                                         <ItemsControl.ItemTemplate>
@@ -619,7 +619,7 @@
                                                         </StackPanel>
                                                         <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0">
                                                             <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
-                                                            <TextBlock Text="{Binding When}" Foreground="{DynamicResource Muted}" FontSize="11" HorizontalAlignment="Right"/>
+                                                            <TextBlock Text="{Binding When}" Foreground="{DynamicResource Muted}" FontSize="12" HorizontalAlignment="Right"/>
                                                         </StackPanel>
                                                     </Grid>
                                                 </Border>
@@ -734,7 +734,7 @@
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                                                                 <TextBlock Text="{Binding Sizes}" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                                                                <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                                                <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Faint}" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"/>
                                                             </StackPanel>
                                                         </Grid>
                                                     </Border>
@@ -784,7 +784,7 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <TextBlock Text="{Binding VerdictText}" FontSize="11" FontWeight="SemiBold">
+                                                    <TextBlock Text="{Binding VerdictText}" FontSize="12" FontWeight="SemiBold">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
                                                                 <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
@@ -809,7 +809,7 @@
                                                     <DataTemplate>
                                                         <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,8,16,8">
                                                             <StackPanel>
-                                                                <TextBlock Text="{Binding Key}" Foreground="{DynamicResource Muted}" FontSize="11"/>
+                                                                <TextBlock Text="{Binding Key}" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                                                 <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                                             </StackPanel>
                                                         </Border>
@@ -822,7 +822,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
                             Os dados vêm do Windows (S.M.A.R.T. e API de armazenamento) e dos sensores do disco. Pendrives e alguns HDs externos
                             não informam saúde. O veredito é uma estimativa: faça backup de qualquer disco com aviso, não só dos críticos.
                         </TextBlock>
@@ -841,7 +841,7 @@
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnEnergyRefresh_Click"/>
                         </Grid>
                         <ItemsControl x:Name="EnergyCards" ItemTemplate="{StaticResource CardTemplate}"/>
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
                             Os dados vêm do Windows (WMI). Alguns notebooks não informam ciclos de carga ou a capacidade de projeto.
                             O consumo mostrado vem dos sensores de CPU e GPU, não da fonte (PSU) do PC.
                         </TextBlock>
@@ -866,7 +866,7 @@
                         </Grid>
                         <TextBlock x:Name="NetStatus" Text="Pronto. O teste leva cerca de 30 segundos." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
                         <ItemsControl x:Name="NetCards" ItemTemplate="{StaticResource CardTemplate}"/>
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
                             O teste envia pacotes de ping ao roteador e aos DNS públicos 1.1.1.1 e 8.8.8.8 e baixa/envia dados de teste do servidor público
                             speed.cloudflare.com (cerca de 100 MB no total). Feche downloads, streaming e jogos antes para um resultado fiel.
                         </TextBlock>
@@ -889,7 +889,7 @@
                     <StackPanel Margin="36,16,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="DRIVER" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Driver" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Verifique, baixe e instale drivers · NVIDIA e AMD automáticos, fabricantes pela página oficial" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnDrvScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR TUDO" Padding="20,9"
@@ -1054,7 +1054,7 @@
                                     <Button Style="{StaticResource OutlineButton}" Content="AMD" Tag="AMD" Padding="14,6" Margin="0,0,8,6" Click="BtnDrvVendor_Click"/>
                                     <Button Style="{StaticResource OutlineButton}" Content="Intel" Tag="Intel" Padding="14,6" Margin="0,0,8,6" Click="BtnDrvVendor_Click"/>
                                 </WrapPanel>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
                                     NVIDIA: o instalador é baixado do servidor oficial, a assinatura digital é conferida e um ponto de restauração é criado antes de abrir.
                                     AMD: o programa procura o instalador na página oficial do seu modelo (RX série 4000 a 9000) ou o instalador que detecta a placa sozinho; se o site bloquear, use ABRIR PÁGINA OFICIAL. Intel: abre a lista de drivers gráficos para Windows 11.
                                     Sem driver de vídeo (por exemplo, depois da limpeza com o DDU), a placa ainda é reconhecida; se não for, escolha o fabricante acima.
@@ -1068,7 +1068,7 @@
                                 <TextBlock x:Name="DrvBoard" Margin="0,10,0,0" TextWrapping="Wrap"/>
                                 <Button x:Name="BtnDrvBoardPage" Style="{StaticResource OutlineButton}" Content="ABRIR SUPORTE DO FABRICANTE" Padding="18,8" Margin="0,14,0,8"
                                         HorizontalAlignment="Left" Click="BtnDrvBoardPage_Click" IsEnabled="False"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
                                     ASUS, MSI, Gigabyte e outros não têm API pública de versões. Abrimos o suporte oficial do fabricante detectado
                                     (chipset, áudio, rede, BIOS). Se a página não abrir no seu modelo, digite o modelo mostrado acima na busca do site.
                                 </TextBlock>
@@ -1109,11 +1109,11 @@
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel>
                                                     <TextBlock Text="{Binding Device}" TextWrapping="Wrap"/>
-                                                    <TextBlock Foreground="{DynamicResource Muted}" FontSize="11">
+                                                    <TextBlock Foreground="{DynamicResource Muted}" FontSize="12">
                                                         <Run Text="{Binding Class, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Vendor, Mode=OneWay}"/>
                                                     </TextBlock>
                                                 </StackPanel>
-                                                <TextBlock Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="11" TextAlignment="Right" Margin="12,0,0,0">
+                                                <TextBlock Grid.Column="1" Foreground="{DynamicResource Muted}" FontSize="12" TextAlignment="Right" Margin="12,0,0,0">
                                                     <Run Text="{Binding Version, Mode=OneWay}"/><LineBreak/><Run Text="{Binding Date, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding SignedText, Mode=OneWay}"/>
                                                 </TextBlock>
                                             </Grid>
@@ -1262,7 +1262,7 @@
                                                            FontWeight="{Binding NameWeight}" Foreground="{Binding NameBrush}" Margin="0,0,10,0"/>
                                                 <ComboBox Grid.Column="1" IsEditable="True" ItemsSource="{Binding Choices}" IsEnabled="{Binding Editable}"
                                                           Text="{Binding EditText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxDropDownHeight="320"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding SourceText}" Foreground="{Binding SourceBrush}" FontSize="11"
+                                                <TextBlock Grid.Column="2" Text="{Binding SourceText}" Foreground="{Binding SourceBrush}" FontSize="12"
                                                            VerticalAlignment="Center" Margin="10,0,0,0"/>
                                                 <Button Grid.Column="3" Style="{StaticResource OutlineButton}" Content="↺" Padding="6,1" FontSize="12" BorderThickness="0"
                                                         Visibility="{Binding ResetVisibility}" ToolTip="Tirar do perfil (volta a herdar o valor)" Click="BtnNpiReset_Click"/>
@@ -1281,7 +1281,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="INTEGRAÇÃO" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Integração" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Iluminação e efeitos do PC · Corsair iCUE, OpenRGB (MSI, Gigabyte, ASUS...) e Razer Chroma (em teste)" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnLightConnect" Style="{StaticResource OutlineButton}" Content="CONECTAR TUDO" Padding="20,9"
@@ -1296,7 +1296,7 @@
                                 <TextBlock x:Name="LightStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
                                 <Button x:Name="BtnLightSdk" Style="{StaticResource OutlineButton}" Content="BAIXAR O SDK DA CORSAIR" Visibility="Collapsed"
                                         HorizontalAlignment="Left" Padding="20,9" Margin="0,10,0,0" Click="BtnLightSdk_Click"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0">
                                     Requer o iCUE aberto com o SDK ativado nas configurações (manual, dentro do iCUE). A DLL do SDK é baixada pelo botão acima.
                                 </TextBlock>
 
@@ -1306,7 +1306,7 @@
                                         <TextBlock x:Name="OrgbStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
                                         <Button x:Name="BtnOrgbOpen" Style="{StaticResource OutlineButton}" Content="ABRIR O OPENRGB"
                                                 HorizontalAlignment="Left" Padding="20,9" Margin="0,10,0,0" Click="BtnOrgbOpen_Click"/>
-                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0">
                                             A MSI, a Gigabyte e a ASUS não oferecem SDK público; o OpenRGB (gratuito, openrgb.org) conversa com os controladores delas.
                                             Ele precisa estar aberto com o servidor SDK ligado, e o MSI Center, o Armoury Crate e o RGB Fusion devem estar fechados.
                                         </TextBlock>
@@ -1317,7 +1317,7 @@
                                     <StackPanel>
                                         <TextBlock Text="Razer Chroma" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
                                         <TextBlock x:Name="RazerStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
-                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0">
                                             Requer o Razer Synapse instalado e aberto. Controla cada categoria (teclado, mouse, headset...) com uma cor só.
                                         </TextBlock>
                                     </StackPanel>
@@ -1337,7 +1337,7 @@
                                                     <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center" Margin="0,0,14,0"/>
                                                     <StackPanel VerticalAlignment="Center">
                                                         <TextBlock Text="{Binding Name}" FontSize="14"/>
-                                                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="11"/>
+                                                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                                     </StackPanel>
                                                 </StackPanel>
                                             </Border>
@@ -1359,7 +1359,7 @@
                                     <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Carga da CPU" Tag="load" Checked="LightFx_Checked"/>
                                     <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Apagar" Tag="off" Checked="LightFx_Checked"/>
                                 </WrapPanel>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,16">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16">
                                     Temperatura e carga mudam a cor sozinhas (azul = frio/ocioso, verde, amarelo, vermelho = quente/carga alta).
                                     Cor fixa e Respiração usam a cor escolhida abaixo.
                                 </TextBlock>
@@ -1401,9 +1401,9 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <TextBlock Text="DIAGNÓSTICO" Style="{StaticResource Label}"/>
-                                <TextBox x:Name="LightDiag" IsReadOnly="True" FontFamily="{StaticResource Mono}" FontSize="11" TextWrapping="Wrap"
+                                <TextBox x:Name="LightDiag" IsReadOnly="True" FontFamily="{StaticResource Mono}" FontSize="12" TextWrapping="Wrap"
                                          MinHeight="90" MaxHeight="260" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0">
                                     Se as luzes não mudarem, copie este quadro e me envie.
                                 </TextBlock>
                             </StackPanel>
@@ -1418,12 +1418,12 @@
                         <StackPanel Margin="36,30,36,30">
                             <Grid Margin="0,0,0,20">
                                 <StackPanel Orientation="Horizontal">
-                                    <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top">
+                                    <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top" Visibility="Collapsed">
                                         <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource Icons}" FontSize="22" Foreground="{DynamicResource OnAccent}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
                                     <StackPanel>
-                                        <TextBlock Text="Jogos" Style="{StaticResource H1}"/>
+                                        <TextBlock Text="Biblioteca" Style="{StaticResource H1}"/>
                                         <TextBlock Text="Seus jogos instalados, com &quot;Preparar e jogar&quot; e os ajustes individuais de cada um. Os arquivos dos jogos nunca são tocados."
                                                    Style="{StaticResource Sub}" TextWrapping="Wrap" MaxWidth="640"/>
                                     </StackPanel>
@@ -1477,7 +1477,7 @@
                                             <Image Source="Assets/logo.png" Width="16" Height="16" Margin="0,0,8,0"/>
                                             <TextBlock x:Name="LDlgTitle" FontSize="12" VerticalAlignment="Center"/>
                                         </StackPanel>
-                                        <Button Style="{StaticResource OutlineButton}" Content="✕" Padding="8,2" FontSize="11" BorderThickness="0"
+                                        <Button Style="{StaticResource OutlineButton}" Content="✕" Padding="8,2" FontSize="12" BorderThickness="0"
                                                 HorizontalAlignment="Right" Click="BtnDlgCancel_Click"/>
                                     </Grid>
                                 </Border>
@@ -1548,7 +1548,7 @@
                                         <Button x:Name="BtnSteamApply" Style="{StaticResource PrimaryButton}" Content="APLICAR NAS OPÇÕES DA STEAM"
                                                 HorizontalAlignment="Left" Padding="20,9" Click="BtnSteamApply_Click"/>
                                     </StackPanel>
-                                    <TextBlock x:Name="LGfxNote" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                    <TextBlock x:Name="LGfxNote" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
                                             <Border Height="1" Background="{DynamicResource Line}" Margin="0,14,0,12"/>
                                             <TextBlock Text="PROGRAMAS AUXILIARES" Style="{StaticResource Label}"/>
                                     <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10">
@@ -1560,7 +1560,7 @@
                                             <DataTemplate>
                                                 <Grid Margin="0,0,0,6">
                                                     <TextBlock Text="{Binding Display}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,90,0"/>
-                                                    <Button Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="10,4" FontSize="11" Tag="{Binding}"
+                                                    <Button Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="10,4" FontSize="12" Tag="{Binding}"
                                                             HorizontalAlignment="Right" Click="BtnRemoveHelper_Click"/>
                                                 </Grid>
                                             </DataTemplate>
@@ -1601,11 +1601,11 @@
                     </Grid>
                     <!-- Barra como a do HWiNFO: zerar mín./máx./média e recolher/expandir os dispositivos -->
                     <WrapPanel Grid.Row="1" Margin="0,0,0,10">
-                        <Button Style="{StaticResource OutlineButton}" Content="ZERAR MÍN. / MÁX. / MÉDIA" Padding="12,6" FontSize="11"
+                        <Button Style="{StaticResource OutlineButton}" Content="ZERAR MÍN. / MÁX. / MÉDIA" Padding="12,6" FontSize="12"
                                 Margin="0,0,8,0" Click="BtnSensorReset_Click" ToolTip="Recomeça mínimo, máximo e média a partir de agora"/>
-                        <Button Style="{StaticResource OutlineButton}" Content="RECOLHER TUDO" Padding="12,6" FontSize="11"
+                        <Button Style="{StaticResource OutlineButton}" Content="RECOLHER TUDO" Padding="12,6" FontSize="12"
                                 Margin="0,0,8,0" Click="BtnSensorCollapse_Click"/>
-                        <Button Style="{StaticResource OutlineButton}" Content="EXPANDIR TUDO" Padding="12,6" FontSize="11"
+                        <Button Style="{StaticResource OutlineButton}" Content="EXPANDIR TUDO" Padding="12,6" FontSize="12"
                                 Click="BtnSensorExpand_Click"/>
                     </WrapPanel>
                     <Border Grid.Row="2" Style="{StaticResource CardBorder}" Padding="0,8,0,0">
@@ -1632,7 +1632,7 @@
                                                                             <StackPanel Orientation="Horizontal">
                                                                                 <TextBlock x:Name="Arrow" Text="▾" Width="16" Foreground="{DynamicResource Muted}"/>
                                                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
-                                                                                <TextBlock Text="{Binding ItemCount, StringFormat=' · {0} sensores'}" FontSize="11"
+                                                                                <TextBlock Text="{Binding ItemCount, StringFormat=' · {0} sensores'}" FontSize="12"
                                                                                            Foreground="{DynamicResource Muted}" VerticalAlignment="Center"/>
                                                                             </StackPanel>
                                                                         </Border>
@@ -1668,7 +1668,7 @@
                 <ScrollViewer x:Name="PageOptFormat" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="FORMATAÇÃO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Formatação" Style="{StaticResource H1}"/>
                             <TextBlock Text="Depois de instalar o Windows: tudo de uma vez, com ponto de restauração · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptFormatHost"/>
@@ -1677,7 +1677,7 @@
                 <ScrollViewer x:Name="PageOptDebloat" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="DEBLOAT" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Debloat" Style="{StaticResource H1}"/>
                             <TextBlock Text="Tirar do Windows o que pesa e espiona, em três níveis · cada item tem desfazer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptDebloatHost"/>
@@ -1686,7 +1686,7 @@
                 <ScrollViewer x:Name="PageOptWindows" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="WINDOWS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Windows" Style="{StaticResource H1}"/>
                             <TextBlock Text="Desempenho, privacidade, aparência, rede e IA · ligue e desligue cada ajuste" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptWindowsHost"/>
@@ -1695,7 +1695,7 @@
                 <ScrollViewer x:Name="PageOptInput" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="MOUSE E TECLADO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Mouse e teclado" Style="{StaticResource H1}"/>
                             <TextBlock Text="Menos atraso e sem atalhos que atrapalham no jogo" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptInputHost"/>
@@ -1713,7 +1713,7 @@
                 <ScrollViewer x:Name="PageOptProfiles" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="PERFIS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Perfis" Style="{StaticResource H1}"/>
                             <TextBlock Text="Pacotes prontos e os seus perfis salvos · aplicar, voltar ao padrão, exportar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptProfilesHost"/>
@@ -1722,7 +1722,7 @@
                 <ScrollViewer x:Name="PageOptClean" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="LIMPEZA" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Limpeza" Style="{StaticResource H1}"/>
                             <TextBlock Text="Ver quanto espaço cada tipo de lixo ocupa e limpar o que quiser" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptCleanHost"/>
@@ -1733,7 +1733,7 @@
                 <ScrollViewer x:Name="PageMaint" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="MANUTENÇÃO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Manutenção" Style="{StaticResource H1}"/>
                             <TextBlock Text="Reparos e reinícios do Windows num clique · cada ferramenta pede confirmação antes de rodar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
 
@@ -1776,7 +1776,7 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,8">
                                     <TextBlock x:Name="MaintRunTitle" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                    <Button x:Name="BtnMaintCancel" Style="{StaticResource OutlineButton}" Content="CANCELAR" Padding="12,5" FontSize="11"
+                                    <Button x:Name="BtnMaintCancel" Style="{StaticResource OutlineButton}" Content="CANCELAR" Padding="12,5" FontSize="12"
                                             HorizontalAlignment="Right" Click="BtnMaintCancel_Click"/>
                                 </Grid>
                                 <TextBlock x:Name="MaintRunStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
@@ -1871,7 +1871,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,16">
                             <StackPanel Orientation="Horizontal" Margin="0,0,170,0">
-                                <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top">
+                                <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top" Visibility="Collapsed">
                                     <TextBlock Text="&#xE7BF;" FontFamily="{StaticResource Icons}" FontSize="22" Foreground="{DynamicResource OnAccent}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
@@ -2016,7 +2016,7 @@
                         </StackPanel>
 
                         <!-- Crédito pedido nos termos de uso da API -->
-                        <TextBlock FontSize="11" Foreground="{DynamicResource Faint}" TextWrapping="Wrap" Margin="0,22,0,0">
+                        <TextBlock FontSize="12" Foreground="{DynamicResource Faint}" TextWrapping="Wrap" Margin="0,22,0,0">
                             Preços e dados por <Hyperlink Foreground="{DynamicResource Muted}" Click="DealsItad_Click">IsThereAnyDeal</Hyperlink>.
                             Os links levam direto à loja de cada oferta. O PcismoMaster não é afiliado ao IsThereAnyDeal.
                         </TextBlock>
@@ -2034,7 +2034,7 @@
 
                     <Grid Margin="0,0,0,20">
                         <StackPanel>
-                            <TextBlock Text="Jogos" Style="{StaticResource H1}"/>
+                            <TextBlock Text="FPS estimado" Style="{StaticResource H1}"/>
                             <TextBlock x:Name="GamesSub" Text="FPS esperado no seu PC" Style="{StaticResource Sub}"/>
                         </StackPanel>
                         <TextBox x:Name="GameSearch" Width="260" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -2108,7 +2108,7 @@
                                     <Border Style="{StaticResource CardBorder}" Margin="0,0,10,10" Padding="16,14">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding Genre}" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,10"/>
+                                            <TextBlock Text="{Binding Genre}" Foreground="{DynamicResource Faint}" FontSize="12" Margin="0,2,0,10"/>
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="{Binding FpsText}" FontFamily="{StaticResource Mono}" FontSize="30"/>
@@ -2126,10 +2126,10 @@
                                                 </Border>
                                             </Grid>
                                             <Grid>
-                                                <TextBlock Text="{Binding LowText}" Foreground="{DynamicResource Muted}" FontSize="11"/>
-                                                <TextBlock Text="{Binding Source}" Foreground="{DynamicResource Faint}" FontSize="11" HorizontalAlignment="Right"/>
+                                                <TextBlock Text="{Binding LowText}" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                                <TextBlock Text="{Binding Source}" Foreground="{DynamicResource Faint}" FontSize="12" HorizontalAlignment="Right"/>
                                             </Grid>
-                                            <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,3,0,0"
+                                            <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="12" Margin="0,3,0,0"
                                                        TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </Border>
@@ -2171,13 +2171,13 @@
                                         </Canvas>
                                     </Grid>
                                     <Grid>
-                                        <TextBlock Text="limita a GPU" Foreground="{DynamicResource Faint}" FontSize="11"/>
-                                        <TextBlock Text="equilibrado" Foreground="{DynamicResource Faint}" FontSize="11" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="limita a CPU" Foreground="{DynamicResource Faint}" FontSize="11" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="limita a GPU" Foreground="{DynamicResource Faint}" FontSize="12"/>
+                                        <TextBlock Text="equilibrado" Foreground="{DynamicResource Faint}" FontSize="12" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="limita a CPU" Foreground="{DynamicResource Faint}" FontSize="12" HorizontalAlignment="Right"/>
                                     </Grid>
                                     <TextBlock x:Name="BnBalanceText" TextWrapping="Wrap" Margin="0,12,0,0"/>
                                     <TextBlock Text="Estimativa pelo desempenho relativo típico; o detector ao vivo mostra a realidade de cada jogo."
-                                               Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                               Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0"/>
                                 </StackPanel>
                             </Border>
 
@@ -2289,7 +2289,7 @@
                                             </ItemsControl>
                                             </Grid>
                                         </Border>
-                                        <TextBlock Text="Prévia com os números reais deste PC" Foreground="{DynamicResource Faint}" FontSize="11"
+                                        <TextBlock Text="Prévia com os números reais deste PC" Foreground="{DynamicResource Faint}" FontSize="12"
                                                    HorizontalAlignment="Left" VerticalAlignment="Bottom" IsHitTestVisible="False"/>
                                     </Grid>
                                 </Border>
@@ -2298,9 +2298,9 @@
                                     <TextBlock Text="TECLA PARA LIGAR/DESLIGAR" Style="{StaticResource Label}" Margin="0,16,0,6"/>
                                     <TextBox x:Name="OvHotkeyBox" IsReadOnly="True" Cursor="Hand" FontFamily="{StaticResource Mono}" IsReadOnlyCaretVisible="False"
                                              PreviewKeyDown="OvHotkey_PreviewKeyDown" ToolTip="Clique e aperte a tecla ou combinação (Esc cancela)"/>
-                                    <TextBlock Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"
+                                    <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0"
                                                Text="Clique na caixa e aperte a tecla. Funciona com o jogo em primeiro plano; use uma tecla ou combinação que o jogo não use."/>
-                                    <TextBlock x:Name="OvHotkeyHint" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    <TextBlock x:Name="OvHotkeyHint" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -2308,7 +2308,7 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <TextBlock Text="POSIÇÃO" Style="{StaticResource Label}"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" Text="No monitor onde o jogo está." Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" Text="No monitor onde o jogo está." Margin="0,0,0,6"/>
                                 <WrapPanel x:Name="OvCornerPanel">
                                     <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Superior esquerdo" Tag="TL" Margin="0,0,6,6" Checked="OvOption_Changed"/>
                                     <RadioButton Style="{StaticResource Chip}" GroupName="OvCorner" Content="Centro superior" Tag="TC" Margin="0,0,6,6" Checked="OvOption_Changed"/>
@@ -2344,12 +2344,12 @@
                                 <Grid>
                                     <TextBlock Text="O QUE MOSTRAR" Style="{StaticResource Label}"/>
                                     <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-                                        <Button Style="{StaticResource OutlineButton}" Content="SÓ FPS" Tag="min" Padding="10,4" FontSize="11" Margin="0,0,6,0" Click="OvPreset_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="PADRÃO" Tag="default" Padding="10,4" FontSize="11" Margin="0,0,6,0" Click="OvPreset_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="TUDO" Tag="all" Padding="10,4" FontSize="11" Click="OvPreset_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="SÓ FPS" Tag="min" Padding="10,4" FontSize="12" Margin="0,0,6,0" Click="OvPreset_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="PADRÃO" Tag="default" Padding="10,4" FontSize="12" Margin="0,0,6,0" Click="OvPreset_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="TUDO" Tag="all" Padding="10,4" FontSize="12" Click="OvPreset_Click"/>
                                     </WrapPanel>
                                 </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0">
                                     Marque o que quer ver por cima do jogo; a mudança vale na hora e fica salva. Cada componente vira uma linha
                                     (GPU, VRAM, CPU, RAM) só com os itens escolhidos. Clock da memória, hotspot e ventoinha dependem da placa;
                                     o limitador (PerfCap) é só NVIDIA. Clock e temperatura da CPU precisam do app como administrador.
@@ -2384,7 +2384,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <StackPanel Margin="0,0,0,16">
-                        <TextBlock Text="BENCH" Style="{StaticResource H1}"/>
+                        <TextBlock Text="Benchmark" Style="{StaticResource H1}"/>
                         <TextBlock x:Name="BenchSub" Text="Benchmark de CPU por renderização 3D (path tracing), no mesmo princípio do Cinebench" Style="{StaticResource Sub}"/>
                     </StackPanel>
 
@@ -2639,7 +2639,7 @@
                                             <RadioButton Style="{StaticResource Chip}" GroupName="RtPreset" Content="Alta" Tag="alta" IsChecked="True"/>
                                             <RadioButton Style="{StaticResource Chip}" GroupName="RtPreset" Content="Extrema" Tag="extrema"/>
                                         </WrapPanel>
-                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
+                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0">
                                             Normal: 2 amostras e 2 rebatidas por pixel · Alta: 4 e 3 · Extrema: 8 e 4.
                                         </TextBlock>
                                         <TextBlock Text="MODO" Style="{StaticResource Label}" Margin="0,10,0,8"/>
@@ -2746,7 +2746,7 @@
                                                 <Grid>
                                                     <StackPanel>
                                                         <TextBlock Text="{Binding Label}" FontSize="14"/>
-                                                        <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,2,140,0"/>
+                                                        <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,2,140,0"/>
                                                     </StackPanel>
                                                     <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontSize="20" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                                 </Grid>
@@ -2801,7 +2801,7 @@
                                                 <Grid>
                                                     <StackPanel>
                                                         <TextBlock Text="{Binding Label}" FontSize="14"/>
-                                                        <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,2,170,0"/>
+                                                        <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,2,170,0"/>
                                                     </StackPanel>
                                                     <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontSize="20" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                                 </Grid>
@@ -2851,7 +2851,7 @@
                 <ScrollViewer x:Name="PageOptimize" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="OTIMIZAÇÃO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Otimização" Style="{StaticResource H1}"/>
                             <TextBlock Text="Libera memória, fecha o que atrapalha e ajusta o Windows para jogos" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -2897,10 +2897,10 @@
                                 <StackPanel>
                                     <Grid Margin="0,0,0,6">
                                         <TextBlock Text="PROGRAMAS PARA FECHAR" Style="{StaticResource Label}"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="ATUALIZAR" Padding="10,4" FontSize="11"
+                                        <Button Style="{StaticResource OutlineButton}" Content="ATUALIZAR" Padding="10,4" FontSize="12"
                                                 HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnRefreshApps_Click"/>
                                     </Grid>
-                                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                         Marcados = seguros de fechar durante o jogo. Programas com janela recebem o pedido de
                                         fechar (como clicar no X) e não são forçados, para não perder nada não salvo.
                                     </TextBlock>
@@ -2917,7 +2917,7 @@
                                                         <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center" Margin="0,0,12,0"/>
                                                         <StackPanel Grid.Column="1">
                                                             <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
-                                                            <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                                            <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="12" TextTrimming="CharacterEllipsis"/>
                                                         </StackPanel>
                                                         <TextBlock Grid.Column="2" Text="{Binding MemoryText}" FontFamily="{StaticResource Mono}"
                                                                    Foreground="{DynamicResource Muted}" VerticalAlignment="Center" Margin="12,0,0,0"/>
@@ -2934,10 +2934,10 @@
                                 <StackPanel>
                                     <Grid Margin="0,0,0,6">
                                         <TextBlock Text="AJUSTES DO WINDOWS PARA JOGOS" Style="{StaticResource Label}"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR ORIGINAIS" Padding="10,4" FontSize="11"
+                                        <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR ORIGINAIS" Padding="10,4" FontSize="12"
                                                 HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnRestoreTweaks_Click"/>
                                     </Grid>
-                                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                         O interruptor mostra o estado atual e aplica na hora. O valor original é guardado na primeira
                                         alteração. Não mexemos em segurança (Defender, Integridade de Memória, UAC, Windows Update).
                                     </TextBlock>
@@ -2959,8 +2959,8 @@
                                                                            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,0,0"/>
                                                             </Grid>
                                                             <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
-                                                            <TextBlock Text="{Binding Effect}" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,0"/>
-                                                            <TextBlock Text="{Binding Status}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                            <TextBlock Text="{Binding Effect}" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                            <TextBlock Text="{Binding Status}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
                                                         </StackPanel>
                                                     </Grid>
                                                 </Border>
@@ -2978,7 +2978,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="INICIALIZAÇÃO" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Inicialização" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Programas que abrem junto com o Windows · desative ou remova o que não precisa" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button Style="{StaticResource PrimaryButton}" Content="ATUALIZAR" Padding="20,9"
@@ -2989,10 +2989,10 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
                                     <TextBlock x:Name="StartupSummary" Text="PROGRAMAS DE INICIALIZAÇÃO" Style="{StaticResource Label}"/>
-                                    <Button x:Name="BtnStartupRestore" Style="{StaticResource OutlineButton}" Content="RESTAURAR REMOVIDOS" Padding="10,4" FontSize="11"
+                                    <Button x:Name="BtnStartupRestore" Style="{StaticResource OutlineButton}" Content="RESTAURAR REMOVIDOS" Padding="10,4" FontSize="12"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnStartupRestore_Click"/>
                                 </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     O interruptor ativa ou desativa na hora, do mesmo jeito que o Gerenciador de Tarefas (a entrada continua
                                     lá e pode ser religada). REMOVER apaga a entrada da inicialização; o programa continua instalado e
                                     dá para desfazer em "Restaurar removidos". Vale na próxima vez que o Windows iniciar.
@@ -3020,7 +3020,7 @@
                                                                    ToolTip="{Binding Command}" Margin="0,2,0,0"/>
                                                         <TextBlock Text="{Binding Source}" Foreground="{DynamicResource Faint}" FontSize="10.5" Margin="0,1,0,0"/>
                                                     </StackPanel>
-                                                    <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,5" FontSize="11"
+                                                    <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,5" FontSize="12"
                                                             Tag="{Binding}" Click="StartupRemove_Click" VerticalAlignment="Center" Margin="14,0,0,0"/>
                                                 </Grid>
                                             </Border>
@@ -3042,7 +3042,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel>
-                                <TextBlock Text="INSTALAR APPS" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Instalar apps" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Os essenciais depois de formatar o PC · versão oficial mais recente, instalação silenciosa" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="16,0,0,0">
@@ -3069,8 +3069,8 @@
                             <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <CheckBox x:Name="AppsHideInstalled" Content="Esconder instalados" VerticalAlignment="Center" Margin="0,0,16,0"
                                           Checked="AppsHideInstalled_Changed" Unchecked="AppsHideInstalled_Changed"/>
-                                <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODOS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnAppsAll_Click"/>
-                                <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnAppsNone_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODOS" Padding="10,4" FontSize="12" Margin="0,0,8,0" Click="BtnAppsAll_Click"/>
+                                <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="12" Click="BtnAppsNone_Click"/>
                             </WrapPanel>
                         </Grid>
                         <WrapPanel x:Name="AppsCatPanel" Margin="0,0,0,8">
@@ -3164,7 +3164,7 @@
                                             <Grid Grid.Column="2" VerticalAlignment="Top">
                                                 <Border x:Name="tick" Width="20" Height="20" CornerRadius="10" BorderThickness="1.5"
                                                         BorderBrush="{DynamicResource LineStrong}" Background="Transparent">
-                                                    <TextBlock x:Name="tickGlyph" Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="11" FontWeight="Bold"
+                                                    <TextBlock x:Name="tickGlyph" Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="12" FontWeight="Bold"
                                                                Foreground="{DynamicResource OnAccent}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
                                                 </Border>
                                                 <Border x:Name="installedChip" Background="#264ED17A" CornerRadius="6" Padding="6,2" Visibility="Collapsed">
@@ -3188,7 +3188,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,8,0,0">
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="2,8,0,0">
                             Clique num cartão para marcar. Usa o winget, o instalador de pacotes da Microsoft que já vem no Windows 10/11:
                             baixa do site oficial de cada fabricante e confere o arquivo antes de instalar. Os apps são instalados um de cada
                             vez, sem janelas. Os ícones vêm do site de cada app e ficam guardados no PC.
@@ -3202,7 +3202,7 @@
                 <ScrollViewer x:Name="PageUtil" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,14">
-                            <TextBlock Text="UTILIDADES" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Utilidades" Style="{StaticResource H1}"/>
                             <TextBlock Text="Ferramentas úteis do dia a dia" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -3244,15 +3244,15 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock x:Name="DlFolder" VerticalAlignment="Center" FontFamily="{StaticResource Mono}" FontSize="12"
                                                    TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Muted}"/>
-                                        <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="ALTERAR" Padding="12,6" FontSize="11" Margin="10,0,8,0" Click="BtnDlFolder_Click"/>
-                                        <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Content="ABRIR" Padding="12,6" FontSize="11" Click="BtnDlOpenFolder_Click"/>
+                                        <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="ALTERAR" Padding="12,6" FontSize="12" Margin="10,0,8,0" Click="BtnDlFolder_Click"/>
+                                        <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Content="ABRIR" Padding="12,6" FontSize="12" Click="BtnDlOpenFolder_Click"/>
                                     </Grid>
 
                                     <Button x:Name="BtnDownload" Style="{StaticResource PrimaryButton}" Content="BAIXAR" Padding="28,11" HorizontalAlignment="Left" Click="BtnDownload_Click"/>
                                     <TextBlock x:Name="DlStatus" TextWrapping="Wrap" Margin="0,12,0,0" FontFamily="{StaticResource Mono}" FontSize="12"/>
                                 </StackPanel>
                             </Border>
-                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,10,0,0"
+                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="2,10,0,0"
                                        Text="Baixe apenas conteúdo que você tem direito de baixar. Para links privados do Instagram pode ser preciso estar logado no navegador."/>
                         </StackPanel>
 
@@ -3291,7 +3291,7 @@
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,10,0,0"
+                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="2,10,0,0"
                                        Text="Dê um duplo clique para abrir a pasta do item. Lê a MFT dos discos NTFS (precisa do modo administrador)."/>
                         </StackPanel>
                     </StackPanel>
@@ -3302,7 +3302,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,16">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="DESINSTALAR APPS" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Desinstalar apps" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Desinstalador oficial + varredura profunda de sobras (pastas, arquivos ocultos, registro, inicialização e tarefas), com Lixeira e backup" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnUnRefresh" Style="{StaticResource OutlineButton}" Content="ATUALIZAR LISTA" Padding="16,8"
@@ -3369,7 +3369,7 @@
                                     <RadioButton Style="{StaticResource ChipAccent}" GroupName="UnMode" Content="Avançado" Tag="Avancado" Checked="UnMode_Checked"/>
                                     <CheckBox x:Name="UnRestorePoint" Content="Criar ponto de restauração antes" IsChecked="True" VerticalAlignment="Center" Margin="14,0,0,0"/>
                                 </WrapPanel>
-                                <TextBlock x:Name="UnModeHint" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,8,0,0"/>
+                                <TextBlock x:Name="UnModeHint" Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="2,8,0,0"/>
                             </StackPanel>
                         </Border>
 
@@ -3384,7 +3384,7 @@
                                     ToolTip="Devolve o registro e as tarefas da última remoção de sobras. Pastas e arquivos voltam pela Lixeira."/>
                             <Button Style="{StaticResource OutlineButton}" Content="ABRIR BACKUPS" Padding="18,11" Margin="0,0,10,8" Click="BtnUnBackups_Click"/>
                         </WrapPanel>
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="2,4,0,0"
+                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="2,4,0,0"
                                    Text="Mostramos só programas de verdade (componentes do Windows, drivers e atualizações ficam de fora). A desinstalação usa o próprio desinstalador do programa; depois procuramos sobras para você revisar. Nada sai sem você marcar e confirmar: pastas e arquivos vão para a Lixeira e o registro e as tarefas ganham backup."/>
 
                         <!-- Sobras encontradas após desinstalar -->
@@ -3393,13 +3393,13 @@
                                 <Grid Margin="0,0,0,4">
                                     <TextBlock x:Name="UnLeftoverTitle" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                     <WrapPanel HorizontalAlignment="Right">
-                                        <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODAS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnUnMarkAll_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="SÓ AS CLARAS" Padding="10,4" FontSize="11" Margin="0,0,8,0" Click="BtnUnMarkStrong_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="11" Click="BtnUnMarkNone_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="MARCAR TODAS" Padding="10,4" FontSize="12" Margin="0,0,8,0" Click="BtnUnMarkAll_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="SÓ AS CLARAS" Padding="10,4" FontSize="12" Margin="0,0,8,0" Click="BtnUnMarkStrong_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="DESMARCAR" Padding="10,4" FontSize="12" Click="BtnUnMarkNone_Click"/>
                                     </WrapPanel>
                                 </Grid>
                                 <TextBlock x:Name="UnLeftoverSummary" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"
                                            Text="Marcado = ligação clara com o app. CONFIRA = só bate com o nome do fabricante ou é parecido: abra antes de remover. Pastas do Windows, pastas pessoais e o registro do sistema nunca aparecem."/>
                                 <ItemsControl x:Name="UnLeftoverList">
                                     <ItemsControl.GroupStyle>
@@ -3439,7 +3439,7 @@
                                                     <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                                         <TextBlock Text="{Binding Display}" FontFamily="{StaticResource Mono}" FontSize="12"
                                                                    TextTrimming="CharacterEllipsis" ToolTip="{Binding Display}"/>
-                                                        <TextBlock Text="{Binding Info}" Foreground="{DynamicResource Faint}" FontSize="11"
+                                                        <TextBlock Text="{Binding Info}" Foreground="{DynamicResource Faint}" FontSize="12"
                                                                    TextTrimming="CharacterEllipsis" Margin="0,2,0,0" ToolTip="{Binding Info}"/>
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="3" Text="{Binding SizeText}" Foreground="{DynamicResource Muted}" FontSize="11.5"
@@ -3471,17 +3471,17 @@
                 <ScrollViewer x:Name="PageMakerPorts" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="PORTAS COM" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Portas COM" Style="{StaticResource H1}"/>
                             <TextBlock Text="Arduino, ESP32 e conversores seriais · remova dispositivos fantasmas e libere números COM presos" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
                                     <TextBlock Text="USB E PORTAS COM (ARDUINO, ESP32, CONVERSORES SERIAIS)" Style="{StaticResource Label}"/>
-                                    <Button Style="{StaticResource OutlineButton}" Content="PROCURAR" Padding="10,4" FontSize="11"
+                                    <Button Style="{StaticResource OutlineButton}" Content="PROCURAR" Padding="10,4" FontSize="12"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnUsbScan_Click"/>
                                 </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,12">
                                     Cada placa plugada numa porta USB diferente vira um registro novo e prende um número COM. Os registros
                                     de dispositivos que não estão conectados ("fantasmas") confundem a IDE do Arduino e empurram a porta
                                     para COM20+. Remover um fantasma é seguro: ao plugar de novo, o Windows reinstala na hora.
@@ -3544,7 +3544,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="DRIVERS SERIAIS" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Drivers seriais" Style="{StaticResource H1}"/>
                                 <TextBlock Text="CH340 · CP2102/CP210x · FTDI · Prolific · Arduino — diagnóstico, reinstalação e troca de versão do driver" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnMakerScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR" Padding="20,9"
@@ -3574,16 +3574,16 @@
                                                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,0,0"/>
                                                         </Grid>
                                                         <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,2,0,0"/>
-                                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,1,0,0">
+                                                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" Margin="0,1,0,0">
                                                             <Run Text="Driver: "/><Run Text="{Binding Driver, Mode=OneWay}"/>
                                                         </TextBlock>
                                                         <TextBlock Text="{Binding Verdict}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                                         <TextBlock Text="{Binding Advice}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
                                                     </StackPanel>
                                                     <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Top">
-                                                        <Button Style="{StaticResource OutlineButton}" Content="REINSTALAR" Padding="12,5" FontSize="11" Margin="0,0,0,6"
+                                                        <Button Style="{StaticResource OutlineButton}" Content="REINSTALAR" Padding="12,5" FontSize="12" Margin="0,0,0,6"
                                                                 Tag="{Binding}" Click="MakerReinstall_Click"/>
-                                                        <Button Style="{StaticResource OutlineButton}" Content="PÁGINA OFICIAL" Padding="12,5" FontSize="11"
+                                                        <Button Style="{StaticResource OutlineButton}" Content="PÁGINA OFICIAL" Padding="12,5" FontSize="12"
                                                                 Tag="{Binding Chip}" Click="MakerOfficial_Click"/>
                                                     </StackPanel>
                                                 </Grid>
@@ -3591,7 +3591,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,12,0,0">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,12,0,0">
                                     REINSTALAR remove o dispositivo e pede ao Windows para detectar de novo, com o melhor driver disponível
                                     (resolve a maioria dos códigos 10 e 43). Placa que não aparece nenhuma vez: troque o cabo, muitos são só de carga.
                                 </TextBlock>
@@ -3603,10 +3603,10 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
                                     <TextBlock Text="DRIVERS INCLUÍDOS" Style="{StaticResource Label}"/>
-                                    <Button x:Name="BtnMakerBundleAll" Style="{StaticResource OutlineButton}" Content="INSTALAR TODOS" Padding="10,4" FontSize="11"
+                                    <Button x:Name="BtnMakerBundleAll" Style="{StaticResource OutlineButton}" Content="INSTALAR TODOS" Padding="10,4" FontSize="12"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnMakerBundleAll_Click"/>
                                 </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Drivers oficiais de cada fabricante que já vêm dentro do PcismoMaster: instalam sem internet, ideal logo depois
                                     de formatar. Pode instalar com a placa desconectada; o Windows usa o driver quando ela for plugada.
                                     Os drivers Arduino são assinados pela Arduino (não pela Microsoft): o Windows pode pedir confirmação.
@@ -3626,9 +3626,9 @@
                                                             <TextBlock Text="{Binding State}" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource Muted}"
                                                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,0,0"/>
                                                         </Grid>
-                                                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="11"/>
+                                                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="12"/>
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="INSTALAR" Padding="12,5" FontSize="11"
+                                                    <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="INSTALAR" Padding="12,5" FontSize="12"
                                                             Tag="{Binding}" Click="MakerInstallBundled_Click" VerticalAlignment="Center" Margin="14,0,0,0"/>
                                                 </Grid>
                                             </Border>
@@ -3643,10 +3643,10 @@
                             <StackPanel>
                                 <Grid Margin="0,0,0,6">
                                     <TextBlock Text="DRIVERS INSTALADOS NO WINDOWS" Style="{StaticResource Label}"/>
-                                    <Button x:Name="BtnMakerRestore" Style="{StaticResource OutlineButton}" Content="RESTAURAR REMOVIDOS" Padding="10,4" FontSize="11"
+                                    <Button x:Name="BtnMakerRestore" Style="{StaticResource OutlineButton}" Content="RESTAURAR REMOVIDOS" Padding="10,4" FontSize="12"
                                             HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnMakerRestore_Click"/>
                                 </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Versões guardadas no Windows para cada chip, da mais nova para a mais antiga. Quando a versão nova não funciona
                                     com a sua placa (clones de CH340, FTDI ou PL2303 falsificados), remova-a: o Windows passa a usar a anterior.
                                     Para desinstalar o driver de vez, remova todas as versões daquele chip. Cada remoção faz backup antes.
@@ -3664,9 +3664,9 @@
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel>
                                                         <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
-                                                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="11"/>
+                                                        <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="12"/>
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,5" FontSize="11"
+                                                    <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,5" FontSize="12"
                                                             Tag="{Binding}" Click="MakerRemovePackage_Click" VerticalAlignment="Center" Margin="14,0,0,0"/>
                                                 </Grid>
                                             </Border>
@@ -3690,7 +3690,7 @@
                                     <Button Style="{StaticResource OutlineButton}" Content="LIMPAR CACHE DA IDE"
                                             Padding="18,9" Margin="0,0,10,8" Click="BtnMakerCache_Click"/>
                                 </WrapPanel>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap">
                                     "Porta ocupada" / "Access denied" no upload: outro programa está com a porta aberta (monitor serial,
                                     Cura, PuTTY...). IDE travada em "Downloading index" ou erro ao instalar placas: limpe o cache (as placas e
                                     bibliotecas instaladas continuam). A instalação da IDE também instala os drivers das placas Arduino oficiais.
@@ -3705,7 +3705,7 @@
                 <ScrollViewer x:Name="PageOc" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="OVERCLOCK" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Overclock" Style="{StaticResource H1}"/>
                             <TextBlock Text="Clock, memória, tensão, energia, curva V/F e curva de fans no estilo do MSI Afterburner · verificador de estabilidade e guia da BIOS"
                                        Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
@@ -3735,7 +3735,7 @@
                                 <CheckBox x:Name="OcApplyOnStart" Content="Reaplicar os últimos ajustes aplicados sempre que o PcismoMaster abrir"
                                           Margin="0,2,0,8" Checked="OcApplyOnStart_Changed" Unchecked="OcApplyOnStart_Changed"/>
                                 <TextBlock x:Name="OcGpuResult" TextWrapping="Wrap"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0">
                                     Os ajustes valem até reiniciar o PC. Suba aos poucos (ex.: +15 MHz no core, +100 MHz na memória) e rode o
                                     verificador de estabilidade abaixo a cada passo. Core Clock e a curva V/F usam a NVAPI (camada do projeto
                                     simple-nvidia-undervolt, licença MIT); energia, temperatura e fans usam a NVML oficial da NVIDIA.
@@ -3749,12 +3749,12 @@
                                 <Grid Margin="0,0,0,6">
                                     <TextBlock Text="CURVA TENSÃO × FREQUÊNCIA (V/F) · UNDERVOLT" Style="{StaticResource Label}"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                                        <Button Style="{StaticResource OutlineButton}" Content="LER DA PLACA" Padding="10,4" FontSize="11" Margin="0,0,8,0"
+                                        <Button Style="{StaticResource OutlineButton}" Content="LER DA PLACA" Padding="10,4" FontSize="12" Margin="0,0,8,0"
                                                 ToolTip="Traz para cá o ajuste aplicado agora na placa (inclusive pelo MSI Afterburner)" Click="BtnOcImport_Click"/>
-                                        <Button Style="{StaticResource OutlineButton}" Content="RELER CURVA" Padding="10,4" FontSize="11" Click="BtnOcReadCurve_Click"/>
+                                        <Button Style="{StaticResource OutlineButton}" Content="RELER CURVA" Padding="10,4" FontSize="12" Click="BtnOcReadCurve_Click"/>
                                     </StackPanel>
                                 </Grid>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Overclock + undervolt como no Afterburner: Shift + arrastar (ou o slider Core Clock) sobe a curva inteira;
                                     depois clique no ponto da tensão desejada e aperte L (ou clique com o botão direito) para travar ali —
                                     a curva fica plana a partir dele e a placa não passa dessa tensão. Arraste o ponto travado (ou use ↑/↓,
@@ -3779,7 +3779,7 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <TextBlock Text="CURVA DE FANS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
-                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Como no Afterburner, a curva é controlada pelo PcismoMaster: ele lê a temperatura a cada segundo e ajusta
                                     os fans. Arraste os pontos, clique duas vezes no gráfico para criar um ponto e clique com o botão direito
                                     num ponto para apagá-lo. Ao fechar o app, os fans voltam para o automático da placa.
@@ -4101,11 +4101,11 @@
                                 <TextBlock Text="TEMPERATURAS — ÚLTIMOS 5 MIN" Style="{StaticResource Label}" Margin="0"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                     <Rectangle Width="14" Height="2" Fill="{DynamicResource Fg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                    <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
+                                    <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,0,16,0"/>
                                     <Rectangle Width="14" Height="2" Fill="{DynamicResource Muted}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                    <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
+                                    <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,0,16,0"/>
                                     <Line X1="0" X2="14" Stroke="{DynamicResource Muted}" StrokeDashArray="3 2" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                    <TextBlock Text="limites" Foreground="{DynamicResource Muted}" FontSize="11"/>
+                                    <TextBlock Text="limites" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                 </StackPanel>
                             </Grid>
                             <Canvas x:Name="TempChart" ClipToBounds="True" SizeChanged="TempChart_SizeChanged"/>

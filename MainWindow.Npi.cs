@@ -176,7 +176,7 @@ public partial class MainWindow
             chip.Child = row;
             NpiApps.Children.Add(chip);
         }
-        var add = new Button { Content = "+ Adicionar .exe", Style = (Style)FindResource("OutlineButton"), Padding = new Thickness(10, 3, 10, 3), FontSize = 11,
+        var add = new Button { Content = "+ Adicionar .exe", Style = (Style)FindResource("OutlineButton"), Padding = new Thickness(10, 3, 10, 3), FontSize = 12,
             Margin = new Thickness(0, 0, 6, 6) };
         add.Click += async (_, _) =>
         {

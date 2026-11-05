@@ -82,11 +82,12 @@ public partial class MainWindow
         body.Children.Add(_bloatRemoveBtn);
 
         // Saída própria (a mesma execução aparece também na seção de scripts).
-        var log = new TextBox { IsReadOnly = true, FontFamily = new FontFamily("Consolas"), FontSize = 11, Height = 130, Margin = new Thickness(0, 10, 0, 6),
+        var log = new TextBox { IsReadOnly = true, FontFamily = new FontFamily("Consolas"), FontSize = 12, Height = 130, Margin = new Thickness(0, 10, 0, 6),
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto, TextWrapping = TextWrapping.Wrap, Text = "O que for removido aparece aqui.",
             Background = (Brush)FindResource("Bg"), Foreground = (Brush)FindResource("Muted"), BorderThickness = new Thickness(0) };
         var stop = TweakButton("PARAR", false, (_, _) => StopScript());
         stop.IsEnabled = _scriptProc != null;
+        log.Visibility = stop.Visibility = _scriptShown ? Visibility.Visible : Visibility.Collapsed;
         body.Children.Add(log);
         body.Children.Add(stop);
         _scriptOutputs.Add((log, stop));
@@ -167,10 +168,10 @@ public partial class MainWindow
         var head = new WrapPanel();
         head.Children.Add(new TextBlock { Text = i.Name, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center });
         if (i.Essential == null) head.Children.Add(RiskBadge(i.Risk));
-        else head.Children.Add(new TextBlock { Text = "🔒 mantido: " + i.Essential, Foreground = (Brush)FindResource("Faint"), FontSize = 11, VerticalAlignment = VerticalAlignment.Center });
+        else head.Children.Add(new TextBlock { Text = "🔒 mantido: " + i.Essential, Foreground = (Brush)FindResource("Faint"), FontSize = 12, VerticalAlignment = VerticalAlignment.Center });
         text.Children.Add(head);
         string sub = (i.Description.Length > 0 ? i.Description + "  ·  " : "") + i.Id.Split('~')[0];
-        text.Children.Add(new TextBlock { Text = sub, Foreground = (Brush)FindResource("Muted"), FontSize = 11, TextWrapping = TextWrapping.Wrap });
+        text.Children.Add(new TextBlock { Text = sub, Foreground = (Brush)FindResource("Muted"), FontSize = 12, TextWrapping = TextWrapping.Wrap });
         text.MouseLeftButtonUp += (_, _) => { if (check.IsEnabled) check.IsChecked = check.IsChecked != true; };
         Grid.SetColumn(text, 1);
         grid.Children.Add(check);
@@ -194,7 +195,7 @@ public partial class MainWindow
         else if (reinstallScript != null)
             row.Children.Add(TweakButton("REINSTALAR", false, (_, _) =>
             { if (RequireAdmin()) _ = RunPowerShellTextAsync("Bloatware · reinstalar " + r.Name, "bloat-reinstalar", reinstallScript, false); }));
-        else row.Children.Add(new TextBlock { Text = "sem volta automática (o próprio programa reinstala quando precisar)", Foreground = (Brush)FindResource("Faint"), FontSize = 11, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 8) });
+        else row.Children.Add(new TextBlock { Text = "sem volta automática (o próprio programa reinstala quando precisar)", Foreground = (Brush)FindResource("Faint"), FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 8) });
         row.Children.Add(TweakButton("TIRAR DA LISTA", false, (_, _) =>
         {
             var list = LoadRemovedBloat();

@@ -135,7 +135,7 @@ public partial class MainWindow
         text.Children.Add(new TextBlock { Text = st.Setting.Help, Foreground = (Brush)FindResource("Muted"), FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 2, 0, 0) });
         grid.Children.Add(text);
         var box = new ComboBox { ItemsSource = items, SelectedIndex = selected, VerticalAlignment = VerticalAlignment.Center };
-        var source = new TextBlock { FontSize = 11, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(10, 0, 0, 0) };
+        var source = new TextBlock { FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(10, 0, 0, 0) };
         void Mark()
         {
             bool dirty = box.SelectedIndex != selected;

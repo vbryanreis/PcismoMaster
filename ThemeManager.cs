@@ -22,7 +22,7 @@ public static class ThemeManager
         ("LineStrong", "#3F3866", "#9088B8"),
         ("Fg", "#F4F2FF", "#14111F"),
         ("Muted", "#9B95B8", "#4A4560"),
-        ("Faint", "#4C466B", "#6A6485"),
+        ("Faint", "#7A7499", "#6A6485"),
         ("Ink", "#07060D", "#FFFFFF"),
         ("ThumbBrush", "#2C2746", "#D6D0EE"),
         ("ThumbHover", "#5A5290", "#ABA2D6"),
