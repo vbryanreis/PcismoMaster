@@ -2,6 +2,12 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.10.3
+
+- **Drivers · chipset Intel reconhecido**: os instaladores mais novos do pacote de chipset da Intel aparecem em "Aplicativos instalados" só como **SetupChipset**, e o app procurava apenas "Intel(R) Chipset Device Software". Agora os dois nomes valem (mostra o nome certo e fica a versão mais alta), e o pacote entra na comparação com a página da placa (ex.: ASUS).
+- Sem o pacote instalado (quando o chipset veio pelo Windows Update ou pelo pacote da placa), o app usa os drivers de chipset da Intel nos próprios dispositivos (versão 10.1.x). Como essa é a versão do driver, e não a do pacote, ele mostra para conferir em vez de acusar uma "versão nova" que não existe.
+- Versão atualizada para 0.10.3.
+
 ## 0.10.2
 
 - **Overlay · cores de FPS, FRAME e 1% LOW separadas**: na 0.10.1 os três ficaram juntos numa sub-opção só. Agora a linha **FPS** (em Valores) tem a cor do FPS, como antes, e o **triângulo ▸** dela abre **FRAME** e **1% LOW**, cada um com a sua cor. Enquanto não ganham cor própria, os dois seguem a do FPS. O gráfico de frametime usa a cor do FRAME, e o de FPS usa a do FPS.

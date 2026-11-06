@@ -222,10 +222,10 @@ public static class BoardSupport
             string kind = Kind(f.Category, f.Title);
             string? vendor = Vendors.FirstOrDefault(v => f.Title.Contains(v, StringComparison.OrdinalIgnoreCase));
             string inst = "", instDate = "", device = "";
+            bool fromDevices = false;
             if (kind == "chipset")
             {
-                var p = programs.FirstOrDefault(kv => Regex.IsMatch(kv.Key, @"(AMD Chipset Software|Chipset Device Software)", RegexOptions.IgnoreCase));
-                if (p.Key != null) { inst = p.Value; device = p.Key; }
+                if (InstalledChipset(programs, installed) is { } chip) { inst = chip.Version; device = chip.Name; fromDevices = chip.FromDevices; }
             }
             else if (kind == "software")
             {
@@ -243,7 +243,8 @@ public static class BoardSupport
 
             BoardStatus st;
             if (inst.Length == 0) st = kind is "software" or "raid" or "vga" ? BoardStatus.Optional : BoardStatus.NotInstalled;
-            else if (!Comparable(f.Version, inst)) st = BoardStatus.Check;
+            // A versão do driver do dispositivo (10.1.49.12) não é a do pacote (10.1.20378.8757): não dá para comparar.
+            else if (fromDevices || !Comparable(f.Version, inst)) st = BoardStatus.Check;
             else st = CompareVersions(f.Version, inst) > 0 ? BoardStatus.Newer : BoardStatus.UpToDate;
             rows.Add(new BoardDriverRow(CategoryName(f.Category, kind), f.Title, f.Version, f.DateText, f.Url, inst, instDate, st, device));
         }
@@ -254,14 +255,31 @@ public static class BoardSupport
     internal static List<BoardDriverRow> LocalRows(List<DriverRow> installed, Dictionary<string, string> programs)
     {
         var rows = new List<BoardDriverRow>();
-        var chip = programs.FirstOrDefault(kv => Regex.IsMatch(kv.Key, @"(AMD Chipset Software|Chipset Device Software)", RegexOptions.IgnoreCase));
-        rows.Add(chip.Key != null
-            ? new BoardDriverRow("Chipset", chip.Key, "", "", "", chip.Value, "", BoardStatus.LocalOnly, chip.Key)
+        rows.Add(InstalledChipset(programs, installed) is { } chip
+            ? new BoardDriverRow("Chipset", chip.Name, "", "", "", chip.Version, "", BoardStatus.LocalOnly, chip.Name)
             : new BoardDriverRow("Chipset", "Pacote de chipset (AMD ou Intel)", "", "", "", "", "", BoardStatus.NotInstalled, ""));
         foreach (var kind in new[] { "audio", "lan", "wifi", "bluetooth", "raid", "usb" })
             foreach (var d in installed.Where(r => Matches(kind, r) && !r.Vendor.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase)).Take(4))
                 rows.Add(new BoardDriverRow(CategoryName("", kind), d.Device, "", "", "", d.Version, d.Date, BoardStatus.LocalOnly, d.Device));
         return rows;
+    }
+
+    /// <summary>
+    /// Pacote de chipset instalado. O da AMD aparece em "Aplicativos instalados" como "AMD Chipset Software"; o da Intel como
+    /// "Intel(R) Chipset Device Software" ou, nos instaladores mais novos, só "SetupChipset" (fica a versão mais alta).
+    /// Sem nenhum dos dois (veio pelo Windows Update ou pelo pacote da placa), usa os drivers de chipset da Intel nos
+    /// dispositivos: fabricante Intel, classe Sistema e versão 10.1.x. Essa versão é a do driver, não a do pacote (FromDevices).
+    /// </summary>
+    internal static (string Name, string Version, bool FromDevices)? InstalledChipset(Dictionary<string, string> programs, List<DriverRow> installed)
+    {
+        var byVersion = Comparer<string>.Create(CompareVersions);
+        var p = programs.Where(kv => Regex.IsMatch(kv.Key, @"AMD Chipset Software|Chipset Device Software|^SetupChipset$", RegexOptions.IgnoreCase))
+                        .OrderByDescending(kv => kv.Value, byVersion).FirstOrDefault();
+        if (p.Key != null)
+            return (p.Key.Equals("SetupChipset", StringComparison.OrdinalIgnoreCase) ? "Intel(R) Chipset Device Software" : p.Key, p.Value, false);
+        var inf = installed.Where(r => r.Class == "SYSTEM" && r.Vendor.Contains("Intel", StringComparison.OrdinalIgnoreCase) && r.Version.StartsWith("10.1."))
+                           .Select(r => r.Version).OrderByDescending(v => v, byVersion).FirstOrDefault();
+        return inf != null ? ("Drivers de chipset da Intel (instalados pelo Windows)", inf, true) : null;
     }
 
     private static string Kind(string category, string title)

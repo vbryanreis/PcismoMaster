@@ -604,6 +604,31 @@ Test("Motherboard: ASUS list keeps the newest of each driver and compares it wit
     Assert(lan.Status == BoardStatus.Newer && lan.Installed == "2.1.4.3");
     Assert(rows.Single(r => r.Category == "Bluetooth").Status == BoardStatus.NotInstalled);
     Assert(BoardSupport.CompareVersions("6.0.10000.1", "6.0.9888.1") > 0 && !BoardSupport.Comparable("31.0.1", "6.0.1"));
+});
+Test("Motherboard: Intel chipset is found as SetupChipset or, without the package, by the chipset devices", () => {
+    var site = new List<BoardFile> { new("Chipset", "Intel Chipset Driver V10.1.20378.8757 for Windows 11 64-bit", "10.1.20378.8757", new DateTime(2025, 9, 1), "https://dlcdnets.asus.com/i.zip", "") };
+    var devices = new List<DriverRow>
+    {
+        new() { Device = "Intel(R) SMBus - 7A23", Class = "SYSTEM", Vendor = "INTEL", Version = "10.1.46.5" },
+        new() { Device = "Intel(R) PCIe RC 010 G5 - A70D", Class = "SYSTEM", Vendor = "INTEL", Version = "10.1.49.12" },
+        new() { Device = "Intel(R) Serial IO I2C Host Controller", Class = "SYSTEM", Vendor = "Intel Corporation", Version = "30.100.2531.31" },
+    };
+    // Instaladores novos da Intel aparecem só como "SetupChipset": vira o nome certo e entra na comparação (fica a versão mais alta).
+    var programs = new Dictionary<string, string> { ["SetupChipset"] = "10.1.20378.8757", ["Intel(R) Chipset Device Software"] = "10.1.19444.8378" };
+    var chip = BoardSupport.InstalledChipset(programs, devices)!.Value;
+    Assert(chip.Name == "Intel(R) Chipset Device Software" && chip.Version == "10.1.20378.8757" && !chip.FromDevices);
+    var row = BoardSupport.Compare(site, devices, programs).Single(r => r.Category == "Chipset");
+    Assert(row.Status == BoardStatus.UpToDate && row.Installed == "10.1.20378.8757");
+    // Sem o pacote: usa o driver dos dispositivos de chipset (10.1.x, o mais alto), mas não compara com a versão do pacote.
+    var none = new Dictionary<string, string>();
+    chip = BoardSupport.InstalledChipset(none, devices)!.Value;
+    Assert(chip.FromDevices && chip.Version == "10.1.49.12");
+    row = BoardSupport.Compare(site, devices, none).Single(r => r.Category == "Chipset");
+    Assert(row.Status == BoardStatus.Check && row.Installed == "10.1.49.12");
+    Assert(BoardSupport.LocalRows(devices, none)[0].Installed == "10.1.49.12");
+    // Nada de chipset: continua "não instalado".
+    Assert(BoardSupport.InstalledChipset(none, new List<DriverRow>()) == null);
+    Assert(BoardSupport.Compare(site, new List<DriverRow>(), none).Single().Status == BoardStatus.NotInstalled);
     Assert(BoardSupport.CompareBios("3402", "3646") == false && BoardSupport.CompareBios("3646", "3646") == true && BoardSupport.CompareBios("FHd", "F18") == null);
     Assert(BoardSupport.BiosVersion("3646 (12/03/2025)") == "3646");
     Assert(BoardSupport.CleanModel("MAG B550 TOMAHAWK (MS-7C91)") == "MAG B550 TOMAHAWK" && BoardSupport.CleanModel("Default string") == "");
