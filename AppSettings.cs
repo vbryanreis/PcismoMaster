@@ -66,6 +66,18 @@ public sealed class AppSettings
     public string? HowManyFpsKeyProtected { get; set; }
     /// <summary>JOGOS · Promoções: chave própria da API do IsThereAnyDeal (cifrada com DPAPI). Vazia = usa a do app.</summary>
     public string? ItadKeyProtected { get; set; }
+    /// <summary>Conta do GitHub: token do Device Flow (cifrado com DPAPI) e o login, para mostrar sem ir à rede.</summary>
+    public string? GitHubTokenProtected { get; set; }
+    public string? GitHubLogin { get; set; }
+    /// <summary>Procura e baixa sozinho as versões novas publicadas no GitHub.</summary>
+    public bool AutoUpdate { get; set; } = true;
+
+    [System.Text.Json.Serialization.JsonIgnore] // nunca gravar o token em texto puro
+    public string? GitHubToken
+    {
+        get => Unprotect(GitHubTokenProtected);
+        set => GitHubTokenProtected = Protect(value);
+    }
 
     // BENCH: últimos resultados (mais recente primeiro)
     public List<BenchRun> BenchRuns { get; set; } = new();

@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.10.3</Version>
+    <Version>0.11.0</Version>
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -24,6 +24,9 @@
 
   <!-- JOGOS · Promoções: chave do app na API do IsThereAnyDeal. NUNCA vai para o código: o workflow de Release passa
        -p:ItadApiKey=… a partir do segredo ITAD_API_KEY do GitHub. Sem ela, o usuário pode colar a própria chave no app. -->
+  <ItemGroup Condition="'$(GitHubClientId)' != ''">
+    <AssemblyMetadata Include="GitHubClientId" Value="$(GitHubClientId)" />
+  </ItemGroup>
   <ItemGroup Condition="'$(ItadApiKey)' != ''">
     <AssemblyMetadata Include="ItadApiKey" Value="$(ItadApiKey)" />
   </ItemGroup>
