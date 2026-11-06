@@ -154,7 +154,11 @@ public partial class MainWindow
         }
         else
         {
-            BoardChipLine.Text = chip?.Installed is { Length: > 0 } i ? $"Instalado: {i}" : "Pacote de chipset não encontrado";
+            // Sem o pacote em "Aplicativos instalados", a versão vem do driver dos dispositivos de chipset (não é a do pacote).
+            bool fromDevices = chip?.Device.StartsWith("Drivers de chipset", StringComparison.Ordinal) == true;
+            BoardChipLine.Text = chip?.Installed is { Length: > 0 } i
+                ? $"Instalado: {i}" + (fromDevices ? " (versão do driver, não a do pacote da Intel)" : "")
+                : "Pacote de chipset não encontrado";
             BoardChipLine.Foreground = (Brush)FindResource("Fg");
             BoardChipHint.Text = c?.ChipsetMessage is { Length: > 0 } m ? m
                 : CpuVendor() == "AMD" ? "Não deu para ler a versão no site da AMD agora; abra a página do chipset para comparar."
