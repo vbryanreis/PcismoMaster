@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.11.1
+
+- **Login com o GitHub ligado**: o OAuth App do PcismoMaster foi criado e o Client ID entra no build pela variável `GH_CLIENT_ID`. Para entrar, clique em **Entrar** no card do menu lateral, digite no GitHub o código mostrado (ele já fica copiado) e autorize.
+- Versão atualizada para 0.11.1.
+
 ## 0.11.0
 
 - **Atualização automática**: 20 segundos depois de abrir (e a cada 6 horas), o app procura a última versão publicada no GitHub, baixa o `PcismoMaster-X.Y.Z.exe` em segundo plano e confere o SHA-256 que o GitHub informa. Quando termina, avisa e mostra no menu lateral o botão **Reiniciar e atualizar**: o `.exe` é trocado no mesmo lugar e a versão nova abre sozinha (o antigo é apagado na abertura seguinte). O link **Procurar atualização**, ao lado da versão, faz a busca na hora. Só vale para o `.exe` publicado; o build de desenvolvimento não se atualiza.
