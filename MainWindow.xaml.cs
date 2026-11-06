@@ -106,6 +106,7 @@ public partial class MainWindow : Window
 
         // A janela aparece já; as coletas pesadas (WMI, sensores, GPU) rodam em paralelo fora da thread da janela.
         Loaded += async (_, _) => await LoadHardwareAsync();
+        InitAccount();
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += async (_, _) =>

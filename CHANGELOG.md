@@ -2,6 +2,12 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.11.0
+
+- **Atualização automática**: 20 segundos depois de abrir (e a cada 6 horas), o app procura a última versão publicada no GitHub, baixa o `PcismoMaster-X.Y.Z.exe` em segundo plano e confere o SHA-256 que o GitHub informa. Quando termina, avisa e mostra no menu lateral o botão **Reiniciar e atualizar**: o `.exe` é trocado no mesmo lugar e a versão nova abre sozinha (o antigo é apagado na abertura seguinte). O link **Procurar atualização**, ao lado da versão, faz a busca na hora. Só vale para o `.exe` publicado; o build de desenvolvimento não se atualiza.
+- **Conta do GitHub**: card no menu lateral com **Entrar** pelo Device Flow do GitHub. O app mostra um código (já copiado), abre github.com/login/device e, depois de você autorizar, mostra seu nome e foto. Nenhuma senha passa pelo app; o token fica cifrado com DPAPI nas configurações e **Sair** apaga. O Client ID do OAuth App entra no build pela variável `GH_CLIENT_ID` do repositório; sem ela, o card avisa que o login está indisponível.
+- Versão atualizada para 0.11.0.
+
 ## 0.10.3
 
 - **Drivers · chipset Intel reconhecido**: os instaladores mais novos do pacote de chipset da Intel aparecem em "Aplicativos instalados" só como **SetupChipset**, e o app procurava apenas "Intel(R) Chipset Device Software". Agora os dois nomes valem (mostra o nome certo e fica a versão mais alta), e o pacote entra na comparação com a página da placa (ex.: ASUS).

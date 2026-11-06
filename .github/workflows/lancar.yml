@@ -19,10 +19,12 @@ jobs:
       - name: Publicar o .exe
         env:
           ITAD_API_KEY: ${{ secrets.ITAD_API_KEY }}
+          GH_CLIENT_ID: ${{ vars.GH_CLIENT_ID }}
         shell: pwsh
         run: |
+          if (-not $env:GH_CLIENT_ID) { Write-Warning "Variável GH_CLIENT_ID ausente: o login com o GitHub fica desligado neste build." }
           if (-not $env:ITAD_API_KEY) { Write-Warning "Segredo ITAD_API_KEY ausente: a aba Promoções vai pedir a chave do usuário." }
-          dotnet publish PcismoMaster.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true "-p:ItadApiKey=$env:ITAD_API_KEY" -o dist --nologo
+          dotnet publish PcismoMaster.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true "-p:ItadApiKey=$env:ITAD_API_KEY" "-p:GitHubClientId=$env:GH_CLIENT_ID" -o dist --nologo
       - name: Empacotar e extrair notas do CHANGELOG
         shell: pwsh
         run: |

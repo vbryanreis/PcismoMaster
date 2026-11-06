@@ -30,9 +30,23 @@ public partial class App : Application
             return;
         }
 
+        // Depois de uma atualização: espera a versão antiga fechar (ela ainda segura o mutex) e apaga o .exe antigo.
+        bool afterUpdate = e.Args.Length >= 2 && e.Args[0] == "--after-update";
+        if (afterUpdate && int.TryParse(e.Args[1], out int oldPid))
+        {
+            try { using var old = System.Diagnostics.Process.GetProcessById(oldPid); old.WaitForExit(20000); } catch { }
+        }
+        AppUpdater.CleanupOld();
+
         bool first;
         try { _single = new Mutex(true, @"Local\PcismoMaster.SingleInstance", out first); }
         catch (UnauthorizedAccessException) { first = false; } // criado por outra instância com outro nível de permissão
+        // Recém-atualizado: a versão antiga pode ainda estar fechando; espera ela soltar a instância única.
+        if (!first && afterUpdate && _single != null)
+        {
+            try { first = _single.WaitOne(TimeSpan.FromSeconds(20)); }
+            catch (AbandonedMutexException) { first = true; }
+        }
 
         if (!first)
         {
