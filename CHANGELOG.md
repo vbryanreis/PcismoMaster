@@ -2,6 +2,12 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.12.0
+
+- **Login obrigatório**: sem conta do GitHub, o app abre numa tela de entrada que cobre tudo (só a barra de título fica livre) e libera depois do login. O código para digitar no GitHub tem os botões **Copiar código** e **Abrir o GitHub de novo**. **Sair** pede confirmação e volta para a tela de entrada. Com a conta salva, o app abre direto, mesmo sem internet. Se o GitHub recusar o token (revogado), a tela de entrada volta.
+- **Desinstalar apps · programa removido sai da lista**: antes, um programa desinstalado continuava na lista ao escolher outro, porque muitos desinstaladores só apagam a entrada do registro depois de o app achar que terminaram. Agora a lista é conferida ao escolher outro programa, ao voltar para a aba e depois de remover as sobras, e o app fica de olho por até 10 minutos depois de cada desinstalação.
+- Versão atualizada para 0.12.0.
+
 ## 0.11.1
 
 - **Login com o GitHub ligado**: o OAuth App do PcismoMaster foi criado e o Client ID entra no build pela variável `GH_CLIENT_ID`. Para entrar, clique em **Entrar** no card do menu lateral, digite no GitHub o código mostrado (ele já fica copiado) e autorize.

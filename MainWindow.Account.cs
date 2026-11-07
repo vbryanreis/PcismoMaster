@@ -26,6 +26,7 @@ public partial class MainWindow
             ShowGhUser(_settings.GitHubLogin ?? "", null);
             _ = RefreshGhUserAsync(token);
         }
+        else ShowGate(true); // sem conta: o app fica bloqueado até entrar
 
         if (AppUpdater.Supported && _settings.AutoUpdate)
         {
@@ -56,6 +57,7 @@ public partial class MainWindow
         GhName.Text = name.Length > 0 ? name : "Conectado";
         GhSub.Text = "@" + (_settings.GitHubLogin ?? "") + " · GitHub";
         BtnGhLogin.Content = "Sair";
+        GateStatus.Text = "";
         if (!string.IsNullOrEmpty(avatarUrl))
         {
             try
@@ -80,23 +82,52 @@ public partial class MainWindow
         GhName.Text = "Sem conta";
         GhSub.Text = sub ?? "Entrar com o GitHub";
         BtnGhLogin.Content = "Entrar";
+        BtnGateLogin.Content = "Entrar com o GitHub";
         GhAvatar.Visibility = Visibility.Collapsed;
+        GateStatus.Text = sub ?? "";
+        ShowGate(true);
     }
+
+    /// <summary>Tela de entrada por cima de tudo (só a barra de título fica livre). Não aparece em build sem Client ID.</summary>
+    private void ShowGate(bool show) =>
+        LoginGate.Visibility = show && GitHubAuth.Available ? Visibility.Visible : Visibility.Collapsed;
+
+    private string _ghVerifyUri = "https://github.com/login/device";
+
+    private void BtnGhCopy_Click(object sender, RoutedEventArgs e)
+    {
+        try { Clipboard.SetText(GateCode.Text); BtnGateCopy.Content = "Copiado ✓"; } catch { }
+    }
+
+    private void BtnGhOpen_Click(object sender, RoutedEventArgs e)
+    {
+        try { Process.Start(new ProcessStartInfo(_ghVerifyUri) { UseShellExecute = true }); } catch { }
+    }
+
+    private void SetLoginStatus(string text) { GhSub.Text = text; GateStatus.Text = text; }
 
     private async void BtnGhLogin_Click(object sender, RoutedEventArgs e)
     {
         if (_ghLoginCts != null) { _ghLoginCts.Cancel(); return; }       // "Cancelar" durante o login
-        if (_settings.GitHubToken != null) { SignOutGh(); return; }        // "Sair"
+        if (_settings.GitHubToken != null)                                 // "Sair"
+        {
+            if (MessageBox.Show(this, "Sair da conta do GitHub? O PcismoMaster fica bloqueado até você entrar de novo.",
+                    "Conta do GitHub", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) SignOutGh();
+            return;
+        }
 
         _ghLoginCts = new CancellationTokenSource(TimeSpan.FromMinutes(15));
-        BtnGhLogin.Content = "Cancelar";
-        GhSub.Text = "Pedindo o código…";
+        BtnGhLogin.Content = BtnGateLogin.Content = "Cancelar";
+        SetLoginStatus("Pedindo o código ao GitHub…");
         try
         {
             var code = await GitHubAuth.StartAsync(_ghLoginCts.Token);
-            GhCode.Text = code.UserCode;
-            GhCodeBox.Visibility = Visibility.Visible;
-            GhSub.Text = "Aguardando você autorizar…";
+            _ghVerifyUri = code.VerificationUri;
+            BtnGateCopy.Content = "Copiar código";
+            GhCode.Text = GateCode.Text = code.UserCode;
+            GhCodeBox.Visibility = LoginGate.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            GateCodeBox.Visibility = Visibility.Visible;
+            SetLoginStatus("Aguardando você autorizar no GitHub…");
             try { Clipboard.SetText(code.UserCode); } catch { }
             try { Process.Start(new ProcessStartInfo(code.VerificationUri) { UseShellExecute = true }); } catch { }
 
@@ -106,13 +137,14 @@ public partial class MainWindow
             _settings.GitHubLogin = user.Login;
             _settings.Save();
             ShowGhUser(user.Name, user.AvatarUrl);
+            ShowGate(false);
             Toast("GitHub", $"Conectado como @{user.Login}.", "");
         }
         catch (OperationCanceledException) { SignOutGh(); }
-        catch (Exception ex) { SignOutGh(ex.Message); }
+        catch (Exception ex) { SignOutGh(ex is System.Net.Http.HttpRequestException ? "Sem conexão com o GitHub. Confira a internet e tente de novo." : ex.Message); }
         finally
         {
-            GhCodeBox.Visibility = Visibility.Collapsed;
+            GhCodeBox.Visibility = GateCodeBox.Visibility = Visibility.Collapsed;
             _ghLoginCts.Dispose();
             _ghLoginCts = null;
         }
