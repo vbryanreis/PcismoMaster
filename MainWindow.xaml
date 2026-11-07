@@ -196,7 +196,10 @@
                                 <Border x:Name="GhCodeBox" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,8" CornerRadius="10" Background="{DynamicResource Line}">
                                     <StackPanel>
                                         <TextBlock Text="Digite este código no GitHub (já copiado):" FontSize="11" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
-                                        <TextBlock x:Name="GhCode" FontFamily="{StaticResource Mono}" FontSize="18" FontWeight="Bold" Margin="0,2,0,0"/>
+                                        <DockPanel Margin="0,2,0,0">
+                                            <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryButton}" Content="Copiar" Padding="8,4" FontSize="11" Click="BtnGhCopy_Click" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="GhCode" FontFamily="{StaticResource Mono}" FontSize="18" FontWeight="Bold"/>
+                                        </DockPanel>
                                     </StackPanel>
                                 </Border>
                                 <Border x:Name="UpdBox" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,8" CornerRadius="10" Background="#26A647FE">
@@ -3289,7 +3292,7 @@
                         </Grid>
 
                         <Border Style="{StaticResource CardBorder}" Padding="8,6">
-                            <ListBox x:Name="UninstallList" MaxHeight="430" ItemContainerStyle="{StaticResource SelectItem}"
+                            <ListBox x:Name="UninstallList" MaxHeight="430" SelectionChanged="UninstallList_SelectionChanged" ItemContainerStyle="{StaticResource SelectItem}"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
                                      VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListBox.ItemTemplate>
@@ -4092,6 +4095,33 @@
                 </Grid>
             </Grid>
             </DockPanel>
+
+            <!-- ===== Tela de entrada: o app só libera depois do login com o GitHub (MainWindow.Account.cs) ===== -->
+            <Grid x:Name="LoginGate" Grid.Row="1" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" Visibility="Collapsed">
+                <Border Width="440" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="36,32"
+                        Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="18">
+                    <StackPanel>
+                        <Image Source="Assets/logo.png" Width="64" Height="64" RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Bem-vindo ao PcismoMaster" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                        <TextBlock Text="Entre com a sua conta do GitHub para usar o programa. Nenhuma senha passa pelo app: você autoriza direto no site do GitHub."
+                                   FontSize="13" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"/>
+                        <Button x:Name="BtnGateLogin" Style="{StaticResource PrimaryButton}" Content="Entrar com o GitHub" Padding="18,10" FontSize="14"
+                                HorizontalAlignment="Center" Margin="0,22,0,0" Click="BtnGhLogin_Click"/>
+                        <Border x:Name="GateCodeBox" Visibility="Collapsed" Margin="0,18,0,0" Padding="14,12" CornerRadius="12" Background="{DynamicResource Line}">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="Digite este código na página do GitHub que abriu (já está copiado):" FontSize="12" Foreground="{DynamicResource Muted}"
+                                           TextWrapping="Wrap" TextAlignment="Center"/>
+                                <TextBlock x:Name="GateCode" FontFamily="{StaticResource Mono}" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                                    <Button x:Name="BtnGateCopy" Style="{StaticResource PrimaryButton}" Content="Copiar código" Padding="12,6" FontSize="12" Click="BtnGhCopy_Click"/>
+                                    <Button Style="{StaticResource PrimaryButton}" Content="Abrir o GitHub de novo" Padding="12,6" FontSize="12" Margin="8,0,0,0" Click="BtnGhOpen_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <TextBlock x:Name="GateStatus" FontSize="12.5" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,14,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
     </Border>
 </Window>

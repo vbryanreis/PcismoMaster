@@ -44,8 +44,56 @@ public partial class MainWindow
     private void InitUninstall()
     {
         UpdateUnModeHint();
-        if (_unBusy || _programs != null) return; // carrega uma vez; ATUALIZAR LISTA recarrega
+        if (_programs != null) { _ = PruneGoneAsync(); return; } // já carregada: só tira o que foi desinstalado
+        if (_unBusy) return;
         _ = LoadProgramsAsync();
+    }
+
+    private static bool IsGone(InstalledProgram p) =>
+        !Uninstaller.UninstallKeyExists(p) ||
+        ProgramInventory.Check(p.UninstallCmd, p.InstallLocation, System.IO.Path.GetFileName(p.KeyPath)).Orphan;
+
+    private bool _pruning;
+
+    /// <summary>
+    /// Tira da lista os programas que já foram desinstalados (a entrada sumiu do registro ou o desinstalador apagou os
+    /// arquivos), sem reler tudo nem perder os ícones. Muitos desinstaladores só apagam a entrada depois de o app achar
+    /// que terminaram; por isso roda também ao voltar à aba e ao escolher outro programa.
+    /// </summary>
+    private async Task PruneGoneAsync()
+    {
+        if (_programs is not { } list || _pruning) return;
+        _pruning = true;
+        try
+        {
+            var gone = await Task.Run(() => list.Where(IsGone).ToList());
+            if (gone.Count == 0 || !ReferenceEquals(_programs, list)) return;
+            var sel = UninstallList.SelectedItem;
+            var keep = list.Except(gone).ToList();
+            _programs = keep;
+            UninstallList.ItemsSource = keep;
+            CollectionViewSource.GetDefaultView(keep).Filter = ProgramFilter;
+            if (sel is InstalledProgram s && keep.Contains(s)) UninstallList.SelectedItem = s;
+            UnStatus.Text = $"{keep.Count} programas. " +
+                            (gone.Count == 1 ? $"{gone[0].Name} já foi desinstalado e saiu da lista." : $"{gone.Count} programas já desinstalados saíram da lista.");
+        }
+        catch { }
+        finally { _pruning = false; }
+    }
+
+    /// <summary>O desinstalador ainda estava rodando quando a lista recarregou: tira o programa assim que a entrada sumir.</summary>
+    private async Task WatchUntilGoneAsync(InstalledProgram p)
+    {
+        for (int i = 0; i < 200; i++) // até 10 minutos
+        {
+            await Task.Delay(3000);
+            if (await Task.Run(() => IsGone(p))) { await PruneGoneAsync(); return; }
+        }
+    }
+
+    private void UninstallList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_unBusy) _ = PruneGoneAsync();
     }
 
     private async Task LoadProgramsAsync()
@@ -165,6 +213,7 @@ public partial class MainWindow
 
             await ScanAndShowAsync(p, forced: false);
             await LoadProgramsAsync(); // o programa pode ter saído da lista
+            if (!IsGone(p)) _ = WatchUntilGoneAsync(p);
         }
         catch (Exception ex) { UnStatus.Text = $"Erro ao desinstalar: {ex.Message}"; }
         finally { BtnUnScanNow.Visibility = Visibility.Collapsed; _unWaitCts?.Dispose(); _unWaitCts = null; SetUnBusy(false); }
@@ -265,6 +314,7 @@ public partial class MainWindow
                                     (res.Fail > 0 ? $" · {res.Fail} não puderam ser removidas (em uso? feche o programa e tente de novo)." : ".") +
                                     (res.BackupDir.Length > 0 ? " Backup do registro/tarefas salvo." : "");
             _leftovers = left;
+            await PruneGoneAsync(); // a entrada em Programas e Recursos pode ter saído junto com as sobras
             if (_leftovers.Count == 0) { UnLeftoverCard.Visibility = Visibility.Collapsed; UnStatus.Text = $"{app}: limpeza concluída. {UnLeftoverStatus.Text}"; }
             else { string status = UnLeftoverStatus.Text; ShowLeftovers(); UnLeftoverStatus.Text = status; }
         }
