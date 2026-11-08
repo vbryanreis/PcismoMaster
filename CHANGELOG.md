@@ -2,6 +2,12 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.12.1
+
+- **Login fica salvo**: o app pedia login a cada abertura quando o GitHub recusava o token salvo. Agora quem já entrou continua entrando: o login só é pedido de novo depois de **Sair**, se a pasta de configurações for apagada, ao formatar o PC ou ao trocar de usuário do Windows. A recusa do GitHub fica registrada no log.
+- **Configurações mais seguras**: o arquivo é gravado num temporário e trocado de uma vez, para fechar o app no meio não corromper os ajustes nem o login.
+- Versão atualizada para 0.12.1.
+
 ## 0.12.0
 
 - **Login obrigatório**: sem conta do GitHub, o app abre numa tela de entrada que cobre tudo (só a barra de título fica livre) e libera depois do login. O código para digitar no GitHub tem os botões **Copiar código** e **Abrir o GitHub de novo**. **Sair** pede confirmação e volta para a tela de entrada. Com a conta salva, o app abre direto, mesmo sem internet. Se o GitHub recusar o token (revogado), a tela de entrada volta.
