@@ -212,6 +212,9 @@ public sealed class AppSettings
     public void Save()
     {
         Directory.CreateDirectory(Folder);
-        File.WriteAllText(FilePath, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+        // Grava num temporário e troca de uma vez: fechar no meio não corrompe o arquivo (e não perde o login e os ajustes).
+        string tmp = FilePath + ".tmp";
+        File.WriteAllText(tmp, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+        File.Move(tmp, FilePath, true);
     }
 }

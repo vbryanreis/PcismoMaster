@@ -44,7 +44,8 @@ public partial class MainWindow
         try
         {
             var user = await GitHubAuth.GetUserAsync(token, CancellationToken.None);
-            if (user == null) { SignOutGh("A sessão do GitHub expirou. Entre de novo."); return; }
+            // Quem já entrou continua entrando: só "Sair" (ou perder o arquivo de configurações) pede o login de novo.
+            if (user == null) { DriverClean.Log("GitHub recusou o token salvo (401); login mantido."); return; }
             _settings.GitHubLogin = user.Login;
             _settings.Save();
             ShowGhUser(user.Name, user.AvatarUrl);
