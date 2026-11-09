@@ -2,6 +2,15 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.18.0
+
+- **63 serviços novos para desligar** na aba Serviços, em grupos (Xbox, Rede, Acesso remoto, Impressão e scanner, Diagnóstico, Sensores e localização, Bluetooth e telefone, Biometria e cartões, Outros, Realidade mista, Máquina virtual). Cada um avisa o que faz e o que para de funcionar; os arriscados (Bluetooth, Windows Hello, teclado virtual, câmera, Store) começam com PERIGOSO. Serviços que não existem no PC são pulados.
+- **Ajustes novos**: suspensão seletiva do USB (Energia); Modo de desenvolvedor (Geral); segundos no relógio, clique na barra abre a última janela, sem sugestões ao encaixar janelas, caixas de seleção nos arquivos, ícones do sistema na área de trabalho e sem setinha nos atalhos (Aparência).
+- **Limpeza**: opção para apagar o Windows antigo (Windows.old), desmarcada e com aviso de que não dá mais para voltar à versão anterior.
+- **Inicialização**: botão ABRIR LOCAL abre a pasta do programa com o arquivo selecionado.
+- **Ferramentas › Tarefas agendadas**: lista as tarefas com pesquisa (as do Windows ficam escondidas por padrão) e deixa executar, parar, ligar, desligar e apagar, sempre com confirmação.
+- Versão atualizada para 0.18.0.
+
 ## 0.17.1
 
 - **Seletor de cor visual** em Cores do programa: no lugar dos quadradinhos, há um quadrado com todas as cores (mais viva para a direita, mais escura para baixo), uma barra com todos os tons, a prévia, o código #RRGGBB e o botão Padrão. À esquerda fica o que pintar (Destaque e as três cores dos ícones), com a cor atual de cada um. A cor muda no app enquanto você arrasta e fica salva ao soltar o mouse.
