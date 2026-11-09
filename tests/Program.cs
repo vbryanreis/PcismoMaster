@@ -377,6 +377,12 @@ Test("Otimizar: todo PowerShell gerado tem sintaxe válida (só analisa, não ro
     if (output.Contains("ERR ")) throw new Exception(output);
     Assert(scripts.Count > 50);
 }).GetAwaiter().GetResult());
+Test("Abas do guia: todo ajuste de Windows, Mouse e Teclado cai em uma aba; Spectre fica em Mitigações", () => {
+    var mine = OptCatalog.All.Where(t => t.Page is OptPage.Windows or OptPage.Mouse or OptPage.Teclado && t.Id != "new_users").ToList();
+    Assert(mine.Count == Enum.GetValues<GuideTab>().Sum(g => OptCatalog.ForTab(g).Count()));
+    Assert(OptCatalog.ForTab(GuideTab.Mitigacoes).Single().Id == "spectre_meltdown_off" && OptCatalog.ById("spectre_meltdown_off")!.Warning!.StartsWith("PERIGOSO"));
+    Assert(OptCatalog.Services().Any(t => t.Id == "sysmain_off" || t.StopServices?.Contains("SysMain") == true) && OptCatalog.ForTab(GuideTab.Energia).Count() == 3);
+});
 Test("Limpeza: respeita idade e máscara, expande perfis e não sai da pasta", () => {
     string root = Path.Combine(temp, "clean");
     Directory.CreateDirectory(Path.Combine(root, "P1", "Cache", "sub")); Directory.CreateDirectory(Path.Combine(root, "P2", "Cache")); Directory.CreateDirectory(Path.Combine(root, "P3"));

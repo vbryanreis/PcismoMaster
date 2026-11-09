@@ -25,7 +25,7 @@ public partial class MainWindow
     private static string OptProfilesFile => Path.Combine(OptDir, "perfis.json");
 
     private readonly HashSet<string> _optBuilt = new();
-    private readonly HashSet<OptPage> _optPagesShown = new();
+    private readonly HashSet<string> _optShown = new(); // ids dos ajustes das páginas já abertas (só deles o estado é lido)
     private readonly Dictionary<string, OptState> _optStates = new();
     private readonly Dictionary<string, List<Action>> _optViews = new();
     private readonly List<Action> _optCounters = new();
@@ -43,10 +43,17 @@ public partial class MainWindow
         switch (page)
         {
             case "PageOptFormat": BuildOptFormat(OptFormatHost); break;
-            case "PageOptDebloat": BuildOptDebloat(OptDebloatHost); _optPagesShown.Add(OptPage.Debloat); break;
-            case "PageOptWindows": BuildOptWindows(OptWindowsHost); _optPagesShown.Add(OptPage.Windows); break;
-            case "PageOptInput": BuildOptInput(OptInputHost); _optPagesShown.Add(OptPage.Mouse); _optPagesShown.Add(OptPage.Teclado); break;
-            case "PageOptGpu": BuildOptGpu(OptGpuHost); _optPagesShown.Add(OptPage.Gpu); break;
+            case "PageOptDebloat": BuildOptDebloat(OptDebloatHost); Shown(OptCatalog.For(OptPage.Debloat)); break;
+            case "PageOptGeral": BuildOptTab(OptGeralHost, "Geral", GuideTab.Geral, "O básico que vale para quase todo PC: gravação de jogos, Modo de Jogo, mouse sem aceleração, teclado, Windows Update e apps em segundo plano."); break;
+            case "PageOptPriv": BuildOptTab(OptPrivHost, "Privacidade", GuideTab.Privacidade, "O que o Windows envia para a Microsoft e o que os apps podem ver. Corta tráfego e processos em segundo plano."); break;
+            case "PageOptPower": BuildOptTab(OptPowerHost, "Energia", GuideTab.Energia, "Menos economia de energia e resposta mais imediata. Pensado para desktop: em notebook na bateria, a autonomia cai. O plano de alto desempenho é ligado por jogo no Launcher."); break;
+            case "PageOptNet": BuildOptTab(OptNetHost, "Rede", GuideTab.Rede, "Ajustes da placa de rede e dos protocolos. A conexão pode cair por alguns segundos ao aplicar."); break;
+            case "PageOptAdv": BuildOptTab(OptAdvHost, "Avançado", GuideTab.Avancado, "Memória, cache e prioridade do processador. Leia o aviso de cada um: o ganho depende do PC."); break;
+            case "PageOptMitig": BuildOptMitig(OptMitigHost); break;
+            case "PageOptSvc": BuildOptServices(OptSvcHost); break;
+            case "PageOptBios": BuildOptBios(OptBiosHost); return;
+            case "PageOptLook": BuildOptTab(OptLookHost, "Aparência", GuideTab.Aparencia, "Efeitos visuais, tema, menu de contexto e Explorer. Alguns reiniciam o Explorer ao aplicar."); break;
+            case "PageOptGpu": BuildOptGpu(OptGpuHost); Shown(OptCatalog.For(OptPage.Gpu)); break;
             case "PageOptProfiles": BuildOptProfiles(OptProfilesHost); break;
             case "PageOptClean": BuildOptClean(OptCleanHost); return;
         }
@@ -62,7 +69,7 @@ public partial class MainWindow
         if (only == null) _optReading = true;
         try
         {
-            var list = only?.ToList() ?? OptCatalog.All.Where(t => _optPagesShown.Contains(t.Page) || t.Id == "new_users").ToList();
+            var list = only?.ToList() ?? OptCatalog.All.Where(t => _optShown.Contains(t.Id) || t.Id == "new_users").ToList();
             if (list.Count == 0) list = OptCatalog.All.ToList(); // perfis e formatação precisam saber o que já está ativo
             var states = await Task.Run(() => Opt.StatesAsync(list));
             foreach (var kv in states) _optStates[kv.Key] = kv.Value;
@@ -321,12 +328,15 @@ public partial class MainWindow
 
     // ---------------- Windows ----------------
 
-    private void BuildOptWindows(Panel host)
+    private void Shown(IEnumerable<OptTweak> items) { foreach (var t in items) _optShown.Add(t.Id); }
+
+    /// <summary>Uma aba do guia: busca, filtro por categoria, APLICAR RECOMENDADOS e um cartão por ajuste.</summary>
+    private void BuildOptTab(Panel host, string name, GuideTab tab, string intro) => BuildOptList(host, name, OptCatalog.ForTab(tab).ToList(), intro);
+
+    private void BuildOptList(Panel host, string name, List<OptTweak> items, string intro)
     {
-        var items = OptCatalog.For(OptPage.Windows).ToList();
-        var tools = TweakCard(host, "", "Ajustes do Windows",
-            "Ligue um ajuste para aplicar; desligue para voltar exatamente como estava. O selo RECOMENDADO marca o que serve para quase todo mundo; " +
-            "o ⚠ diz quando evitar. A aceleração do mouse fica em Mouse e teclado; o plano de energia de alto desempenho é ligado por jogo no Launcher.", out var tb);
+        Shown(items);
+        var tools = TweakCard(host, "", name, intro + " Ligue um ajuste para aplicar; desligue para voltar exatamente como estava. RECOMENDADO marca o que serve para quase todo mundo; o ⚠ diz quando evitar.", out var tb);
         var search = new TextBox { Margin = new Thickness(0, 0, 0, 10), ToolTip = "Pesquisar ajustes" };
         tb.Children.Add(OptText("Pesquisar", "Faint", 11, 4));
         tb.Children.Add(search);
@@ -337,11 +347,11 @@ public partial class MainWindow
         foreach (var c in new[] { "" }.Concat(OptCatalog.Categories))
         {
             if (c.Length > 0 && !items.Any(t => t.Category == c)) continue;
-            var chip = new RadioButton { Style = (Style)FindResource("Chip"), Content = c.Length == 0 ? "Todas" : c, GroupName = "OptWinCat", IsChecked = c.Length == 0, Margin = new Thickness(0, 0, 6, 6) };
+            var chip = new RadioButton { Style = (Style)FindResource("Chip"), Content = c.Length == 0 ? "Todas" : c, GroupName = "OptCat" + name, IsChecked = c.Length == 0, Margin = new Thickness(0, 0, 6, 6) };
             chip.Checked += (_, _) => { cat = c; Filter(); };
             chips.Children.Add(chip);
         }
-        tb.Children.Add(chips);
+        if (chips.Children.Count > 2) tb.Children.Add(chips);
         onlyRec.Click += (_, _) => Filter();
         tb.Children.Add(onlyRec);
         var counter = OptText("", "Muted", 12, 8);
@@ -350,8 +360,8 @@ public partial class MainWindow
         bar.Children.Add(TweakButton("APLICAR RECOMENDADOS", true, async (_, _) =>
         {
             var list = items.Where(t => t.Recommended && _optStates.GetValueOrDefault(t.Id)?.On == false).ToList();
-            if (list.Count > 0 && MessageBox.Show(this, $"Aplicar {list.Count} ajuste(s) recomendado(s) que ainda não estão ativos?", "Windows", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
-            await ApplyOptAsync(list, "Windows · recomendados");
+            if (list.Count > 0 && MessageBox.Show(this, $"Aplicar {list.Count} ajuste(s) recomendado(s) que ainda não estão ativos?", name, MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+            await ApplyOptAsync(list, name + " · recomendados");
         }));
         bar.Children.Add(TweakButton("SALVAR COMO PERFIL", false, (_, _) => SaveActiveAsProfile()));
         tb.Children.Add(bar);
@@ -378,25 +388,48 @@ public partial class MainWindow
         Count();
     }
 
-    private void BuildOptInput(Panel host)
-    {
-        OptOutputCard(host);
-        foreach (var (page, title, intro) in new[]
-                 {
-                     (OptPage.Mouse, "Mouse", "Pacote completo de resposta do mouse (inclui o 1:1 sem aceleração)."),
-                     (OptPage.Teclado, "Teclado", "Atalhos de acessibilidade e de idioma que costumam disparar no meio do jogo, e a resposta das teclas."),
-                 })
-        {
-            TweakCard(host, page == OptPage.Mouse ? "" : "", title, intro, out _);
-            foreach (var t in OptCatalog.For(page)) host.Children.Add(OptCard(t));
-        }
-    }
-
     private void BuildOptGpu(Panel host)
     {
         TweakCard(host, "", "GPU e monitor", "Os ajustes do driver da placa de vídeo (perfil NVIDIA, P0, preempção e afins) ficam em TWEAKING › Drivers.", out _);
         OptOutputCard(host);
         foreach (var t in OptCatalog.For(OptPage.Gpu)) host.Children.Add(OptCard(t));
+    }
+
+    // ---------------- Mitigações, Serviços e BIOS ----------------
+
+    private void BuildOptMitig(Panel host)
+    {
+        BuildOptList(host, "Mitigações", OptCatalog.ForTab(GuideTab.Mitigacoes).ToList(),
+            "As mitigações são correções do Windows contra falhas do processador. Desligar pode dar algum desempenho em CPUs antigas, mas deixa o PC menos protegido. Está aqui para você testar e comparar: aplique, reinicie, meça e desfaça se não valer a pena.");
+        TweakCard(host, "", "O que fica de fora, e por quê", null, out var b);
+        foreach (var line in new[]
+        {
+            "• Isolamento de núcleo (HVCI/VBS): anti-cheats como o Vanguard (Valorant) e o FACEIT exigem ligado em muitos PCs, e desligar abre o kernel para drivers maliciosos. Fica em Segurança do Windows › Segurança do dispositivo, se quiser mexer.",
+            "• DEP e SmartScreen: o ganho em jogos é zero, e são a primeira barreira contra programas maliciosos. Não vale desligar.",
+            "• Anti-cheat: desligar Spectre/Meltdown não costuma afetar anti-cheats, mas se um jogo reclamar, desfaça aqui e reinicie.",
+        }) b.Children.Add(OptText(line, "Muted", 12, 6));
+    }
+
+    private void BuildOptServices(Panel host) => BuildOptList(host, "Serviços", OptCatalog.Services().ToList(),
+        "Serviços do Windows que dá para desligar, um por um. Cada cartão diz o que para de funcionar quando você desliga. Os mesmos ajustes também aparecem nas outras abas e no Debloat: ligar aqui ou lá é a mesma coisa.");
+
+    private void BuildOptBios(Panel host)
+    {
+        TweakCard(host, "", "Ajustes da BIOS", "O PcismoMaster não grava nada na BIOS: um valor errado ali pode deixar o PC sem ligar, e não tem como desfazer por aqui. " +
+            "Abaixo está o que cada ajuste faz, para você mudar com calma na tela da BIOS (tecla Del ou F2 ao ligar o PC). Anote o valor de antes de cada um.", out _);
+        foreach (var (title, what, how) in new[]
+        {
+            ("C-states (economia da CPU)", "Os núcleos dormem quando ficam ociosos e demoram um pouco para acordar. Desligar deixa a resposta mais imediata e aumenta o consumo e a temperatura em repouso.", "C-States, Global C-state Control (AMD) ou CPU C-states (Intel). Evite desligar em notebook."),
+            ("ASPM (economia do PCI Express)", "Põe a placa de vídeo, o SSD e a placa de rede em economia quando ociosos. Desligar evita pequenos atrasos ao acordar.", "ASPM, Native ASPM ou PCI Express Power Management."),
+            ("Spread spectrum", "Varia de leve o clock para reduzir interferência eletromagnética. Desligar deixa o clock fixo, útil em overclock.", "Spread Spectrum (CPU e PCIe)."),
+            ("VT-x / SVM (virtualização)", "Necessário para máquinas virtuais, WSL, emuladores Android e o Isolamento de núcleo. Só desligue se não usa nada disso: alguns anti-cheats exigem ligado.", "Intel Virtualization Technology (Intel) ou SVM Mode (AMD)."),
+            ("IOMMU", "Isola o acesso direto à memória dos dispositivos. Desligar não costuma dar ganho em jogos.", "IOMMU (AMD) ou VT-d (Intel). Na dúvida, deixe em Auto."),
+        })
+        {
+            TweakCard(host, "", title, null, out var b);
+            b.Children.Add(OptText(what, "Muted", 12, 6));
+            b.Children.Add(OptText("Onde mexer: " + how, "Faint", 12, 0));
+        }
     }
 
     // ---------------- Perfis ----------------

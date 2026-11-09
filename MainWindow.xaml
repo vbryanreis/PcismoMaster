@@ -295,16 +295,34 @@
                                     <TextBlock Text="Debloat" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavOptWindows" Style="{StaticResource NavItem}" Tag="PageOptWindows" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptGeral" Style="{StaticResource NavItem}" Tag="PageOptGeral" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE770;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Windows" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE713;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Geral" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavOptInput" Style="{StaticResource NavItem}" Tag="PageOptInput" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptPriv" Style="{StaticResource NavItem}" Tag="PageOptPriv" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE962;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Mouse e teclado" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Privacidade" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptPower" Style="{StaticResource NavItem}" Tag="PageOptPower" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Energia" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptNet" Style="{StaticResource NavItem}" Tag="PageOptNet" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE968;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Rede" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptAdv" Style="{StaticResource NavItem}" Tag="PageOptAdv" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE9F5;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Avançado" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             <RadioButton x:Name="NavOptGpu" Style="{StaticResource NavItem}" Tag="PageOptGpu" Checked="Nav_Checked">
@@ -319,16 +337,40 @@
                                     <TextBlock Text="Drivers" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavOptProfiles" Style="{StaticResource NavItem}" Tag="PageOptProfiles" Checked="Nav_Checked">
+                            <RadioButton x:Name="NavOptMitig" Style="{StaticResource NavItem}" Tag="PageOptMitig" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Perfis" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE83D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Mitigações" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptSvc" Style="{StaticResource NavItem}" Tag="PageOptSvc" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE912;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Serviços" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptBios" Style="{StaticResource NavItem}" Tag="PageOptBios" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE964;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="BIOS" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             <RadioButton x:Name="NavOptClean" Style="{StaticResource NavItem}" Tag="PageOptClean" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE894;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Limpeza" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptLook" Style="{StaticResource NavItem}" Tag="PageOptLook" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE790;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Aparência" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOptProfiles" Style="{StaticResource NavItem}" Tag="PageOptProfiles" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Perfis" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -1689,22 +1731,85 @@
                         <StackPanel x:Name="OptDebloatHost"/>
                     </StackPanel>
                 </ScrollViewer>
-                <ScrollViewer x:Name="PageOptWindows" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageOptGeral" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="Windows" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Desempenho, privacidade, aparência, rede e IA · ligue e desligue cada ajuste" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="Geral" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Game DVR, Modo de Jogo, mouse, teclado, Windows Update e apps em segundo plano" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel x:Name="OptWindowsHost"/>
+                        <StackPanel x:Name="OptGeralHost"/>
                     </StackPanel>
                 </ScrollViewer>
-                <ScrollViewer x:Name="PageOptInput" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="PageOptPriv" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="Mouse e teclado" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Menos atraso e sem atalhos que atrapalham no jogo" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="Privacidade" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Telemetria, ID de publicidade, digitação e fala, sugestões de busca, permissões e IA" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
-                        <StackPanel x:Name="OptInputHost"/>
+                        <StackPanel x:Name="OptPrivHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptPower" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Energia" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Limitação de energia, agrupamento de timers e dynamic tick" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptPowerHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptNet" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Rede" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Placa de rede, NetBIOS, IPv6, Nagle e prioridade dos jogos" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptNetHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptAdv" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Avançado" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Compressão e combinação de memória, SysMain, desligamento e prioridade do processador" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptAdvHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptMitig" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Mitigações" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Spectre e Meltdown: o ganho, o risco e como desfazer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptMitigHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptSvc" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Serviços" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Serviços do Windows que dá para desligar, e o que para de funcionar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptSvcHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptBios" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="BIOS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Ajustes do firmware: o que cada um faz e onde mexer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptBiosHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <ScrollViewer x:Name="PageOptLook" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Aparência" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Efeitos visuais, modo escuro, transparência, menu de contexto e Explorer" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptLookHost"/>
                     </StackPanel>
                 </ScrollViewer>
                 <ScrollViewer x:Name="PageOptGpu" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
