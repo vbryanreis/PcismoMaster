@@ -57,6 +57,8 @@ public static class FlatIcons
                            C(Circle(12, 15, 2)), C(P("M11.2,15 H12.8 V19 H11.2 Z")) },
         ["bolt"] = new[] { B(P("M14,1 L4,14 H11 L9.5,23 L20,9.5 H13 Z")), C(P("M14,1 L13,9.5 H20 L16,14.5 L9,14 Z")) },
         ["sliders"] = new[] { C(P("M2.5,6 H21.5 V8 H2.5 Z M2.5,16 H21.5 V18 H2.5 Z")), B(Circle(8, 7, 3.2)), A(Circle(16, 17, 3.2)) },
+        ["update"] = new[] { C(Circle(12, 12, 3.2)), A(P("M2.5,12 A9.5,9.5 0 0 1 19.5,6.3 L22,4 V11 H15 L17.4,8.6 A6.5,6.5 0 0 0 5.5,12 Z")),
+                             B(P("M21.5,12 A9.5,9.5 0 0 1 4.5,17.7 L2,20 V13 H9 L6.6,15.4 A6.5,6.5 0 0 0 18.5,12 Z")) },
         ["download"] = new[] { A(P("M2.5,16.5 H21.5 V22 H2.5 Z")), B(P("M9.5,1.5 H14.5 V9.5 H18.5 L12,16.5 L5.5,9.5 H9.5 Z")), C(P("M16,18.5 H19 V20 H16 Z")) },
         ["shield"] = new[] { A(P("M12,1 L21,4.8 V11 C21,17 17.2,21 12,23 C6.8,21 3,17 3,11 V4.8 Z")), C(P("M12,1 L21,4.8 V11 C21,17 17.2,21 12,23 Z")),
                              B(P("M7.5,11.5 L9.4,9.6 L11,11.2 L15.2,7 L17.1,8.9 L11,15 Z")) },
@@ -87,7 +89,7 @@ public static class FlatIcons
     {
         ["NavHome"] = "home", ["NavDash"] = "eye", ["NavSystem"] = "monitor", ["NavSensors"] = "thermo", ["NavGpu"] = "gpu", ["NavDisks"] = "disk",
         ["NavEnergy"] = "battery", ["NavNet"] = "signal", ["NavMaint"] = "wrench",
-        ["NavOptStart"] = "checklist", ["NavOptDebloat"] = "trash", ["NavOptGeral"] = "gear", ["NavOptPriv"] = "lock", ["NavOptPower"] = "bolt",
+        ["NavOptStart"] = "checklist", ["NavOptUpdate"] = "update", ["NavOptDebloat"] = "trash", ["NavOptGeral"] = "gear", ["NavOptPriv"] = "lock", ["NavOptPower"] = "bolt",
         ["NavOptNet"] = "globe", ["NavOptAdv"] = "sliders", ["NavOptGpu"] = "gpu", ["NavDriver"] = "download", ["NavOptMitig"] = "shield",
         ["NavOptSvc"] = "gears", ["NavOptBios"] = "chip", ["NavOptClean"] = "sparkle", ["NavOptLook"] = "palette", ["NavOptProfiles"] = "layers",
         ["NavLauncher"] = "layers", ["NavDeals"] = "tag", ["NavGames"] = "target", ["NavBottleneck"] = "gauge", ["NavOverlay"] = "overlay",
@@ -98,6 +100,7 @@ public static class FlatIcons
     /// <summary>Glifos da fonte de ícones que têm desenho próprio (cabeçalhos de cartão e blocos do Início).</summary>
     private static readonly Dictionary<string, string> ByGlyph = new()
     {
+        ["\uE895"] = "update",
         [""] = "home", [""] = "monitor", [""] = "thermo", [""] = "gpu", [""] = "gpu", [""] = "disk",
         [""] = "battery", [""] = "signal", [""] = "globe", [""] = "wrench", [""] = "checklist", [""] = "trash",
         [""] = "gear", [""] = "lock", [""] = "bolt", [""] = "sliders", [""] = "download", [""] = "shield",

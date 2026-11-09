@@ -332,6 +332,12 @@
                                     <TextBlock Text="GPU" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavOptUpdate" Style="{StaticResource NavItem}" Tag="PageOptUpdate" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE895;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Windows Update" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -1728,6 +1734,16 @@
                 </Grid>
 
                 <!-- ===== TWEAKING (páginas montadas em MainWindow.Opt.cs a partir do OptCatalog) ===== -->
+                <ScrollViewer x:Name="PageOptUpdate" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="Windows Update" Style="{StaticResource H1}"/>
+                            <TextBlock Text="O que falta instalar, se a atualização tem problema conhecido e os bloqueios de drivers e do Update" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel x:Name="OptUpdateHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+
                 <ScrollViewer x:Name="PageOptStart" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
