@@ -128,6 +128,7 @@ public partial class MainWindow : Window
         };
         _timer.Start();
         ApplyPageLayout();
+        SetupTweakSteps();
 
         StateChanged += (_, _) =>
         {
@@ -263,6 +264,7 @@ public partial class MainWindow : Window
         var item = (FrameworkElement)sender;
         string page = (string)item.Tag;
         ShowPage(page);
+        AddStepFooter(page);
         // Discos e rede em detalhe só quando alguma página mostra esses sensores (ver SensorMonitor.FullDetail).
         _monitor.FullDetail = page is "PageSensors" or "PageSystem" or "PageDisks" or "PageNet" or "PageGpu" or "PageEnergy";
 
@@ -299,14 +301,14 @@ public partial class MainWindow : Window
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
             case "PageMaint": InitMaint(); break;
-            case "PageOptDebloat" or "PageOptGeral" or "PageOptPriv" or "PageOptPower" or "PageOptNet" or "PageOptAdv" or "PageOptMitig" or "PageOptSvc" or "PageOptBios" or "PageOptLook" or "PageOptGpu" or "PageOptProfiles": InitOpt(page); break;
+            case "PageOptStart" or "PageOptDebloat" or "PageOptGeral" or "PageOptPriv" or "PageOptPower" or "PageOptNet" or "PageOptAdv" or "PageOptMitig" or "PageOptSvc" or "PageOptBios" or "PageOptLook" or "PageOptGpu" or "PageOptProfiles": InitOpt(page); break;
             case "PageOptClean": InitOpt(page); InitMemory(); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageHome, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageOptStart, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 

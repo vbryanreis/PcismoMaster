@@ -83,6 +83,7 @@ public static class PageCatalog
         new("NavEnergy", "Energia", "MASTER", "Bateria e plano de energia.", "bateria energia plano notebook", true, ""),
         new("NavNet", "Rede", "MASTER", "Velocidade da rede, ping e adaptadores.", "internet rede ping wifi", true, ""),
         new("NavMaint", "Reparos do Windows", "MANUTENÇÃO", "Consertar o Windows (SFC, DISM), limpar arquivos e revisão semanal.", "reparo consertar sfc dism limpeza manutencao lento erro", false, ""),
+        new("NavOptStart", "Começar aqui", "TWEAKING", "Passo a passo depois de formatar: as abas do TWEAKING na ordem, e o atalho que aplica o pacote completo de uma vez.", "comecar inicio passo a passo formatacao formatar windows novo instalar boost completo pos instalacao ordem", false, ""),
         new("NavOptDebloat", "Debloat", "TWEAKING", "Tirar telemetria, propaganda, IA e apps que vêm com o Windows, em níveis Essencial, Recomendado e Avançado.", "debloat bloatware remover apps telemetria copilot recall onedrive servicos tarefas", false, ""),
         new("NavOptGeral", "Geral", "TWEAKING", "Game DVR, Modo de Jogo, mouse, teclado, Windows Update e apps em segundo plano, cada um com desfazer.", "geral game dvr modo de jogo mouse aceleracao teclado aderencia shift windows update segundo plano", false, ""),
         new("NavOptPriv", "Privacidade", "TWEAKING", "Telemetria, ID de publicidade, digitação e fala, sugestões de busca, permissões e IA.", "privacidade telemetria publicidade anuncio digitacao fala busca permissoes copilot recall ia edge brave", false, ""),
@@ -95,7 +96,7 @@ public static class PageCatalog
         new("NavOptLook", "Aparência", "TWEAKING", "Efeitos visuais, modo escuro, transparência, menu de contexto clássico e Explorer.", "aparencia visual efeitos modo escuro transparencia menu contexto classico explorer", false, ""),
         new("NavOptGpu", "GPU e monitor", "TWEAKING", "Monitor na taxa máxima, agendamento de GPU e energia do PCI Express.", "gpu hags hz taxa atualizacao monitor pcie aspm", false, ""),
         new("NavDriver", "Drivers", "TWEAKING", "Driver de vídeo, BIOS, chipset e drivers da placa-mãe comparados com o site oficial, ajustes do driver e limpeza com o DDU.", "driver drivers atualizar nvidia amd intel ddu limpar painel bios chipset placa mae profile inspector preempcao p0 clock gating", false, ""),
-        new("NavOptProfiles", "Perfis", "TWEAKING", "PC recém-formatado (pacote completo de uma vez), pacotes prontos e os seus perfis salvos, cada um mostrando o que mexe em cada aba.", "formatacao formatar windows novo instalar boost completo pos instalacao perfil perfis pacote basico sem ia padrao exportar importar", false, ""),
+        new("NavOptProfiles", "Perfis", "TWEAKING", "Pacotes prontos (Básico, Sem IA, Padrão do Windows) e os seus perfis salvos, cada um mostrando o que mexe em cada aba.", "perfil perfis pacote basico sem ia padrao exportar importar", false, ""),
         new("NavOptClean", "Limpeza", "TWEAKING", "Liberar a memória RAM, fechar programas em segundo plano e apagar temporários, lixeira e caches.", "limpeza limpar temporarios lixo cache shader navegador lixeira espaco memoria ram otimizacao otimizar fechar programas", false, ""),
         new("NavLauncher", "Meus jogos", "JOGOS", "Todos os seus jogos num lugar só, com perfil de abertura.", "jogos biblioteca steam epic launcher abrir", false, ""),
         new("NavDeals", "Promoções", "JOGOS", "Preços e promoções dos jogos nas lojas.", "promocao preco barato desconto loja favorito favoritos coracao drm steam epic xbox gog", false, ""),
@@ -117,7 +118,7 @@ public static class PageCatalog
     public static readonly HomeTask[] Tasks =
     {
         new("Ver como o PC está", "Temperatura, uso e saúde agora.", "NavDash", "", "ChartGpu"),
-        new("Deixar o PC mais rápido", "Ajustes do Windows, todos com desfazer.", "NavOptGeral", "", "Accent"),
+        new("Deixar o PC mais rápido", "Passo a passo do TWEAKING, tudo com desfazer.", "NavOptStart", "", "Accent"),
         new("Remover apps que vêm com o Windows", "Debloat em três níveis ou app por app.", "NavOptDebloat", "", "TempWarn"),
         new("Consertar e limpar o Windows", "Reparos, arquivos temporários e revisão.", "NavMaint", "", "AccentCyan"),
         new("Desinstalar programas", "E apagar as sobras que ficam.", "NavUninstall", "", "TempHot"),

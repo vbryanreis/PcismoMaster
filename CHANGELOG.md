@@ -2,6 +2,13 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.16.0
+
+- **TWEAKING virou um passo a passo para depois de formatar**: as abas aparecem numeradas na ordem de aplicar (01 Começar aqui, 02 Drivers, 03 Debloat, 04 Geral, 05 Privacidade, 06 Energia, 07 Rede, 08 Avançado, 09 GPU e monitor, 10 Serviços, 11 Mitigações, 12 BIOS, 13 Aparência, 14 Limpeza e 15 Perfis).
+- **01 · Começar aqui (nova)**: mostra a ordem completa, cada passo com o que fazer e o botão ABRIR, e o atalho "PC recém-formatado", que aplica o pacote completo de uma vez (saiu de Perfis).
+- **Próximo passo**: no fim de cada aba aparece "PASSO X DE 15", o botão para voltar e o botão do próximo passo. O bloco "Deixar o PC mais rápido" do Início abre o passo a passo.
+- Versão atualizada para 0.16.0.
+
 ## 0.15.0
 
 - **Formatação foi para dentro de Perfis**: o cartão "PC recém-formatado" (pacote completo, Visualizador de Fotos, OneDrive, contas novas e limpeza) fica no topo de Perfis, seguido dos pacotes prontos e dos seus perfis. O menu TWEAKING tem uma aba a menos, na ordem do guia.
