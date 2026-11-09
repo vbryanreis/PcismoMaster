@@ -2,6 +2,13 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.19.1
+
+- **Windows Update ganhou aba própria**: é o passo 02 do TWEAKING, logo depois do Começar aqui, com os bloqueios, o leitor de atualizações e os botões. Os passos seguintes foram renumerados (Drivers 03 … Perfis 16).
+- **Ícone novo** de atualizar (duas setas em círculo) no menu e no cartão do Windows Update.
+- Quando a Microsoft não informa qual atualização causou um problema conhecido, o texto agora diz isso em vez de ficar vazio.
+- Versão atualizada para 0.19.1.
+
 ## 0.19.0
 
 - **Windows Update em Começar aqui**: cartão novo logo abaixo do passo a passo.
