@@ -159,7 +159,9 @@ public partial class MainWindow
         var head = new WrapPanel();
         head.Children.Add(new TextBlock { Text = t.Title, FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 8, 2), TextWrapping = TextWrapping.Wrap });
         if (t.Recommended || t.Level is OptLevel.Essencial or OptLevel.Recomendado) head.Children.Add(Badge("RECOMENDADO", (Brush)FindResource("ChartGpu")));
-        if (t.Restart) head.Children.Add(Badge("REINICIA", (Brush)FindResource("TempWarn")));
+        head.Children.Add(OptRisk(t) switch { 2 => Badge("PERIGOSO", (Brush)FindResource("TempCrit")), 1 => Badge("ATENÇÃO", (Brush)FindResource("TempWarn")), _ => Badge("SEM RISCO", (Brush)FindResource("ChartGpu")) });
+        if (t.Restart) head.Children.Add(Badge("PEDE REINICIAR", (Brush)FindResource("Faint")));
+        else if (t.Explorer) head.Children.Add(Badge("REINICIA O EXPLORER", (Brush)FindResource("Faint")));
         head.Children.Add(Badge(t.Category.ToUpperInvariant(), (Brush)FindResource("Faint")));
         return head;
     }
@@ -169,7 +171,7 @@ public partial class MainWindow
         var text = new StackPanel { Margin = new Thickness(0, 0, 16, 0) };
         text.Children.Add(OptBadges(t));
         text.Children.Add(OptText(t.Description, "Muted", 12));
-        if (t.Warning != null) text.Children.Add(new TextBlock { Text = "⚠ " + t.Warning, Foreground = (Brush)FindResource("TempWarn"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
+        if (t.Warning != null) text.Children.Add(new TextBlock { Text = (OptRisk(t) == 2 ? "⚠ " : "⚠ Quando evitar: ") + t.Warning, Foreground = (Brush)FindResource("TempWarn"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
         return text;
     }
 
@@ -334,57 +336,153 @@ public partial class MainWindow
     /// <summary>Uma aba do guia: busca, filtro por categoria, APLICAR RECOMENDADOS e um cartão por ajuste.</summary>
     private void BuildOptTab(Panel host, string name, GuideTab tab, string intro) => BuildOptList(host, name, OptCatalog.ForTab(tab).ToList(), intro);
 
+    /// <summary>0 = sem efeito colateral; 1 = tem efeito colateral (o aviso diz quando evitar); 2 = PERIGOSO.</summary>
+    private static int OptRisk(OptTweak t) => t.Warning == null ? 0 : t.Warning.StartsWith("PERIGOSO", StringComparison.OrdinalIgnoreCase) ? 2 : 1;
+    private static bool OptIsRec(OptTweak t) => t.Recommended || t.Level is OptLevel.Essencial or OptLevel.Recomendado;
+
+    /// <summary>
+    /// Lista de uma aba do TWEAKING, pensada para avaliar item por item: resumo do que já está ligado no topo, filtros simples
+    /// (o que mostrar, tema, pesquisa) e os ajustes separados em três blocos: recomendados, opcionais e arriscados (estes fechados
+    /// até você pedir). Cada cartão diz o que faz, o risco e quando evitar.
+    /// </summary>
     private void BuildOptList(Panel host, string name, List<OptTweak> items, string intro)
     {
         Shown(items);
-        var tools = TweakCard(host, "", name, intro + " Ligue um ajuste para aplicar; desligue para voltar exatamente como estava. RECOMENDADO marca o que serve para quase todo mundo; o ⚠ diz quando evitar.", out var tb);
-        var search = new TextBox { Margin = new Thickness(0, 0, 0, 10), ToolTip = "Pesquisar ajustes" };
-        tb.Children.Add(OptText("Pesquisar", "Faint", 11, 4));
-        tb.Children.Add(search);
-        var cards = new StackPanel();
-        var onlyRec = new CheckBox { Content = "Só os recomendados", Margin = new Thickness(0, 0, 0, 10) };
-        var chips = new WrapPanel { Margin = new Thickness(0, 0, 0, 8) };
-        string cat = "";
-        foreach (var c in new[] { "" }.Concat(OptCatalog.Categories))
-        {
-            if (c.Length > 0 && !items.Any(t => t.Category == c)) continue;
-            var chip = new RadioButton { Style = (Style)FindResource("Chip"), Content = c.Length == 0 ? "Todas" : c, GroupName = "OptCat" + name, IsChecked = c.Length == 0, Margin = new Thickness(0, 0, 6, 6) };
-            chip.Checked += (_, _) => { cat = c; Filter(); };
-            chips.Children.Add(chip);
-        }
-        if (chips.Children.Count > 2) tb.Children.Add(chips);
-        onlyRec.Click += (_, _) => Filter();
-        tb.Children.Add(onlyRec);
-        var counter = OptText("", "Muted", 12, 8);
-        tb.Children.Add(counter);
+        TweakCard(host, "", name, intro, out var tb);
+        var search = new TextBox { Margin = new Thickness(0, 2, 0, 0), ToolTip = "Pesquisar pelo nome ou pelo que o ajuste faz" };
+        var sections = new List<(StackPanel Box, TextBlock Head, StackPanel Cards, OptTweak[] Items, string Title, bool Risky)>();
+
+        // Como ler cada cartão
+        var legend = new WrapPanel { Margin = new Thickness(0, 0, 0, 10) };
+        legend.Children.Add(OptText("Como ler:  ", "Faint", 11.5));
+        legend.Children.Add(Badge("RECOMENDADO", (Brush)FindResource("ChartGpu"))); legend.Children.Add(OptText("serve para quase todo mundo   ", "Faint", 11.5));
+        legend.Children.Add(Badge("SEM RISCO", (Brush)FindResource("ChartGpu"))); legend.Children.Add(OptText("não tira nada que você usa   ", "Faint", 11.5));
+        legend.Children.Add(Badge("ATENÇÃO", (Brush)FindResource("TempWarn"))); legend.Children.Add(OptText("leia quando evitar   ", "Faint", 11.5));
+        legend.Children.Add(Badge("PERIGOSO", (Brush)FindResource("TempCrit"))); legend.Children.Add(OptText("só se souber o que está fazendo", "Faint", 11.5));
+        tb.Children.Add(legend);
+        tb.Children.Add(OptText("Ligue o interruptor para aplicar; desligue para voltar exatamente como estava.", "Faint", 11.5, 10));
+
+        // Resumo do que já está ligado
+        var summary = new TextBlock { FontSize = 13, FontWeight = FontWeights.SemiBold, Foreground = (Brush)FindResource("Fg"), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 8) };
+        tb.Children.Add(summary);
         var bar = new WrapPanel();
-        bar.Children.Add(TweakButton("APLICAR RECOMENDADOS", true, async (_, _) =>
+        var applyRec = TweakButton("LIGAR OS RECOMENDADOS", true, async (_, _) =>
         {
-            var list = items.Where(t => t.Recommended && _optStates.GetValueOrDefault(t.Id)?.On == false).ToList();
-            if (list.Count > 0 && MessageBox.Show(this, $"Aplicar {list.Count} ajuste(s) recomendado(s) que ainda não estão ativos?", name, MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+            var list = items.Where(t => OptIsRec(t) && _optStates.GetValueOrDefault(t.Id)?.On == false).ToList();
+            if (list.Count == 0) { MessageBox.Show(this, "Todos os recomendados desta aba já estão ligados.", name); return; }
+            string lines = string.Join("\n", list.Take(15).Select(t => "• " + t.Title + (t.Warning != null ? "  ⚠ " + t.Warning : "")));
+            if (MessageBox.Show(this, $"Ligar {list.Count} ajuste(s) recomendado(s)?\n\n{lines}" + (list.Count > 15 ? "\n…" : ""), name, MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
             await ApplyOptAsync(list, name + " · recomendados");
-        }));
+        });
+        bar.Children.Add(applyRec);
         bar.Children.Add(TweakButton("SALVAR COMO PERFIL", false, (_, _) => SaveActiveAsProfile()));
         tb.Children.Add(bar);
+
+        // Filtros
+        var filters = new StackPanel { Margin = new Thickness(0, 6, 0, 0) };
+        string show = "", cat = "";
+        var showRow = new WrapPanel { Margin = new Thickness(0, 0, 0, 4) };
+        showRow.Children.Add(OptText("Mostrar  ", "Faint", 11.5));
+        foreach (var (key, label) in new[] { ("", "Todos"), ("rec", "Recomendados"), ("on", "Ligados"), ("off", "Desligados"), ("safe", "Sem risco") })
+        {
+            var chip = new RadioButton { Style = (Style)FindResource("Chip"), Content = label, GroupName = "OptShow" + name, IsChecked = key.Length == 0, Margin = new Thickness(0, 0, 6, 6) };
+            chip.Checked += (_, _) => { show = key; Filter(); };
+            showRow.Children.Add(chip);
+        }
+        filters.Children.Add(showRow);
+        var cats = OptCatalog.Categories.Where(c => items.Any(t => t.Category == c)).ToList();
+        if (cats.Count > 1)
+        {
+            var catRow = new WrapPanel { Margin = new Thickness(0, 0, 0, 4) };
+            catRow.Children.Add(OptText("Tema  ", "Faint", 11.5));
+            foreach (var c in new[] { "" }.Concat(cats))
+            {
+                var chip = new RadioButton { Style = (Style)FindResource("Chip"), Content = c.Length == 0 ? "Todos" : c.Replace("Serviços · ", ""), GroupName = "OptCat" + name, IsChecked = c.Length == 0, Margin = new Thickness(0, 0, 6, 6) };
+                chip.Checked += (_, _) => { cat = c; Filter(); };
+                catRow.Children.Add(chip);
+            }
+            filters.Children.Add(catRow);
+        }
+        filters.Children.Add(OptText("Pesquisar", "Faint", 11, 4));
+        filters.Children.Add(search);
+        tb.Children.Add(filters);
         AddScriptOutput(tb, "O que for aplicado aparece aqui.");
         AddLegacyTweakRestore(tb);
 
-        foreach (var t in items) cards.Children.Add(OptCard(t));
-        host.Children.Add(cards);
+        // Três blocos: recomendados, opcionais, arriscados
+        var groups = new (string Title, string Sub, Func<OptTweak, bool> In, bool Closed)[]
+        {
+            ("RECOMENDADOS", "Servem para quase todo mundo. Comece por aqui.", t => OptIsRec(t) && OptRisk(t) < 2, false),
+            ("OPCIONAIS", "Dependem do seu uso: leia o que cada um faz e quando evitar.", t => !OptIsRec(t) && OptRisk(t) < 2, false),
+            ("ARRISCADOS", "Tiram proteção ou recursos importantes. Só para quem sabe o que está fazendo; todos têm desfazer.", t => OptRisk(t) == 2, true),
+        };
+        foreach (var g in groups)
+        {
+            var list = items.Where(g.In).OrderBy(OptRisk).ToArray();
+            if (list.Length == 0) continue;
+            var box = new StackPanel { Margin = new Thickness(0, 4, 0, 6) };
+            var head = new TextBlock { Text = g.Title, FontFamily = (FontFamily)FindResource("Mono"), FontSize = 11.5, FontWeight = FontWeights.Bold,
+                Foreground = (Brush)FindResource(g.Title == "ARRISCADOS" ? "TempCrit" : "Fg"), Margin = new Thickness(0, 6, 0, 2) };
+            box.Children.Add(head);
+            box.Children.Add(OptText(g.Sub, "Faint", 11.5, 8));
+            var cardsPanel = new StackPanel();
+            foreach (var t in list) cardsPanel.Children.Add(OptCard(t));
+            if (g.Closed)
+            {
+                cardsPanel.Visibility = Visibility.Collapsed;
+                Button? open = null;
+                open = TweakButton($"MOSTRAR OS {list.Length} ARRISCADOS", false, (_, _) =>
+                {
+                    bool vis = cardsPanel.Visibility != Visibility.Visible;
+                    cardsPanel.Visibility = vis ? Visibility.Visible : Visibility.Collapsed;
+                    open!.Content = vis ? "ESCONDER OS ARRISCADOS" : $"MOSTRAR OS {list.Length} ARRISCADOS";
+                    Filter();
+                });
+                box.Children.Add(open);
+            }
+            box.Children.Add(cardsPanel);
+            host.Children.Add(box);
+            sections.Add((box, head, cardsPanel, list, g.Title, g.Closed));
+        }
+
+        bool Match(OptTweak t)
+        {
+            string q = search.Text.Trim();
+            bool? on = _optStates.GetValueOrDefault(t.Id)?.On;
+            return (cat.Length == 0 || t.Category == cat) &&
+                   (show switch { "rec" => OptIsRec(t), "on" => on == true, "off" => on == false, "safe" => OptRisk(t) == 0, _ => true }) &&
+                   (q.Length == 0 || t.Title.Contains(q, StringComparison.CurrentCultureIgnoreCase) || t.Description.Contains(q, StringComparison.CurrentCultureIgnoreCase)
+                    || (t.Warning?.Contains(q, StringComparison.CurrentCultureIgnoreCase) ?? false));
+        }
 
         void Filter()
         {
-            string q = search.Text.Trim();
-            foreach (var card in cards.Children.OfType<Border>())
+            bool searching = search.Text.Trim().Length > 0;
+            foreach (var s in sections)
             {
-                var t = (OptTweak)card.Tag;
-                bool ok = (cat.Length == 0 || t.Category == cat) && (onlyRec.IsChecked != true || t.Recommended) &&
-                          (q.Length == 0 || t.Title.Contains(q, StringComparison.CurrentCultureIgnoreCase) || t.Description.Contains(q, StringComparison.CurrentCultureIgnoreCase));
-                card.Visibility = ok ? Visibility.Visible : Visibility.Collapsed;
+                int n = 0;
+                foreach (var card in s.Cards.Children.OfType<Border>())
+                {
+                    bool ok = Match((OptTweak)card.Tag);
+                    card.Visibility = ok ? Visibility.Visible : Visibility.Collapsed;
+                    if (ok) n++;
+                }
+                // pesquisando, os arriscados que batem aparecem mesmo com o bloco fechado
+                if (searching && n > 0 && s.Risky) s.Cards.Visibility = Visibility.Visible;
+                s.Box.Visibility = n > 0 ? Visibility.Visible : Visibility.Collapsed;
+                int on = s.Items.Count(t => _optStates.GetValueOrDefault(t.Id)?.On == true);
+                s.Head.Text = $"{s.Title}  ·  {on} de {s.Items.Length} ligados";
             }
         }
         search.TextChanged += (_, _) => Filter();
-        void Count() => counter.Text = $"{items.Count(t => _optStates.GetValueOrDefault(t.Id)?.On == true)} de {items.Count} ativos neste PC";
+        void Count()
+        {
+            int on = items.Count(t => _optStates.GetValueOrDefault(t.Id)?.On == true);
+            int recOff = items.Count(t => OptIsRec(t) && _optStates.GetValueOrDefault(t.Id)?.On == false);
+            summary.Text = $"{on} de {items.Count} ligados neste PC" + (recOff > 0 ? $"  ·  {recOff} recomendado(s) ainda desligado(s)" : "  ·  todos os recomendados já estão ligados");
+            applyRec.IsEnabled = recOff > 0 && !_optBusy;
+            Filter();
+        }
         _optCounters.Add(Count);
         Count();
     }
