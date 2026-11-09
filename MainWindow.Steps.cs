@@ -105,6 +105,7 @@ public partial class MainWindow
             grid.Children.Add(num); grid.Children.Add(text); grid.Children.Add(open);
             body.Children.Add(grid);
         }
+        BuildWinUpdateCard(host);
         BuildOptFormat(host);
     }
 }
