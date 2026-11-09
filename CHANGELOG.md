@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.20.1
+
+- **Corrigido em Desinstalar apps**: depois de desinstalar um programa, escolher outro na lista não funcionava, porque a seleção ficava presa no app que já tinha sido removido e era preciso fechar e abrir o PcismoMaster. Agora a lista troca de programa normalmente.
+- Versão atualizada para 0.20.1.
+
 ## 0.20.0
 
 - **Abas do TWEAKING reorganizadas** para avaliar item por item com mais facilidade.
