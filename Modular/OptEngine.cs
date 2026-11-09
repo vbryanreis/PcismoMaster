@@ -140,6 +140,9 @@ public sealed class OptEngine
             ExtraKind.Hibernate => state != "1",
             ExtraKind.ReservedStorage => state.Length == 0 ? null : state != "Enabled",
             ExtraKind.MemCompression => state.Length == 0 ? null : !state.Equals("True", StringComparison.OrdinalIgnoreCase),
+            ExtraKind.PageCombining => state.Length == 0 ? null : !state.Equals("True", StringComparison.OrdinalIgnoreCase),
+            ExtraKind.NicProp or ExtraKind.NetBios => state.Length == 0 ? null : Pairs(state).All(p => p.Value == (x.Kind == ExtraKind.NetBios ? "2" : x.Args[1])),
+            ExtraKind.Bcd => state is "Yes" or "Sim" || state.Equals(x.Args[1], StringComparison.OrdinalIgnoreCase),
             ExtraKind.OneDrive or ExtraKind.Mstsc => state == "0",
             ExtraKind.BootName => state == x.Args[0],
             ExtraKind.CreateKey => state == "1",
@@ -152,6 +155,10 @@ public sealed class OptEngine
 
     private static string Q(string s) => "'" + s.Replace("'", "''") + "'";
     private static string List(IEnumerable<string> items) => "@(" + string.Join(",", items.Select(Q)) + ")";
+    private const string NetBtKey = @"HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces";
+    /// <summary>"nome=valor|nome=valor" (placas de rede, interfaces do NetBIOS) em pares; o nome pode ter "=", o valor não.</summary>
+    private static IEnumerable<KeyValuePair<string, string>> Pairs(string state) => state.Split('|', StringSplitOptions.RemoveEmptyEntries)
+        .Select(p => { int i = p.LastIndexOf('='); return new KeyValuePair<string, string>(i < 0 ? p : p[..i], i < 0 ? "" : p[(i + 1)..]); });
     private static (string Path, string Name) TaskParts(string full) { int i = full.LastIndexOf('\\'); return (full[..(i + 1)], full[(i + 1)..]); }
     private const string DiscordFile = "\"$env:APPDATA\\discord\\settings.json\"";
 
@@ -164,6 +171,10 @@ public sealed class OptEngine
         ExtraKind.Hibernate => "(Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power').HibernateEnabled",
         ExtraKind.ReservedStorage => "(Get-WindowsReservedStorageState).ReservedStorageState",
         ExtraKind.MemCompression => "(Get-MMAgent).MemoryCompression",
+        ExtraKind.PageCombining => "(Get-MMAgent).PageCombining",
+        ExtraKind.NicProp => $"(@(Get-NetAdapter -Physical -ErrorAction SilentlyContinue | ForEach-Object {{ $p = Get-NetAdapterAdvancedProperty -Name $_.Name -RegistryKeyword {Q(x.Args[0])} -ErrorAction SilentlyContinue; if ($p) {{ $_.Name + '=' + $p.RegistryValue[0] }} }})) -join '|'",
+        ExtraKind.NetBios => $"(@(Get-ChildItem {Q(NetBtKey)} -ErrorAction SilentlyContinue | ForEach-Object {{ $_.PSChildName + '=' + [string](Get-ItemProperty $_.PSPath).NetbiosOptions }})) -join '|'",
+        ExtraKind.Bcd => $"$(if ($m = @(bcdedit /enum '{{current}}') -match '^{x.Args[0]}\\s') {{ ($m[0] -split '\\s+')[1] }} else {{ '-' }})",
         ExtraKind.Appx => $"(@(Get-AppxPackage -AllUsers | Where-Object {{ $n = $_.Name; {List(x.Args)} | Where-Object {{ $n -like $_ }} }} | ForEach-Object Name | Select-Object -Unique)) -join ','",
         ExtraKind.OneDrive => "$(if ((Test-Path \"$env:LOCALAPPDATA\\Microsoft\\OneDrive\\OneDrive.exe\") -or (Test-Path \"$env:ProgramFiles\\Microsoft OneDrive\\OneDrive.exe\")) { '1' } else { '0' })",
         ExtraKind.Mstsc => "$(if (Test-Path \"$env:SystemRoot\\System32\\mstsc.exe\") { '1' } else { '0' })",
@@ -327,6 +338,10 @@ public sealed class OptEngine
         ExtraKind.Hibernate => "powercfg /hibernate off",
         ExtraKind.ReservedStorage => "Set-WindowsReservedStorageState -State Disabled | Out-Null",
         ExtraKind.MemCompression => "Disable-MMAgent -MemoryCompression",
+        ExtraKind.PageCombining => "Disable-MMAgent -PageCombining",
+        ExtraKind.NicProp => $"Get-NetAdapter -Physical -ErrorAction SilentlyContinue | ForEach-Object {{ Set-NetAdapterAdvancedProperty -Name $_.Name -RegistryKeyword {Q(x.Args[0])} -RegistryValue {Q(x.Args[1])} -ErrorAction SilentlyContinue }}",
+        ExtraKind.NetBios => $"Get-ChildItem {Q(NetBtKey)} | ForEach-Object {{ Set-ItemProperty $_.PSPath -Name NetbiosOptions -Value 2 -Type DWord }}",
+        ExtraKind.Bcd => $"bcdedit /set '{{current}}' {x.Args[0]} {x.Args[1]} | Out-Null",
         ExtraKind.Appx => $"$p = {List(x.Args)}\r\nGet-AppxPackage -AllUsers | Where-Object {{ $n = $_.Name; $p | Where-Object {{ $n -like $_ }} }} | ForEach-Object {{ Write-Output \"Removendo $($_.Name)...\"; Remove-AppxPackage -Package $_.PackageFullName -AllUsers -ErrorAction SilentlyContinue }}\r\n" +
                            "Get-AppxProvisionedPackage -Online | Where-Object { $n = $_.DisplayName; $p | Where-Object { $n -like $_ } } | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null",
         ExtraKind.OneDrive => "$ErrorActionPreference = 'Continue'\r\n" + Bloatware.ProgramRemove("onedrive"),
@@ -352,6 +367,12 @@ public sealed class OptEngine
         ExtraKind.Hibernate => before == "1" ? "powercfg /hibernate on" : null,
         ExtraKind.ReservedStorage => before == "Enabled" ? "Set-WindowsReservedStorageState -State Enabled | Out-Null" : null,
         ExtraKind.MemCompression => before.Equals("True", StringComparison.OrdinalIgnoreCase) ? "Enable-MMAgent -MemoryCompression" : null,
+        ExtraKind.PageCombining => before.Equals("True", StringComparison.OrdinalIgnoreCase) ? "Enable-MMAgent -PageCombining" : null,
+        ExtraKind.NicProp => before.Length == 0 ? null : string.Join("\r\n", Pairs(before).Select(p => $"Set-NetAdapterAdvancedProperty -Name {Q(p.Key)} -RegistryKeyword {Q(x.Args[0])} -RegistryValue {Q(p.Value)} -ErrorAction SilentlyContinue")),
+        ExtraKind.NetBios => before.Length == 0 ? null : string.Join("\r\n", Pairs(before).Select(p => p.Value.Length == 0
+            ? $"Remove-ItemProperty {Q(NetBtKey + "\\" + p.Key)} -Name NetbiosOptions -ErrorAction SilentlyContinue"
+            : $"Set-ItemProperty {Q(NetBtKey + "\\" + p.Key)} -Name NetbiosOptions -Value {p.Value} -Type DWord -ErrorAction SilentlyContinue")),
+        ExtraKind.Bcd => before == "-" ? $"bcdedit /deletevalue '{{current}}' {x.Args[0]} | Out-Null" : before is "Yes" or "Sim" ? null : $"bcdedit /set '{{current}}' {x.Args[0]} no | Out-Null",
         ExtraKind.Appx => null, // volta pela Microsoft Store
         ExtraKind.OneDrive => before == "1" ? Bloatware.ProgramReinstall("onedrive") : null,
         ExtraKind.Mstsc => before == "1" ? Bloatware.ProgramReinstall("rdp") : null,

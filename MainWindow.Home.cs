@@ -74,7 +74,7 @@ public partial class MainWindow
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition());
-        var icon = new Border { Width = 44, Height = 44, CornerRadius = new CornerRadius(12), Margin = new Thickness(0, 0, 14, 0), VerticalAlignment = VerticalAlignment.Top,
+        var icon = new Border { Width = 44, Height = 44, CornerRadius = new CornerRadius(0), Margin = new Thickness(0, 0, 14, 0), VerticalAlignment = VerticalAlignment.Top,
             Background = new SolidColorBrush(Color.FromArgb(0x2A, c.R, c.G, c.B)),
             Child = new TextBlock { Text = t.Icon, FontFamily = (FontFamily)FindResource("Icons"), FontSize = 20, Foreground = accent, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } };
         var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
@@ -106,7 +106,7 @@ public partial class MainWindow
         }
         foreach (var p in found.Take(8))
         {
-            var row = new Border { Padding = new Thickness(14, 10, 14, 10), CornerRadius = new CornerRadius(10), Cursor = Cursors.Hand, Background = Brushes.Transparent };
+            var row = new Border { Padding = new Thickness(14, 10, 14, 10), CornerRadius = new CornerRadius(0), Cursor = Cursors.Hand, Background = Brushes.Transparent };
             var sp = new StackPanel { Orientation = Orientation.Horizontal };
             sp.Children.Add(new TextBlock { Text = p.Icon, FontFamily = (FontFamily)FindResource("Icons"), FontSize = 15, Width = 30, VerticalAlignment = VerticalAlignment.Center, Foreground = (Brush)FindResource("Accent") });
             var tx = new StackPanel();

@@ -81,7 +81,7 @@ public partial class MainWindow
     private static ControlTemplate SwatchTemplate()
     {
         var border = new FrameworkElementFactory(typeof(Border));
-        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(15));
+        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(0));
         border.SetBinding(Border.BackgroundProperty, new System.Windows.Data.Binding("Background") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
         border.SetBinding(Border.BorderBrushProperty, new System.Windows.Data.Binding("BorderBrush") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
         border.SetValue(Border.BorderThicknessProperty, new Thickness(1));

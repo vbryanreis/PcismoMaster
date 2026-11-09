@@ -2,6 +2,15 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.13.0
+
+- **Visual novo**: o app inteiro foi redesenhado no estilo do ArtCraft. Agora tem cantos retos, fundo grafite e cabeçalho com o nome em caixa alta. Botões e etiquetas usam fonte mono e o botão principal é branco. As etiquetas (RECOMENDADO, REINICIA, ATENÇÃO) só têm contorno, sem fundo. O modo claro foi ajustado à nova paleta.
+- **Novos ajustes de Windows**, todos com aviso e desfazer:
+  - **Energia** (categoria nova): desligar a limitação de energia de programas, não agrupar os timers e desligar o dynamic tick.
+  - **Rede**: desligar a moderação de interrupção das placas de rede e desligar o NetBIOS sobre TCP/IP. O valor de antes de cada placa e de cada interface fica guardado.
+  - **Desempenho**: desligar a combinação de páginas de memória.
+- Versão atualizada para 0.13.0.
+
 ## 0.12.1
 
 - **Login fica salvo**: o app pedia login a cada abertura quando o GitHub recusava o token salvo. Agora quem já entrou continua entrando: o login só é pedido de novo depois de **Sair**, se a pasta de configurações for apagada, ao formatar o PC ou ao trocar de usuário do Windows. A recusa do GitHub fica registrada no log.

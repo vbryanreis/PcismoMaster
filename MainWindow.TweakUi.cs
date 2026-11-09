@@ -48,12 +48,11 @@ public partial class MainWindow
 
     private Border RiskBadge(ScriptRisk r) => Badge(RiskText(r), RiskBrush(r));
 
-    /// <summary>Selo pequeno colorido (RECOMENDADO, REINICIA, ATENÇÃO…).</summary>
+    /// <summary>Etiqueta de status (RECOMENDADO, REINICIA, ATENÇÃO…): contorno fino e texto mono na cor do status, sem fundo.</summary>
     private Border Badge(string text, Brush brush)
     {
-        var c = brush is SolidColorBrush s ? s.Color : Colors.Gray;
-        var b = new Border { Style = (Style)FindResource("MaintBadge"), Padding = new Thickness(7, 2, 7, 2), Margin = new Thickness(0, 0, 6, 0),
-            Background = new SolidColorBrush(Color.FromArgb(0x26, c.R, c.G, c.B)), Child = new TextBlock { Text = text } };
+        var b = new Border { Style = (Style)FindResource("MaintBadge"), Padding = new Thickness(6, 2, 6, 2), Margin = new Thickness(0, 0, 6, 0),
+            BorderBrush = brush, Child = new TextBlock { Text = text.ToUpperInvariant() } };
         TextElement.SetForeground(b, brush);
         return b;
     }

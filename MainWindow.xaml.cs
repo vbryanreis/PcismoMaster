@@ -100,7 +100,7 @@ public partial class MainWindow : Window
         InitBench();
         SnapshotUsb();
         RefreshDrives();
-        TitlePage.Text = "Início";
+        TitlePage.Text = "INÍCIO";
         InitHome();
         UpdateDashboard();
 
@@ -276,7 +276,7 @@ public partial class MainWindow : Window
             group.IsChecked = true;
             name = $"{group.Content} · {name}";
         }
-        TitlePage.Text = name;
+        TitlePage.Text = name.ToUpper(new System.Globalization.CultureInfo("pt-BR"));
         UpdatePageHelp(item.Name);
 
         if (page != "PageUtil") LeaveFinder();

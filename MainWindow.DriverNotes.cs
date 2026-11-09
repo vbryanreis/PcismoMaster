@@ -116,7 +116,7 @@ public partial class MainWindow
         }
         return new Border
         {
-            BorderBrush = (Brush)FindResource(highlight ? "LineStrong" : "Line"), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8),
+            BorderBrush = (Brush)FindResource(highlight ? "LineStrong" : "Line"), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(0),
             Padding = new Thickness(14, 10, 14, 12), Margin = new Thickness(0, 0, 0, 8), Child = body,
         };
     }

@@ -13,6 +13,13 @@ public sealed class FriendlyCaseConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Binding.DoNothing;
 }
 
+/// <summary>Textos de botão em CAIXA ALTA (estilo técnico dos botões e rótulos).</summary>
+public sealed class UpperCaseConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value is string s ? s.ToUpper(new CultureInfo("pt-BR")) : value;
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Binding.DoNothing;
+}
+
 /// <summary>Aplica o modelo amigável só quando o conteúdo é texto; ícones e painéis seguem o padrão do WPF.</summary>
 public sealed class FriendlyTemplateSelector : DataTemplateSelector
 {
