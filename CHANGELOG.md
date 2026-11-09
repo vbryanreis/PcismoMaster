@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.17.1
+
+- **Seletor de cor visual** em Cores do programa: no lugar dos quadradinhos, há um quadrado com todas as cores (mais viva para a direita, mais escura para baixo), uma barra com todos os tons, a prévia, o código #RRGGBB e o botão Padrão. À esquerda fica o que pintar (Destaque e as três cores dos ícones), com a cor atual de cada um. A cor muda no app enquanto você arrasta e fica salva ao soltar o mouse.
+- Versão atualizada para 0.17.1.
+
 ## 0.17.0
 
 - **Cores do programa**: botão da paleta na barra de título. Escolha a cor de destaque e as três cores dos ícones (11 cores prontas, código #RRGGBB ou Padrão), e se os botões principais usam a cor de destaque. Vale na hora, no modo escuro e no claro, e fica salvo.
