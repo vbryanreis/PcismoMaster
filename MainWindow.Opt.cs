@@ -42,7 +42,6 @@ public partial class MainWindow
         if (!_optBuilt.Add(page)) return;
         switch (page)
         {
-            case "PageOptFormat": BuildOptFormat(OptFormatHost); break;
             case "PageOptDebloat": BuildOptDebloat(OptDebloatHost); Shown(OptCatalog.For(OptPage.Debloat)); break;
             case "PageOptGeral": BuildOptTab(OptGeralHost, "Geral", GuideTab.Geral, "O básico que vale para quase todo PC: gravação de jogos, Modo de Jogo, mouse sem aceleração, teclado, Windows Update e apps em segundo plano."); break;
             case "PageOptPriv": BuildOptTab(OptPrivHost, "Privacidade", GuideTab.Privacidade, "O que o Windows envia para a Microsoft e o que os apps podem ver. Corta tráfego e processos em segundo plano."); break;
@@ -54,7 +53,7 @@ public partial class MainWindow
             case "PageOptBios": BuildOptBios(OptBiosHost); return;
             case "PageOptLook": BuildOptTab(OptLookHost, "Aparência", GuideTab.Aparencia, "Efeitos visuais, tema, menu de contexto e Explorer. Alguns reiniciam o Explorer ao aplicar."); break;
             case "PageOptGpu": BuildOptGpu(OptGpuHost); Shown(OptCatalog.For(OptPage.Gpu)); break;
-            case "PageOptProfiles": BuildOptProfiles(OptProfilesHost); break;
+            case "PageOptProfiles": BuildOptProfiles(OptProfilesHost); Shown(OptCatalog.All); break; // a lista "o que mexe" mostra o estado de tudo
             case "PageOptClean": BuildOptClean(OptCleanHost); return;
         }
         _ = RefreshOptStatesAsync();
@@ -436,22 +435,29 @@ public partial class MainWindow
 
     private void BuildOptProfiles(Panel host)
     {
-        OptOutputCard(host);
+        BuildOptFormat(host);
+        host.Children.Add(OptText("PACOTES PRONTOS", "Faint", 11, 10));
         foreach (var p in OptCatalog.Profiles)
         {
             TweakCard(host, "", p.Title, null, out var body);
             foreach (var line in p.Lines) body.Children.Add(OptText("• " + line, "Muted", 12, 2));
             body.Children.Add(OptText($"{p.Tweaks.Length} ajustes" + (p.Cleanup ? " + limpeza de temporários" : ""), "Faint", 11, 10));
-            body.Children.Add(TweakButton("APLICAR", true, async (_, _) => await ApplyProfileAsync(p.Title, p.Tweaks, p.Cleanup)));
+            var bar1 = new WrapPanel();
+            bar1.Children.Add(TweakButton("APLICAR", true, async (_, _) => await ApplyProfileAsync(p.Title, p.Tweaks, p.Cleanup)));
+            AddWhatItTouches(body, bar1, () => p.Tweaks.Select(OptCatalog.ById).OfType<OptTweak>());
         }
         TweakCard(host, "", "Padrão do Windows", "Desfaz tudo o que o PcismoMaster aplicou nas páginas do TWEAKING, voltando cada valor ao que era antes.", out var def);
-        def.Children.Add(TweakButton("VOLTAR AO PADRÃO", false, async (_, _) =>
+        var defBar = new WrapPanel();
+        defBar.Children.Add(TweakButton("VOLTAR AO PADRÃO", false, async (_, _) =>
         {
             var ours = OptCatalog.All.Where(Opt.Ours).ToList();
             if (ours.Count == 0) { MessageBox.Show(this, "Nada foi aplicado pelo PcismoMaster.", "Perfis"); return; }
             if (MessageBox.Show(this, $"Desfazer {ours.Count} ajuste(s) aplicados pelo PcismoMaster?", "Perfis", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             await ApplyOptAsync(ours, "Voltar ao padrão do Windows", undo: true);
         }));
+        AddWhatItTouches(def, defBar, () => OptCatalog.All.Where(Opt.Ours), "VER O QUE SERIA DESFEITO");
+
+        host.Children.Add(OptText("MEUS PERFIS", "Faint", 11, 10));
 
         TweakCard(host, "", "Meus perfis", "Salve o que está aplicado agora como um perfil para repetir em outro PC ou depois de formatar. Dá para exportar e importar o arquivo.", out var mine);
         var bar = new WrapPanel();
@@ -461,6 +467,58 @@ public partial class MainWindow
         _optProfilesList = new StackPanel { Margin = new Thickness(0, 8, 0, 0) };
         mine.Children.Add(_optProfilesList);
         BuildProfileRows();
+    }
+
+    /// <summary>Nome da aba do TWEAKING onde o ajuste fica (para mostrar de onde vem cada item de um pacote).</summary>
+    private static string TabName(OptTweak t) => t.Page switch
+    {
+        OptPage.Debloat => "Debloat",
+        OptPage.Gpu => "GPU e monitor",
+        _ when t.Id == "new_users" => "Geral",
+        _ => OptCatalog.Tab(t) switch
+        {
+            GuideTab.Privacidade => "Privacidade", GuideTab.Energia => "Energia", GuideTab.Rede => "Rede", GuideTab.Avancado => "Avançado",
+            GuideTab.Mitigacoes => "Mitigações", GuideTab.Aparencia => "Aparência", _ => "Geral",
+        },
+    };
+
+    private static readonly string[] TabOrder = { "Debloat", "Geral", "Privacidade", "Energia", "Rede", "Avançado", "GPU e monitor", "Mitigações", "Aparência" };
+
+    /// <summary>
+    /// Botão VER O QUE MEXE ao lado das ações de um pacote: abre a lista dos ajustes agrupados pela aba de onde vêm,
+    /// cada um com ● ativo / ○ ainda não, ⚠ quando tem aviso e ↻ quando pede reiniciar. Montada ao abrir, com o estado do momento.
+    /// </summary>
+    private void AddWhatItTouches(Panel body, WrapPanel bar, Func<IEnumerable<OptTweak>> items, string label = "VER O QUE MEXE")
+    {
+        var list = new StackPanel { Visibility = Visibility.Collapsed, Margin = new Thickness(0, 6, 0, 4) };
+        Button? toggle = null;
+        toggle = TweakButton(label, false, (_, _) =>
+        {
+            bool open = list.Visibility != Visibility.Visible;
+            list.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+            toggle!.Content = open ? "ESCONDER A LISTA" : label;
+            if (!open) return;
+            list.Children.Clear();
+            var all = items().Distinct().ToList();
+            if (all.Count == 0) { list.Children.Add(OptText("Nenhum ajuste.", "Faint", 12)); return; }
+            int on = all.Count(t => _optStates.GetValueOrDefault(t.Id)?.On == true);
+            list.Children.Add(OptText($"{all.Count} ajustes · {on} já ativos neste PC · ● ativo  ○ ainda não  ⚠ tem aviso  ↻ pede reiniciar", "Faint", 11, 8));
+            foreach (var g in all.GroupBy(TabName).OrderBy(g => Array.IndexOf(TabOrder, g.Key)))
+            {
+                list.Children.Add(new TextBlock { Text = g.Key.ToUpperInvariant() + $"  ·  {g.Count()}", FontWeight = FontWeights.Bold, FontSize = 11,
+                    Foreground = (Brush)FindResource("Fg"), Margin = new Thickness(0, 6, 0, 4) });
+                foreach (var t in g)
+                {
+                    bool active = _optStates.GetValueOrDefault(t.Id)?.On == true;
+                    var line = OptText((active ? "●  " : "○  ") + t.Title + (t.Warning != null ? "  ⚠" : "") + (t.Restart ? "  ↻" : ""), active ? "Fg" : "Muted", 12, 2);
+                    line.ToolTip = t.Description + (t.Warning != null ? "\n\n⚠ " + t.Warning : "");
+                    list.Children.Add(line);
+                }
+            }
+        });
+        bar.Children.Add(toggle);
+        if (!body.Children.Contains(bar)) body.Children.Add(bar);
+        body.Children.Add(list);
     }
 
     private static List<SavedOptProfile> LoadProfiles()
@@ -499,7 +557,10 @@ public partial class MainWindow
                 SaveProfiles(all);
                 BuildProfileRows();
             }));
-            _optProfilesList.Children.Add(row);
+            var holder = new StackPanel();
+            holder.Children.Add(row);
+            AddWhatItTouches(holder, row, () => p.Ids.Select(OptCatalog.ById).OfType<OptTweak>());
+            _optProfilesList.Children.Add(holder);
         }
     }
 
@@ -573,9 +634,9 @@ public partial class MainWindow
     private void BuildOptFormat(Panel host)
     {
         var boost = FullBoost();
-        TweakCard(host, "", "Windows recém-instalado",
-            "Para rodar logo depois de formatar. Aplica de uma vez o pacote completo de otimização (o mesmo das outras páginas, então cada item " +
-            "pode ser desfeito depois em Debloat, Windows, Mouse e teclado ou GPU). Programas e jogos para instalar ficam em Instalar apps.", out var intro);
+        TweakCard(host, "", "PC recém-formatado",
+            "Acabou de instalar o Windows? Comece por aqui. Aplica de uma vez o pacote completo de otimização (o mesmo das outras abas, então cada item " +
+            "pode ser desfeito depois na aba de onde ele vem). Programas e jogos para instalar ficam em Instalar apps.", out var intro);
         intro.Children.Add(OptText($"Pacote completo: {boost.Count} ajustes · {boost.Count(t => t.Restart)} pedem reiniciar · {boost.Count(t => t.Warning != null)} com aviso", "Muted", 12));
 
         TweakCard(host, "", "O que incluir", null, out var body);
@@ -585,7 +646,8 @@ public partial class MainWindow
         var cUsers = new CheckBox { Content = "Aplicar também para contas criadas depois", IsChecked = true, Margin = new Thickness(0, 0, 0, 8) };
         var cClean = new CheckBox { Content = "Limpar temporários e cache de atualização no final", IsChecked = true, Margin = new Thickness(0, 0, 0, 14) };
         foreach (var c in new[] { cBoost, cPhoto, cOne, cUsers, cClean }) body.Children.Add(c);
-        body.Children.Add(TweakButton("INICIAR CONFIGURAÇÃO", true, async (_, _) =>
+        var fbar = new WrapPanel();
+        fbar.Children.Add(TweakButton("INICIAR CONFIGURAÇÃO", true, async (_, _) =>
         {
             var list = new List<OptTweak>();
             if (cBoost.IsChecked == true) list.AddRange(boost);
@@ -597,11 +659,20 @@ public partial class MainWindow
             if (MessageBox.Show(this, $"Aplicar {list.Count} item(ns)" + (cClean.IsChecked == true ? " e limpar temporários" : "") +
                     "?\n\nUm ponto de restauração é criado antes. Leva alguns minutos; o Explorer pisca no final.", "Formatação",
                     MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
-            if (list.Count > 0) await ApplyOptAsync(list, "Formatação · configuração completa");
+            if (list.Count > 0) await ApplyOptAsync(list, "PC recém-formatado · configuração completa");
             if (cClean.IsChecked == true) await CleanDefaultAsync();
-            if (MessageBox.Show(this, "Configuração terminada. Reiniciar o PC agora para tudo valer?", "Formatação", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show(this, "Configuração terminada. Reiniciar o PC agora para tudo valer?", "PC recém-formatado", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 Process.Start(new ProcessStartInfo("shutdown.exe", "/r /t 5") { CreateNoWindow = true, UseShellExecute = false });
         }));
+        AddWhatItTouches(body, fbar, () =>
+        {
+            var l = new List<OptTweak>();
+            if (cBoost.IsChecked == true) l.AddRange(boost);
+            if (cPhoto.IsChecked == true) l.Add(OptCatalog.ById("photo_viewer_classic")!);
+            if (cOne.IsChecked == true) l.Add(OptCatalog.ById("onedrive_remove")!);
+            if (cUsers.IsChecked == true) l.Add(OptCatalog.ById("new_users")!);
+            return l;
+        });
         OptOutputCard(host);
     }
 

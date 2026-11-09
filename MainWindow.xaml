@@ -283,12 +283,6 @@
                             </StackPanel>
                             <ToggleButton x:Name="GrpTweak" Style="{StaticResource NavGroup}" Content="TWEAKING"/>
                             <StackPanel x:Name="GrpTweakItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpTweak, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavOptFormat" Style="{StaticResource NavItem}" Tag="PageOptFormat" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE9E9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Formatação" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
                             <RadioButton x:Name="NavOptDebloat" Style="{StaticResource NavItem}" Tag="PageOptDebloat" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -1713,15 +1707,6 @@
                 </Grid>
 
                 <!-- ===== TWEAKING (páginas montadas em MainWindow.Opt.cs a partir do OptCatalog) ===== -->
-                <ScrollViewer x:Name="PageOptFormat" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="36,30,36,30">
-                        <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="Formatação" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Depois de instalar o Windows: tudo de uma vez, com ponto de restauração · nada é aplicado ao abrir esta página" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                        <StackPanel x:Name="OptFormatHost"/>
-                    </StackPanel>
-                </ScrollViewer>
                 <ScrollViewer x:Name="PageOptDebloat" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
@@ -1825,7 +1810,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
                             <TextBlock Text="Perfis" Style="{StaticResource H1}"/>
-                            <TextBlock Text="Pacotes prontos e os seus perfis salvos · aplicar, voltar ao padrão, exportar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            <TextBlock Text="PC recém-formatado, pacotes prontos e os seus perfis · veja o que cada um mexe antes de aplicar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel x:Name="OptProfilesHost"/>
                     </StackPanel>

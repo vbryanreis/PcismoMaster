@@ -2,6 +2,12 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.15.0
+
+- **Formatação foi para dentro de Perfis**: o cartão "PC recém-formatado" (pacote completo, Visualizador de Fotos, OneDrive, contas novas e limpeza) fica no topo de Perfis, seguido dos pacotes prontos e dos seus perfis. O menu TWEAKING tem uma aba a menos, na ordem do guia.
+- **VER O QUE MEXE** em todo pacote e perfil salvo: mostra os ajustes agrupados pela aba de onde vêm (Debloat, Geral, Privacidade, Energia, Rede…), com ● ativo / ○ ainda não, ⚠ quando tem aviso e ↻ quando pede reiniciar. Passe o mouse num item para ler a descrição e o aviso. No Padrão do Windows, mostra o que seria desfeito.
+- Versão atualizada para 0.15.0.
+
 ## 0.14.0
 
 - **TWEAKING organizado como o guia da Adamx**: as abas agora são Formatação, Debloat, Geral, Privacidade, Energia, Rede, Avançado, GPU e monitor, Drivers, Mitigações, Serviços, BIOS, Limpeza, Aparência e Perfis. A antiga página Windows foi dividida entre as abas, e Mouse e teclado foi para Geral. Cada aba tem busca, filtro, APLICAR RECOMENDADOS e desfazer.
