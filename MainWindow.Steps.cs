@@ -14,6 +14,7 @@ public partial class MainWindow
     private static readonly (string Nav, string Page, string Title, string What)[] TweakSteps =
     {
         ("NavOptStart", "PageOptStart", "Começar aqui", "A ordem dos passos e o atalho que aplica o pacote completo de uma vez."),
+        ("NavOptUpdate", "PageOptUpdate", "Windows Update", "Veja o que falta instalar e se tem problema conhecido; segure drivers ou o Update se precisar."),
         ("NavDriver", "PageDriver", "Drivers", "Driver de vídeo, chipset e BIOS atualizados antes de qualquer ajuste."),
         ("NavOptDebloat", "PageOptDebloat", "Debloat", "Tira apps, propaganda, telemetria e IA que vêm com o Windows."),
         ("NavOptGeral", "PageOptGeral", "Geral", "Modo de Jogo, gravação de jogos, mouse, teclado e Windows Update."),
@@ -105,7 +106,6 @@ public partial class MainWindow
             grid.Children.Add(num); grid.Children.Add(text); grid.Children.Add(open);
             body.Children.Add(grid);
         }
-        BuildWinUpdateCard(host);
         BuildOptFormat(host);
     }
 }

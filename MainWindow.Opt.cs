@@ -43,6 +43,7 @@ public partial class MainWindow
         switch (page)
         {
             case "PageOptStart": BuildOptStart(OptStartHost); Shown(OptCatalog.All); break;
+            case "PageOptUpdate": BuildWinUpdateCard(OptUpdateHost); Shown(new[] { OptCatalog.ById("wu_drivers_block")!, OptCatalog.ById("wu_block_all")! }); break;
             case "PageOptDebloat": BuildOptDebloat(OptDebloatHost); Shown(OptCatalog.For(OptPage.Debloat)); break;
             case "PageOptGeral": BuildOptTab(OptGeralHost, "Geral", GuideTab.Geral, "O básico que vale para quase todo PC: gravação de jogos, Modo de Jogo, mouse sem aceleração, teclado, Windows Update e apps em segundo plano."); break;
             case "PageOptPriv": BuildOptTab(OptPrivHost, "Privacidade", GuideTab.Privacidade, "O que o Windows envia para a Microsoft e o que os apps podem ver. Corta tráfego e processos em segundo plano."); break;

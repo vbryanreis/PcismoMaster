@@ -18,7 +18,7 @@ public partial class MainWindow
 
     private void BuildWinUpdateCard(Panel host)
     {
-        TweakCard(host, "", "Windows Update",
+        TweakCard(host, "", "Windows Update",
             "A Microsoft às vezes solta uma atualização que quebra alguma coisa e só corrige semanas depois. Aqui você vê o que falta instalar e se ela tem problema " +
             "conhecido antes de instalar, e pode segurar os drivers ou o Update inteiro enquanto isso.", out var body);
         foreach (var id in new[] { "wu_drivers_block", "wu_block_all" })
