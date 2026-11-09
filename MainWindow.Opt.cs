@@ -42,6 +42,7 @@ public partial class MainWindow
         if (!_optBuilt.Add(page)) return;
         switch (page)
         {
+            case "PageOptStart": BuildOptStart(OptStartHost); Shown(OptCatalog.All); break;
             case "PageOptDebloat": BuildOptDebloat(OptDebloatHost); Shown(OptCatalog.For(OptPage.Debloat)); break;
             case "PageOptGeral": BuildOptTab(OptGeralHost, "Geral", GuideTab.Geral, "O básico que vale para quase todo PC: gravação de jogos, Modo de Jogo, mouse sem aceleração, teclado, Windows Update e apps em segundo plano."); break;
             case "PageOptPriv": BuildOptTab(OptPrivHost, "Privacidade", GuideTab.Privacidade, "O que o Windows envia para a Microsoft e o que os apps podem ver. Corta tráfego e processos em segundo plano."); break;
@@ -435,7 +436,7 @@ public partial class MainWindow
 
     private void BuildOptProfiles(Panel host)
     {
-        BuildOptFormat(host);
+        OptOutputCard(host);
         host.Children.Add(OptText("PACOTES PRONTOS", "Faint", 11, 10));
         foreach (var p in OptCatalog.Profiles)
         {
