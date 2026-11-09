@@ -2,6 +2,14 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.14.0
+
+- **TWEAKING organizado como o guia da Adamx**: as abas agora são Formatação, Debloat, Geral, Privacidade, Energia, Rede, Avançado, GPU e monitor, Drivers, Mitigações, Serviços, BIOS, Limpeza, Aparência e Perfis. A antiga página Windows foi dividida entre as abas, e Mouse e teclado foi para Geral. Cada aba tem busca, filtro, APLICAR RECOMENDADOS e desfazer.
+- **Mitigações (nova)**: desligar as proteções contra Spectre e Meltdown, com aviso de PERIGOSO, reinício e desfazer. Serve para testar o ganho na sua máquina. A aba também explica por que o Isolamento de núcleo, o DEP e o SmartScreen ficam de fora.
+- **Serviços (nova)**: todos os ajustes que desligam serviços do Windows numa lista só, cada um dizendo o que para de funcionar.
+- **BIOS (nova)**: o que cada ajuste do firmware faz (C-states, ASPM, spread spectrum, VT-x/SVM, IOMMU) e onde mudar. O app não grava nada na BIOS.
+- Versão atualizada para 0.14.0.
+
 ## 0.13.0
 
 - **Visual novo**: o app inteiro foi redesenhado no estilo do ArtCraft. Agora tem cantos retos, fundo grafite e cabeçalho com o nome em caixa alta. Botões e etiquetas usam fonte mono e o botão principal é branco. As etiquetas (RECOMENDADO, REINICIA, ATENÇÃO) só têm contorno, sem fundo. O modo claro foi ajustado à nova paleta.

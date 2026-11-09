@@ -1,9 +1,12 @@
-namespace ResetExplode.Modular;
+﻿namespace ResetExplode.Modular;
 
 /// <summary>Página do TWEAKING onde o ajuste aparece.</summary>
 public enum OptPage { Debloat, Windows, Mouse, Teclado, Gpu }
 
 /// <summary>Nível no Debloat (Essencial e Recomendado vêm marcados; Avançado nunca). Nas outras páginas é Normal.</summary>
+/// <summary>Aba do TWEAKING na mesma ordem e com os mesmos nomes do guia da Adamx.</summary>
+public enum GuideTab { Geral, Privacidade, Energia, Rede, Avancado, Mitigacoes, Aparencia }
+
 public enum OptLevel { Essencial, Recomendado, Avancado, Normal }
 
 /// <summary>O que um ajuste faz além de valores de registro. Cada tipo guarda o estado de antes e sabe desfazer.</summary>
@@ -482,6 +485,12 @@ public static class OptCatalog
                 S(), new[] { X(ExtraKind.Bcd, "disabledynamictick", "yes") },
                 warn: "Evite em notebook na bateria. Se o PC usa BitLocker, tenha a chave de recuperação à mão: mexer na inicialização pode pedir a chave.", restart: true),
 
+            // ---- Mitigações: só para testar; deixa o PC menos protegido ----
+            T("spectre_meltdown_off", W, N, "Mitigações", "Desligar as proteções contra Spectre e Meltdown", "Desliga no Windows as correções de software para as falhas Spectre e Meltdown do processador. Em alguns processadores, principalmente Intel antigos, dá um pouco mais de desempenho. Serve para testar e comparar na sua máquina.",
+                S(Lm(@"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", "FeatureSettingsOverride", 3),
+                  Lm(@"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", "FeatureSettingsOverrideMask", 3)),
+                warn: "PERIGOSO: deixa o PC vulnerável a programas e sites maliciosos que leem a memória de outros programas (senhas, chaves, dados do navegador). Em processadores novos o ganho costuma ser zero. Use só para testar e desfaça se não notar diferença. Nunca use em PC de trabalho ou com dados importantes.", restart: true),
+
             // ---- Rede: placa de rede e protocolos ----
             T("nic_interrupt_moderation_off", W, N, "Rede", "Desligar a moderação de interrupção da placa de rede", "A placa avisa o processador a cada pacote, em vez de juntar vários. Pacotes pequenos de jogo chegam antes.",
                 S(), new[] { X(ExtraKind.NicProp, "*InterruptModeration", "0") },
@@ -566,7 +575,26 @@ public static class OptCatalog
 
     public static string LevelText(OptLevel l) => l switch { OptLevel.Essencial => "Essencial", OptLevel.Recomendado => "Recomendado", OptLevel.Avancado => "Avançado", _ => "" };
 
-    public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Energia", "Privacidade", "Jogos", "Rede", "IA" };
+    public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Energia", "Privacidade", "Jogos", "Rede", "IA", "Mitigações" };
+
+    /// <summary>Aba do guia onde um ajuste das páginas Windows, Mouse e Teclado aparece (Debloat e GPU têm página própria).</summary>
+    public static GuideTab Tab(OptTweak t) => t.Category switch
+    {
+        "Privacidade" or "IA" => GuideTab.Privacidade,
+        "Energia" => GuideTab.Energia,
+        "Rede" => GuideTab.Rede,
+        "Desempenho" => GuideTab.Avancado,
+        "Mitigações" => GuideTab.Mitigacoes,
+        "Aparência" => GuideTab.Aparencia,
+        _ => GuideTab.Geral,
+    };
+
+    /// <summary>Ajustes de uma aba do guia (só das páginas Windows, Mouse e Teclado).</summary>
+    public static IEnumerable<OptTweak> ForTab(GuideTab tab) => All.Where(t => t.Page is OptPage.Windows or OptPage.Mouse or OptPage.Teclado && t.Id != "new_users" && Tab(t) == tab);
+
+    /// <summary>Aba Serviços: todo ajuste que muda o tipo de inicialização de um serviço do Windows, de qualquer página.</summary>
+    public static IEnumerable<OptTweak> Services() => All.Where(t => t.StopServices is { Length: > 0 } ||
+        t.Settings.Any(x => x.Name == "Start" && x.Path.StartsWith(@"SYSTEM\CurrentControlSet\Services\", StringComparison.OrdinalIgnoreCase)));
 
     public static readonly OptProfile[] Profiles =
     {

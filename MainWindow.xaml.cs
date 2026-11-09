@@ -299,14 +299,14 @@ public partial class MainWindow : Window
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
             case "PageMaint": InitMaint(); break;
-            case "PageOptFormat" or "PageOptDebloat" or "PageOptWindows" or "PageOptInput" or "PageOptGpu" or "PageOptProfiles": InitOpt(page); break;
+            case "PageOptFormat" or "PageOptDebloat" or "PageOptGeral" or "PageOptPriv" or "PageOptPower" or "PageOptNet" or "PageOptAdv" or "PageOptMitig" or "PageOptSvc" or "PageOptBios" or "PageOptLook" or "PageOptGpu" or "PageOptProfiles": InitOpt(page); break;
             case "PageOptClean": InitOpt(page); InitMemory(); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageHome, PageOptFormat, PageOptDebloat, PageOptWindows, PageOptInput, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageOptFormat, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 
