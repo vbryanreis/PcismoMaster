@@ -224,6 +224,7 @@ public partial class MainWindow
             BtnUnScanNow.Visibility = Visibility.Collapsed;
 
             await ScanAndShowAsync(p, forced: false);
+            UninstallList.SelectedItem = null; // a seleção não fica presa no app desinstalado
             await LoadProgramsAsync(); // o programa pode ter saído da lista
             if (!IsGone(p)) _ = WatchUntilGoneAsync(p);
         }

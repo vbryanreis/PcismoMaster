@@ -34,6 +34,11 @@ public sealed record InstalledProgram(
     public bool HasIcon => _icon != null;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    // Igualdade por referência: a do record compara todos os campos, inclusive o ícone e o PropertyChanged, que mudam
+    // depois que a lista aparece. O hash mudava e a ListBox perdia a seleção (ficava presa no app já desinstalado).
+    public bool Equals(InstalledProgram? other) => ReferenceEquals(this, other);
+    public override int GetHashCode() => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
 }
 
 /// <summary>
