@@ -479,11 +479,11 @@ public partial class MainWindow
         _ => OptCatalog.Tab(t) switch
         {
             GuideTab.Privacidade => "Privacidade", GuideTab.Energia => "Energia", GuideTab.Rede => "Rede", GuideTab.Avancado => "Avançado",
-            GuideTab.Mitigacoes => "Mitigações", GuideTab.Aparencia => "Aparência", _ => "Geral",
+            GuideTab.Mitigacoes => "Mitigações", GuideTab.Aparencia => "Aparência", GuideTab.Servicos => "Serviços", _ => "Geral",
         },
     };
 
-    private static readonly string[] TabOrder = { "Debloat", "Geral", "Privacidade", "Energia", "Rede", "Avançado", "GPU e monitor", "Mitigações", "Aparência" };
+    private static readonly string[] TabOrder = { "Debloat", "Geral", "Privacidade", "Energia", "Rede", "Avançado", "GPU e monitor", "Serviços", "Mitigações", "Aparência" };
 
     /// <summary>
     /// Botão VER O QUE MEXE ao lado das ações de um pacote: abre a lista dos ajustes agrupados pela aba de onde vêm,

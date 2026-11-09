@@ -66,6 +66,30 @@ public partial class MainWindow
         ScanStartup();
     }
 
+    private void StartupOpenLocation_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: StartupEntry item }) return;
+        string? path = StartupFile(item);
+        if (path == null) { StartupResult.Text = $"{item.Name}: o arquivo não existe mais, não há local para abrir."; return; }
+        try { System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\""); }
+        catch (Exception ex) { StartupResult.Text = $"{item.Name}: não deu para abrir o local ({ex.Message})."; }
+    }
+
+    /// <summary>O arquivo de um item: o atalho/arquivo da pasta Inicializar, ou o executável do comando (com ou sem aspas).</summary>
+    private static string? StartupFile(StartupEntry item)
+    {
+        if (item.FilePath != null && System.IO.File.Exists(item.FilePath)) return item.FilePath;
+        string cmd = Environment.ExpandEnvironmentVariables(item.Command.Trim());
+        if (cmd.StartsWith('"')) { int end = cmd.IndexOf('"', 1); return end > 1 && System.IO.File.Exists(cmd[1..end]) ? cmd[1..end] : null; }
+        for (int i = cmd.Length; i > 0; i = cmd.LastIndexOf(' ', i - 1))
+        {
+            string c = cmd[..i];
+            if (System.IO.File.Exists(c)) return c;
+            if (!c.Contains(' ')) break;
+        }
+        return null;
+    }
+
     private void BtnStartupRestore_Click(object sender, RoutedEventArgs e)
     {
         var removed = _settings.StartupRemoved;
