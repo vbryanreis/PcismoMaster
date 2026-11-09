@@ -383,6 +383,30 @@ Test("Abas do guia: todo ajuste de Windows, Mouse e Teclado cai em uma aba; Spec
     Assert(OptCatalog.ForTab(GuideTab.Mitigacoes).Single().Id == "spectre_meltdown_off" && OptCatalog.ById("spectre_meltdown_off")!.Warning!.StartsWith("PERIGOSO"));
     Assert(OptCatalog.Services().Any(t => t.Id == "sysmain_off" || t.StopServices?.Contains("SysMain") == true) && OptCatalog.ForTab(GuideTab.Energia).Count() == 4 && OptCatalog.ForTab(GuideTab.Servicos).All(t => t.Warning != null && t.StopServices?.Length == 1 && OptCatalog.Services().Contains(t)) && OptCatalog.ForTab(GuideTab.Servicos).Count() > 60);
 });
+Test("Windows Update: lê histórico e problemas conhecidos e avalia cada versão", () => {
+    string hist = "<strong>Version 26H2 (OS build 26300)</strong> <table><tbody><tr><th>x</th></tr>" +
+        "<tr> <td>GA</td> <td>2026-10 D</td> <td>2026-10-28</td> <td>26300.9818</td> <td><a href=\"x\">KB5127936</a></td> </tr>" +
+        "<tr> <td>GA</td> <td>2026-10 OOB</td> <td>2026-10-26</td> <td>26300.9725</td> <td><a href=\"x\">KB5134133</a></td> </tr>" +
+        "<tr> <td>GA</td> <td>2026-10 B</td> <td>2026-10-13</td> <td>26300.9711</td> <td><a href=\"x\">KB5127648</a></td> </tr>" +
+        "<tr> <td>GA</td> <td>2026-09 D</td> <td>2026-09-29</td> <td>26300.9550</td> <td><a href=\"x\">KB5124010</a></td> </tr></tbody></table>";
+    var h = WinUpdates.ParseHistory(hist, 26300);
+    Assert(h.Count == 4 && h[0].Kb == "KB5127936" && h[0].Revision == 9818 && h[1].TypeText.StartsWith("Emergencial") && h[2].TypeText.StartsWith("Mensal"));
+    string Row(string title, string build, string kb, string status) =>
+        $"<tr><td><a href=\"#a\"><b>{title}</b></a><br>Resumo.<br></td><td>OS Build {build}<br> <a href=\"x\">{kb}</a><br>2026-09-01</td><td>{status}</td><td>2026-10-13 <br>10:13 PT</td></tr>";
+    string iss = "<h2 id=\"known-issues\">Known issues</h2><table><thead><tr><th>S</th></tr></thead><tbody>" +
+        Row("Tela preta", "26100.9550", "KB5124010", "Resolved<br> <a href=\"x\">KB5127648</a>") +
+        Row("Som USB", "26100.9550", "KB5124010", "Mitigated<br>") +
+        Row("Rede cai", "26100.9818", "KB5127936", "Confirmed<br>") + "</tbody></table>";
+    var i = WinUpdates.ParseIssues(iss);
+    Assert(i.Count == 3 && i[0].FixKb == "KB5127648" && !i[0].Open && i[1].Open && i[2].OriginKb == "KB5127936");
+    // instalado 9711: a OOB 9725 não traz problema novo; a prévia 9818 traz um confirmado
+    Assert(WinUpdates.Judge(h[1], i, h, 9711).Level == "ok");
+    Assert(WinUpdates.Judge(h[0], i, h, 9711).Level == "problema");
+    // instalado 9550: a 9711 corrige a tela preta
+    Assert(WinUpdates.Judge(h[2], i, h, 9550).Fixes.Single().Title == "Tela preta");
+    var all = OptCatalog.ById("wu_block_all")!;
+    Assert(all.Warning!.StartsWith("PERIGOSO") && !all.Recommended && !all.DefaultOn && OptCatalog.ById("wu_drivers_block")!.Warning != null && all.Group == OptCatalog.ById("wu_notify")!.Group);
+});
 Test("Limpeza: respeita idade e máscara, expande perfis e não sai da pasta", () => {
     string root = Path.Combine(temp, "clean");
     Directory.CreateDirectory(Path.Combine(root, "P1", "Cache", "sub")); Directory.CreateDirectory(Path.Combine(root, "P2", "Cache")); Directory.CreateDirectory(Path.Combine(root, "P3"));

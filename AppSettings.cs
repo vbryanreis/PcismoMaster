@@ -172,6 +172,9 @@ public sealed class AppSettings
     /// <summary>Último limite global usado, para o atalho de ligar/desligar o limitador.</summary>
     public uint LimiterLastFps { get; set; }
     public int RecordFps { get; set; } = 60;
+    /// <summary>Aviso de versão nova do Windows: última checagem e último KB avisado (avisa uma vez por versão).</summary>
+    public DateTime WinUpdLastCheck { get; set; }
+    public string? WinUpdLastNotified { get; set; }
     /// <summary>Perfis por jogo (nome do executável em minúsculas, sem .exe).</summary>
     public Dictionary<string, OverlayGameProfile>? OverlayGames { get; set; }
 

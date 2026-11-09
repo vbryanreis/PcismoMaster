@@ -2,6 +2,15 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.19.0
+
+- **Windows Update em Começar aqui**: cartão novo logo abaixo do passo a passo.
+  - **Bloquear drivers pelo Windows Update**: o Update para de baixar e trocar drivers sozinho e de oferecer drivers e apps opcionais. Drivers novos passam a ser instalados pela aba Driver.
+  - **Bloquear o Windows Update inteiro** (PERIGOSO, nunca recomendado): aponta o Update para um endereço que não existe (wu-bloqueado.invalid) e esconde as opções de atualizar. Fica sem correções de segurança até desfazer; Store, Edge, Defender e programas do fabricante seguem atualizando por fora. Não fica ligado junto com "Windows Update só avisa".
+  - **Leitor de atualizações**: mostra as versões do Windows que você ainda não tem e, para cada uma, se a Microsoft reconheceu problema (OK, ATENÇÃO ou TEM PROBLEMA), o que ela corrige do que você tem hoje e se é só prévia opcional. Lê as páginas oficiais da Microsoft, então funciona mesmo com o Update bloqueado. PERGUNTAR AO WINDOWS UPDATE também lista drivers, Defender e .NET pendentes, sem baixar nada. Cada atualização tem NOTAS DA MICROSOFT e PROCURAR RELATOS.
+  - **Aviso de versão nova**: ao abrir o app (no máximo a cada 12 h), avisa no canto da tela quando sai uma versão nova do Windows, já dizendo se ela tem problema conhecido.
+- Versão atualizada para 0.19.0.
+
 ## 0.18.0
 
 - **63 serviços novos para desligar** na aba Serviços, em grupos (Xbox, Rede, Acesso remoto, Impressão e scanner, Diagnóstico, Sensores e localização, Bluetooth e telefone, Biometria e cartões, Outros, Realidade mista, Máquina virtual). Cada um avisa o que faz e o que para de funcionar; os arriscados (Bluetooth, Windows Hello, teclado virtual, câmera, Store) começam com PERIGOSO. Serviços que não existem no PC são pulados.
