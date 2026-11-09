@@ -2,6 +2,16 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.17.0
+
+- **Cores do programa**: botão da paleta na barra de título. Escolha a cor de destaque e as três cores dos ícones (11 cores prontas, código #RRGGBB ou Padrão), e se os botões principais usam a cor de destaque. Vale na hora, no modo escuro e no claro, e fica salvo.
+- **Ícones novos**: menu lateral, cabeçalhos dos cartões e blocos do Início com ícones chapados em duas ou três cores (azul, laranja e creme no padrão), desenhados para o PcismoMaster.
+- **Botões de atualizar conferidos**:
+  - Limpeza: ATUALIZAR não derruba mais o app se a leitura falhar e fica travado enquanto lê.
+  - Desinstalar apps: ATUALIZAR LISTA trava os botões enquanto lê e limpa a seleção antiga.
+  - Atualizar apps pelo winget: diz "Já está na versão mais recente" ou "Atualizado" (antes dizia "Já estava instalado"), e explica quando o app nem está instalado.
+- Versão atualizada para 0.17.0.
+
 ## 0.16.0
 
 - **TWEAKING virou um passo a passo para depois de formatar**: as abas aparecem numeradas na ordem de aplicar (01 Começar aqui, 02 Drivers, 03 Debloat, 04 Geral, 05 Privacidade, 06 Energia, 07 Rede, 08 Avançado, 09 GPU e monitor, 10 Serviços, 11 Mitigações, 12 BIOS, 13 Aparência, 14 Limpeza e 15 Perfis).

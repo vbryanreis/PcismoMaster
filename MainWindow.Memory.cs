@@ -123,13 +123,28 @@ public partial class MainWindow
     }
 
     /// <summary>Lista os programas abertos fora da thread da janela (percorre todos os processos do Windows).</summary>
-    private async void RefreshApps()
+    private bool _appsReading;
+
+    /// <summary>Relê os programas abertos. Um por vez; uma falha vira aviso em vez de derrubar o app.</summary>
+    private async void RefreshApps(Button? button = null)
     {
-        _apps = await Task.Run(Optimizer.ListApps);
-        OptApps.ItemsSource = _apps;
+        if (_appsReading) return;
+        _appsReading = true;
+        if (button != null) button.IsEnabled = false;
+        try
+        {
+            _apps = await Task.Run(Optimizer.ListApps);
+            OptApps.ItemsSource = _apps;
+        }
+        catch (Exception ex) { MessageBox.Show(this, "Não deu para ler os programas abertos: " + ex.Message, "Limpeza"); }
+        finally
+        {
+            _appsReading = false;
+            if (button != null) button.IsEnabled = true;
+        }
     }
 
-    private void BtnRefreshApps_Click(object sender, RoutedEventArgs e) => RefreshApps();
+    private void BtnRefreshApps_Click(object sender, RoutedEventArgs e) => RefreshApps(sender as Button);
 
     private async void BtnOptimize_Click(object sender, RoutedEventArgs e)
     {

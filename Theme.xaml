@@ -28,6 +28,10 @@
     <SolidColorBrush x:Key="TagBlue" Color="#7C9CFF"/>
     <SolidColorBrush x:Key="TagAmber" Color="#E8B44A"/>
     <SolidColorBrush x:Key="TagGreen" Color="#5FCF8A"/>
+    <!-- Ícones chapados (FlatIcons): azul, laranja e creme; o usuário pode trocar em Cores do programa -->
+    <SolidColorBrush x:Key="IconA" Color="#3D6BFF"/>
+    <SolidColorBrush x:Key="IconB" Color="#FF5A36"/>
+    <SolidColorBrush x:Key="IconC" Color="#EFE6D2"/>
     <!-- Quadrado claro atrás dos ícones de apps (Instalar/Desinstalar): ícones escuros e coloridos ficam todos legíveis -->
     <SolidColorBrush x:Key="IconTile" Color="#F4EFEA"/>
 
