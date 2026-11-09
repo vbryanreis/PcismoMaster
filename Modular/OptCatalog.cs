@@ -26,6 +26,10 @@ public enum ExtraKind
     RefreshMax,     // monitores na maior taxa de atualização
     Discord,        // opção do settings.json do Discord (Args = nome, valor JSON)
     NewUsers,       // copiar os ajustes de usuário aplicados para contas criadas depois
+    PageCombining,  // combinação de páginas de memória desligada (Disable-MMAgent -PageCombining)
+    NicProp,        // propriedade avançada de todas as placas de rede físicas (Args = palavra-chave, valor)
+    NetBios,        // NetBIOS sobre TCP/IP desligado em todas as interfaces (NetbiosOptions = 2)
+    Bcd,            // opção do gerenciador de inicialização (Args = nome, valor), ex.: disabledynamictick yes
 }
 
 public sealed record OptExtra(ExtraKind Kind, params string[] Args);
@@ -467,6 +471,30 @@ public static class OptCatalog
             T("ps_remotesigned", W, N, "Geral", "Permitir scripts PowerShell (RemoteSigned)", "Scripts .ps1 criados no PC rodam normalmente; scripts baixados da internet continuam exigindo assinatura.",
                 S(LmT(@"SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell", "ExecutionPolicy", "RemoteSigned")), warn: "Só ative se você usa scripts PowerShell. É o padrão do Windows Server."),
 
+            // ---- Energia: menos economia, resposta mais imediata (desktop) ----
+            T("power_throttling_off", W, N, "Energia", "Desligar a limitação de energia de programas", "O Windows para de baixar o clock da CPU para programas em segundo plano. Tudo responde na hora, com um pouco mais de consumo.",
+                S(Lm(@"SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", "PowerThrottlingOff", 1)),
+                warn: "Evite em notebook na bateria: a autonomia cai.", restart: true),
+            T("timer_coalescing_off", W, N, "Energia", "Não agrupar os timers do Windows", "Os timers disparam na hora marcada, em vez de serem juntados para o processador dormir mais.",
+                S(Lm(@"SYSTEM\CurrentControlSet\Control\Session Manager\kernel", "CoalescingTimerInterval", 0)),
+                warn: "Evite em notebook na bateria: o processador acorda mais vezes.", restart: true),
+            T("dynamic_tick_off", W, N, "Energia", "Desligar o dynamic tick", "O relógio do sistema bate num ritmo fixo, sem pular batidas quando o PC está ocioso. Deixa o tempo entre quadros mais regular.",
+                S(), new[] { X(ExtraKind.Bcd, "disabledynamictick", "yes") },
+                warn: "Evite em notebook na bateria. Se o PC usa BitLocker, tenha a chave de recuperação à mão: mexer na inicialização pode pedir a chave.", restart: true),
+
+            // ---- Rede: placa de rede e protocolos ----
+            T("nic_interrupt_moderation_off", W, N, "Rede", "Desligar a moderação de interrupção da placa de rede", "A placa avisa o processador a cada pacote, em vez de juntar vários. Pacotes pequenos de jogo chegam antes.",
+                S(), new[] { X(ExtraKind.NicProp, "*InterruptModeration", "0") },
+                warn: "Usa um pouco mais de processador em downloads grandes. A conexão cai por alguns segundos ao aplicar."),
+            T("netbios_off", W, N, "Rede", "Desligar o NetBIOS sobre TCP/IP", "Desliga o NetBIOS em todas as interfaces de rede: menos tráfego de broadcast e menos portas abertas.",
+                S(), new[] { X(ExtraKind.NetBios) },
+                warn: "Evite se você acessa pastas compartilhadas ou impressoras pelo nome em PCs muito antigos da rede local."),
+
+            // ---- Memória ----
+            T("page_combining_off", W, N, "Desempenho", "Desligar a combinação de páginas de memória", "O Windows para de procurar páginas iguais na RAM para juntá-las. Economiza processador com o PC parado.",
+                S(), new[] { X(ExtraKind.PageCombining) },
+                warn: "Evite com 8 GB de RAM ou menos: juntar páginas iguais economiza memória.", restart: true),
+
             // ===================== MOUSE =====================
             T("input_mouse", M, N, "Jogos", "Mouse sem atrasos", "Cursor 1:1 sem aceleração, dica ao parar o mouse em 10 ms, sem rastro, sem som e sem foco ao passar por cima; curvas de movimento padrão.",
                 S(CuT(@"Control Panel\Mouse", "MouseSpeed", "0"), CuT(@"Control Panel\Mouse", "MouseThreshold1", "0"), CuT(@"Control Panel\Mouse", "MouseThreshold2", "0"),
@@ -538,7 +566,7 @@ public static class OptCatalog
 
     public static string LevelText(OptLevel l) => l switch { OptLevel.Essencial => "Essencial", OptLevel.Recomendado => "Recomendado", OptLevel.Avancado => "Avançado", _ => "" };
 
-    public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Privacidade", "Jogos", "Rede", "IA" };
+    public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Energia", "Privacidade", "Jogos", "Rede", "IA" };
 
     public static readonly OptProfile[] Profiles =
     {

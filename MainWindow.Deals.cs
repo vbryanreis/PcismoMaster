@@ -263,7 +263,7 @@ public partial class MainWindow
         var deal = d.Deal;
         var banner = new Border
         {
-            Height = bannerH, CornerRadius = new CornerRadius(10, 10, 0, 0), Background = (Brush)FindResource("AccentGradient"),
+            Height = bannerH, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient"),
             Child = new TextBlock { Text = Initials(d.Title), FontSize = 32, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent"),
                 Opacity = 0.85, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         };
@@ -276,7 +276,7 @@ public partial class MainWindow
         if (FlagText(deal.Flag) is string flag)
             top.Children.Add(new Border
             {
-                Background = (Brush)FindResource(deal.Flag == "S" ? "AccentCyan" : "AccentGradient"), CornerRadius = new CornerRadius(6),
+                Background = (Brush)FindResource(deal.Flag == "S" ? "AccentCyan" : "AccentGradient"), CornerRadius = new CornerRadius(0),
                 Padding = new Thickness(7, 2, 7, 2), Margin = new Thickness(8), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top,
                 Child = new TextBlock { Text = flag, FontSize = 9.5, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent") },
             });
@@ -319,7 +319,7 @@ public partial class MainWindow
         body.Children.Add(info);
         var card = new Border
         {
-            Width = w, CornerRadius = new CornerRadius(10), Background = (Brush)FindResource("Card"), Margin = new Thickness(0, 0, 14, 14),
+            Width = w, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("Card"), Margin = new Thickness(0, 0, 14, 14),
             BorderBrush = (Brush)FindResource("Line"), BorderThickness = new Thickness(1), Child = body, Cursor = Cursors.Hand,
             ToolTip = $"Abrir a oferta na {deal.Shop.Name}",
         };
@@ -331,7 +331,7 @@ public partial class MainWindow
 
     private Border CutBadge(int cut, Thickness margin, HorizontalAlignment align) => new()
     {
-        Background = (Brush)FindResource("ChartGpu"), CornerRadius = new CornerRadius(6), Padding = new Thickness(7, 2, 7, 2), Margin = margin,
+        Background = (Brush)FindResource("ChartGpu"), CornerRadius = new CornerRadius(0), Padding = new Thickness(7, 2, 7, 2), Margin = margin,
         HorizontalAlignment = align, VerticalAlignment = VerticalAlignment.Top,
         Child = new TextBlock { Text = $"-{cut}%", FontWeight = FontWeights.Bold, FontSize = 12, Foreground = (Brush)FindResource("Ink") },
     };
@@ -400,7 +400,7 @@ public partial class MainWindow
     {
         var banner = new Border
         {
-            Width = 184, Height = 86, CornerRadius = new CornerRadius(8), Background = (Brush)FindResource("AccentGradient"), VerticalAlignment = VerticalAlignment.Top,
+            Width = 184, Height = 86, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient"), VerticalAlignment = VerticalAlignment.Top,
             Child = new TextBlock { Text = Initials(title), FontSize = 26, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent"),
                 Opacity = 0.85, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         };
@@ -411,7 +411,7 @@ public partial class MainWindow
         var head = new StackPanel { Orientation = Orientation.Horizontal };
         head.Children.Add(new TextBlock { Text = title, FontSize = 15, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center });
         if (type is "dlc" or "package")
-            head.Children.Add(new Border { Background = (Brush)FindResource("Hover"), CornerRadius = new CornerRadius(5), Padding = new Thickness(6, 1, 6, 1), Margin = new Thickness(8, 0, 0, 0),
+            head.Children.Add(new Border { Background = (Brush)FindResource("Hover"), CornerRadius = new CornerRadius(0), Padding = new Thickness(6, 1, 6, 1), Margin = new Thickness(8, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Child = new TextBlock { Text = type == "dlc" ? "DLC" : "PACOTE", FontSize = 9.5, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("Muted") } });
         var heart = FavHeart(gameId, title, slug, bannerUrl, overlay: false);
@@ -471,7 +471,7 @@ public partial class MainWindow
             Foreground = (Brush)FindResource(best ? "AccentCyan" : "Fg") };
         Grid.SetColumn(price, 3); g.Children.Add(price);
 
-        var line = new Border { Padding = new Thickness(8, 5, 8, 5), CornerRadius = new CornerRadius(6), Background = Brushes.Transparent, Child = g,
+        var line = new Border { Padding = new Thickness(8, 5, 8, 5), CornerRadius = new CornerRadius(0), Background = Brushes.Transparent, Child = g,
             Cursor = Cursors.Hand, ToolTip = $"Abrir na {x.Shop.Name}" };
         line.MouseEnter += (_, _) => line.Background = (Brush)FindResource("Hover");
         line.MouseLeave += (_, _) => line.Background = Brushes.Transparent;
@@ -489,7 +489,7 @@ public partial class MainWindow
         var glyph = new TextBlock { FontFamily = (FontFamily)FindResource("Icons"), FontSize = overlay ? 15 : 16,
             HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         // Sobre o banner vai num círculo escuro, para aparecer em qualquer capa.
-        var heart = new Border { Width = 30, Height = 30, CornerRadius = new CornerRadius(15), Child = glyph, Cursor = Cursors.Hand,
+        var heart = new Border { Width = 30, Height = 30, CornerRadius = new CornerRadius(0), Child = glyph, Cursor = Cursors.Hand,
             VerticalAlignment = VerticalAlignment.Center,
             Background = overlay ? new SolidColorBrush(Color.FromArgb(0xB4, 0x07, 0x06, 0x0D)) : Brushes.Transparent };
         void Paint()
@@ -568,7 +568,7 @@ public partial class MainWindow
     {
         var banner = new Border
         {
-            Height = 110, CornerRadius = new CornerRadius(10, 10, 0, 0), Background = (Brush)FindResource("AccentGradient"),
+            Height = 110, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient"),
             Child = new TextBlock { Text = Initials(f.Title), FontSize = 32, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent"),
                 Opacity = 0.85, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         };
@@ -589,7 +589,7 @@ public partial class MainWindow
         var body = new StackPanel();
         body.Children.Add(top);
         body.Children.Add(info);
-        return new Border { Width = 236, CornerRadius = new CornerRadius(10), Background = (Brush)FindResource("Card"), Margin = new Thickness(0, 0, 14, 14),
+        return new Border { Width = 236, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("Card"), Margin = new Thickness(0, 0, 14, 14),
             BorderBrush = (Brush)FindResource("Line"), BorderThickness = new Thickness(1), Child = body };
     }
 
@@ -619,7 +619,7 @@ public partial class MainWindow
         string title = gw.Games.Count == 1 ? gw.Games[0].Title : gw.Title;
         var banner = new Border
         {
-            Width = 184, Height = 86, CornerRadius = new CornerRadius(8), Background = (Brush)FindResource("AccentGradient"),
+            Width = 184, Height = 86, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient"),
             Child = new TextBlock { Text = Initials(title), FontSize = 26, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent"),
                 Opacity = 0.85, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         };

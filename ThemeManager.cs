@@ -13,25 +13,31 @@ public static class ThemeManager
 
     private static readonly (object Key, string Dark, string Light)[] Palette =
     {
-        // Paleta do ícone: tons neutros levemente arroxeados; o roxo/ciano de destaque fica no Theme.xaml (igual nos dois modos).
-        ("Bg", "#07060D", "#FFFFFF"),
-        ("Panel", "#0B0A14", "#F6F4FD"),
-        ("Card", "#110F1D", "#FFFFFF"),
-        ("Hover", "#1B1830", "#ECE8FA"),
-        ("Line", "#24203A", "#DAD4F0"),
-        ("LineStrong", "#3F3866", "#9088B8"),
-        ("Fg", "#F4F2FF", "#14111F"),
-        ("Muted", "#9B95B8", "#4A4560"),
-        ("Faint", "#7A7499", "#6A6485"),
-        ("Ink", "#07060D", "#FFFFFF"),
-        ("ThumbBrush", "#2C2746", "#D6D0EE"),
-        ("ThumbHover", "#5A5290", "#ABA2D6"),
-        ("ThumbDrag", "#8A80C8", "#8A80C8"),
-        ("Accent", "#A66BFF", "#8B3FF0"),
-        ("NavHover", "#3EC6EA", "#1E9BC4"), // hover das categorias: ciano no escuro, um azul mais fechado (menos claro) no modo claro
-        (SystemColors.ControlBrushKey, "#07060D", "#FFFFFF"),
-        (SystemColors.HighlightBrushKey, "#1B1830", "#ECE8FA"),
-        (SystemColors.InactiveSelectionHighlightBrushKey, "#1B1830", "#ECE8FA"),
+        // Paleta neutra (preto/grafite no escuro, papel/grafite no claro). O destaque é monocromático: branco no escuro, preto no claro.
+        ("Bg", "#0E0E10", "#F4F4F2"),
+        ("Panel", "#0A0A0B", "#ECECEA"),
+        ("Card", "#131315", "#FFFFFF"),
+        ("Hover", "#1C1C20", "#E4E4E0"),
+        ("Line", "#26262B", "#D4D4CF"),
+        ("LineStrong", "#3A3A41", "#A6A6A0"),
+        ("Fg", "#ECECEE", "#111113"),
+        ("Muted", "#9A9AA2", "#55555C"),
+        ("Faint", "#66666E", "#7A7A80"),
+        ("Ink", "#0E0E10", "#FFFFFF"),
+        ("ThumbBrush", "#2A2A30", "#CFCFCA"),
+        ("ThumbHover", "#4A4A52", "#A6A6A0"),
+        ("ThumbDrag", "#7A7A84", "#7A7A80"),
+        ("Accent", "#7C9CFF", "#2F5BE0"),
+        ("AccentGradient", "#ECECEE", "#111113"),
+        ("AccentGradientV", "#ECECEE", "#111113"),
+        ("OnAccent", "#0E0E10", "#FFFFFF"),
+        ("TagBlue", "#7C9CFF", "#2F5BE0"),
+        ("TagAmber", "#E8B44A", "#A86F00"),
+        ("TagGreen", "#5FCF8A", "#1E8A4C"),
+        ("NavHover", "#FFFFFF", "#000000"),
+        (SystemColors.ControlBrushKey, "#0E0E10", "#F4F4F2"),
+        (SystemColors.HighlightBrushKey, "#1C1C20", "#E4E4E0"),
+        (SystemColors.InactiveSelectionHighlightBrushKey, "#1C1C20", "#E4E4E0"),
     };
 
     public static void Apply(bool light)

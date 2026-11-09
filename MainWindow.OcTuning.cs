@@ -178,7 +178,7 @@ public partial class MainWindow
             Grid.SetColumn(right, 3); grid.Children.Add(right);
             OcSliders.Children.Add(new Border
             {
-                Child = grid, Padding = new Thickness(14, 10, 14, 10), CornerRadius = new CornerRadius(8),
+                Child = grid, Padding = new Thickness(14, 10, 14, 10), CornerRadius = new CornerRadius(0),
                 Background = (Brush)FindResource("Bg"), BorderBrush = (Brush)FindResource("Line"), BorderThickness = new Thickness(1),
                 Margin = new Thickness(0, 0, 0, 8),
             });
@@ -399,7 +399,7 @@ public partial class MainWindow
             head.Children.Add(value);
             var stack = new StackPanel();
             stack.Children.Add(head); stack.Children.Add(canvas);
-            OcCharts.Children.Add(new Border { Child = stack, Margin = new Thickness(0, 0, 14, 14), Padding = new Thickness(12), Background = (Brush)FindResource("Bg"), CornerRadius = new CornerRadius(10) });
+            OcCharts.Children.Add(new Border { Child = stack, Margin = new Thickness(0, 0, 14, 14), Padding = new Thickness(12), Background = (Brush)FindResource("Bg"), CornerRadius = new CornerRadius(0) });
             _ocCharts.Add((canvas, value, get, limit, unit, color));
         }
     }

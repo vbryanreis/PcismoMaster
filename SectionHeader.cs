@@ -32,7 +32,7 @@ public sealed class SectionHeader : DockPanel
         _icon.SetResourceReference(TextBlock.FontFamilyProperty, "Icons");
         _icon.SetResourceReference(TextBlock.ForegroundProperty, "OnAccent");
         _sub.SetResourceReference(TextBlock.ForegroundProperty, "Muted");
-        var tile = new Border { Width = 44, Height = 44, CornerRadius = new CornerRadius(11), Margin = new Thickness(0, 0, 14, 0), VerticalAlignment = VerticalAlignment.Center, Child = _icon };
+        var tile = new Border { Width = 44, Height = 44, CornerRadius = new CornerRadius(0), Margin = new Thickness(0, 0, 14, 0), VerticalAlignment = VerticalAlignment.Center, Child = _icon };
         tile.SetResourceReference(Border.BackgroundProperty, "AccentGradient");
         SetDock(tile, Dock.Left);
         Children.Add(tile);

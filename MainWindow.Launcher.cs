@@ -96,7 +96,7 @@ public partial class MainWindow
     /// <summary>Linha do modo lista: banner horizontal, nome, loja e pasta, e os mesmos botões do cartão.</summary>
     private FrameworkElement GameRow(LibGame g)
     {
-        var banner = new Border { Width = 184, Height = 86, CornerRadius = new CornerRadius(8), Background = (Brush)FindResource("AccentGradient"),
+        var banner = new Border { Width = 184, Height = 86, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient"),
             Child = new TextBlock { Text = Initials(g.Name), FontSize = 26, FontWeight = FontWeights.Bold, Foreground = (Brush)FindResource("OnAccent"),
                 Opacity = 0.85, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } };
         _ = LoadArtAsync(g, banner, vertical: false);
@@ -168,7 +168,7 @@ public partial class MainWindow
     private FrameworkElement GameCard(LibGame g)
     {
         const double w = 184, coverH = 260;
-        var cover = new Border { Height = coverH, CornerRadius = new CornerRadius(10, 10, 0, 0), Background = (Brush)FindResource("AccentGradient") };
+        var cover = new Border { Height = coverH, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient") };
         var initials = new TextBlock
         {
             Text = Initials(g.Name),
@@ -186,7 +186,7 @@ public partial class MainWindow
         body.Children.Add(info);
         var card = new Border
         {
-            Width = w, CornerRadius = new CornerRadius(10), Background = (Brush)FindResource("Card"),
+            Width = w, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("Card"),
             BorderBrush = (Brush)FindResource("Line"), BorderThickness = new Thickness(1), Child = body,
         };
 

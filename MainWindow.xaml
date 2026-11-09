@@ -119,12 +119,14 @@
             </Grid.ColumnDefinitions>
 
             <!-- ===== Barra de título (marca + página atual + botões da janela) ===== -->
-            <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Margin="30,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Image x:Name="TitleLogo" Source="Assets/logo.png" Width="22" Height="22" Margin="0,0,12,0" VerticalAlignment="Center"
+            <!-- Cabeçalho no estilo "suíte técnica": marca | página atual em mono, linha fina embaixo -->
+            <Border Grid.ColumnSpan="2" Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1"/>
+            <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Margin="16,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+                <Image x:Name="TitleLogo" Source="Assets/logo.png" Width="20" Height="20" Margin="0,0,10,0" VerticalAlignment="Center"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
-                <TextBlock Text="Pcismo" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
-                <TextBlock Text="Master" FontWeight="Light" FontSize="13" VerticalAlignment="Center"/>
-                <TextBlock x:Name="TitlePage" Foreground="{DynamicResource Faint}" FontSize="13" Margin="16,0,0,0" VerticalAlignment="Center"/>
+                <TextBlock Text="PCISMOMASTER" FontWeight="Black" FontSize="14" VerticalAlignment="Center"/>
+                <Rectangle Width="1" Fill="{DynamicResource Line}" Margin="18,0,18,0"/>
+                <TextBlock x:Name="TitlePage" Foreground="{DynamicResource Muted}" FontFamily="{StaticResource Mono}" FontSize="10.5" VerticalAlignment="Center"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                         WindowChrome.IsHitTestVisibleInChrome="True">
@@ -137,13 +139,13 @@
             </StackPanel>
 
             <!-- ===== Menu lateral por categorias (painel arredondado, sempre visível) ===== -->
-            <Border x:Name="Sidebar" Grid.Row="1" Margin="14,0,0,14" Background="{DynamicResource Panel}"
-                    BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="20">
+            <Border x:Name="Sidebar" Grid.Row="1" Margin="0" Background="{DynamicResource Panel}"
+                    BorderBrush="{DynamicResource Line}" BorderThickness="0,0,1,0" CornerRadius="0">
                 <DockPanel>
                     <!-- Rodapé: aviso de sensores + leitura ao vivo compacta -->
                     <StackPanel DockPanel.Dock="Bottom" Margin="16,6,16,16">
                         <Border x:Name="CpuSensorWarn" Visibility="Collapsed" BorderBrush="{DynamicResource Fg}" BorderThickness="1"
-                                CornerRadius="12" Padding="12,10" Margin="0,0,0,12">
+                                CornerRadius="0" Padding="12,10" Margin="0,0,0,12">
                             <StackPanel>
                                 <TextBlock Text="Sem temperatura e consumo da CPU" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap"/>
                                 <TextBlock x:Name="CpuSensorWarnText" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,8"/>
@@ -151,7 +153,7 @@
                                         Click="BtnFixCpuSensors_Click"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="14" Padding="14,10">
+                        <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0" Padding="14,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="46"/>
@@ -174,7 +176,7 @@
                             </Grid>
                         </Border>
                         <!-- Conta do GitHub e atualização automática (MainWindow.Account.cs) -->
-                        <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="14" Padding="12,10" Margin="0,8,0,0">
+                        <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0" Padding="12,10" Margin="0,8,0,0">
                             <StackPanel>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -193,7 +195,7 @@
                                     </StackPanel>
                                     <Button x:Name="BtnGhLogin" Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="Entrar" Padding="10,5" FontSize="11.5" Click="BtnGhLogin_Click"/>
                                 </Grid>
-                                <Border x:Name="GhCodeBox" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,8" CornerRadius="10" Background="{DynamicResource Line}">
+                                <Border x:Name="GhCodeBox" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,8" CornerRadius="0" Background="{DynamicResource Line}">
                                     <StackPanel>
                                         <TextBlock Text="Digite este código no GitHub (já copiado):" FontSize="11" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
                                         <DockPanel Margin="0,2,0,0">
@@ -202,7 +204,7 @@
                                         </DockPanel>
                                     </StackPanel>
                                 </Border>
-                                <Border x:Name="UpdBox" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,8" CornerRadius="10" Background="#26A647FE">
+                                <Border x:Name="UpdBox" Visibility="Collapsed" Margin="0,8,0,0" Padding="10,8" CornerRadius="0" Background="#26A647FE">
                                     <StackPanel>
                                         <TextBlock x:Name="UpdText" FontSize="11.5" TextWrapping="Wrap"/>
                                         <Button x:Name="BtnUpdate" Style="{StaticResource PrimaryButton}" Content="Reiniciar e atualizar" Padding="10,5" FontSize="11.5" Margin="0,6,0,0" HorizontalAlignment="Left" Click="BtnUpdate_Click" Visibility="Collapsed"/>
@@ -439,7 +441,7 @@
 
             <!-- ===== Conteúdo (com a explicação curta da página no topo) ===== -->
             <DockPanel Grid.Row="1" Grid.Column="1">
-            <Border x:Name="PageHelp" DockPanel.Dock="Top" Margin="20,0,24,10" Padding="16,10" CornerRadius="12"
+            <Border x:Name="PageHelp" DockPanel.Dock="Top" Margin="20,0,24,10" Padding="16,10" CornerRadius="0"
                     Background="{DynamicResource AccentSoft}" Visibility="Collapsed">
                 <DockPanel>
                     <Button DockPanel.Dock="Right" Style="{StaticResource CaptionButton}" Width="30" Content="&#xE711;" Click="PageHelpHide_Click"
@@ -519,7 +521,7 @@
                                         <Border Height="1" Background="{DynamicResource Line}" Margin="0,16"/>
                                         <ItemsControl x:Name="DashScores" ItemTemplate="{StaticResource KeyValueRow}"/>
                                         <!-- Caixa interna, como o widget de troca da referência -->
-                                        <Border Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="14"
+                                        <Border Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0"
                                                 Padding="14,4" Margin="0,14,0,0">
                                             <StackPanel>
                                                 <Grid Margin="0,10">
@@ -571,7 +573,7 @@
                                                         <ColumnDefinition Width="56"/>
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Border Width="28" Height="28" CornerRadius="8" Background="{DynamicResource Hover}" Margin="0,0,12,0">
+                                                        <Border Width="28" Height="28" CornerRadius="0" Background="{DynamicResource Hover}" Margin="0,0,12,0">
                                                             <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="13"
                                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Border>
@@ -643,7 +645,7 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Border Width="34" Height="34" CornerRadius="17" Background="{DynamicResource Fg}" Margin="0,0,12,0">
+                                                        <Border Width="34" Height="34" CornerRadius="0" Background="{DynamicResource Fg}" Margin="0,0,12,0">
                                                             <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="14" Foreground="{DynamicResource Ink}"
                                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Border>
@@ -751,7 +753,7 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="4" Padding="16,14" Margin="0,0,10,10"
+                                                    <Border BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0" Padding="16,14" Margin="0,0,10,10"
                                                             Background="{DynamicResource Bg}">
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
@@ -912,7 +914,7 @@
                     <StackPanel Margin="36,22,36,30">
 
                         <!-- Cabeçalho: verificação e o resumo de cada fabricante (logos montados no código) -->
-                        <Border CornerRadius="16" Padding="24,20,24,18" Margin="0,0,0,16" Background="{DynamicResource Panel}"
+                        <Border CornerRadius="0" Padding="24,20,24,18" Margin="0,0,0,16" Background="{DynamicResource Panel}"
                                 BorderBrush="{DynamicResource Line}" BorderThickness="1">
                             <StackPanel>
                                 <Grid>
@@ -931,7 +933,7 @@
                                 </Grid>
                                 <TextBlock x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,14"/>
                                 <UniformGrid Columns="3">
-                                    <Border CornerRadius="12" Padding="14,12" Margin="0,0,8,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                                    <Border CornerRadius="0" Padding="14,12" Margin="0,0,8,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
                                         <DockPanel>
                                             <ContentControl x:Name="DrvTileGpuLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
                                             <StackPanel VerticalAlignment="Center">
@@ -941,7 +943,7 @@
                                             </StackPanel>
                                         </DockPanel>
                                     </Border>
-                                    <Border CornerRadius="12" Padding="14,12" Margin="4,0,4,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                                    <Border CornerRadius="0" Padding="14,12" Margin="4,0,4,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
                                         <DockPanel>
                                             <ContentControl x:Name="DrvTileBoardLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
                                             <StackPanel VerticalAlignment="Center">
@@ -951,7 +953,7 @@
                                             </StackPanel>
                                         </DockPanel>
                                     </Border>
-                                    <Border CornerRadius="12" Padding="14,12" Margin="8,0,0,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                                    <Border CornerRadius="0" Padding="14,12" Margin="8,0,0,0" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1">
                                         <DockPanel>
                                             <ContentControl x:Name="DrvTileChipLogo" DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Center" Focusable="False"/>
                                             <StackPanel VerticalAlignment="Center">
@@ -969,7 +971,7 @@
                         <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,8">
-                                    <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
+                                    <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="0" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
                                         <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
@@ -1023,7 +1025,7 @@
                                 <TextBlock x:Name="GfxCardInfo" Visibility="Collapsed" Foreground="{DynamicResource AccentCyan}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
 
                                 <!-- Versão instalada x mais recente e o que mudou (notas oficiais da NVIDIA) -->
-                                <Border Background="{DynamicResource Panel}" CornerRadius="12" Padding="18,14" Margin="0,0,0,14">
+                                <Border Background="{DynamicResource Panel}" CornerRadius="0" Padding="18,14" Margin="0,0,0,14">
                                     <StackPanel>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -1045,7 +1047,7 @@
                                                 <TextBlock x:Name="DrvVerDate" Foreground="{DynamicResource Muted}" FontSize="12"/>
                                             </StackPanel>
                                             <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                                <Border x:Name="DrvVerBadge" CornerRadius="8" Padding="12,5" HorizontalAlignment="Right" Visibility="Collapsed">
+                                                <Border x:Name="DrvVerBadge" CornerRadius="0" Padding="12,5" HorizontalAlignment="Right" Visibility="Collapsed">
                                                     <TextBlock x:Name="DrvVerBadgeText" FontWeight="SemiBold" FontSize="12"/>
                                                 </Border>
                                                 <CheckBox x:Name="DrvStudio" Content="Driver Studio (criação) em vez de Game Ready" Margin="0,10,0,0" HorizontalAlignment="Right"
@@ -1091,7 +1093,7 @@
                                 <TextBlock x:Name="DebloatStatus" Foreground="{DynamicResource Accent}" TextWrapping="Wrap" Margin="0,0,0,6"/>
 
                                 <!-- Ferramentas NVIDIA: instaladas junto com cada driver -->
-                                <Border x:Name="GfxNvInstallRow" Background="{DynamicResource Panel}" CornerRadius="12" Padding="16,12" Margin="0,6,0,6">
+                                <Border x:Name="GfxNvInstallRow" Background="{DynamicResource Panel}" CornerRadius="0" Padding="16,12" Margin="0,6,0,6">
                                     <StackPanel>
                                         <TextBlock Text="FERRAMENTAS NVIDIA (VÊM JUNTO COM CADA DRIVER INSTALADO POR AQUI)" Style="{StaticResource Label}" Margin="0,0,0,6"/>
                                         <TextBlock x:Name="NvToolsInfo" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
@@ -1133,7 +1135,7 @@
 
                                 <UniformGrid Columns="2" Margin="0,0,0,10">
                                     <!-- BIOS: instalada x mais recente no site -->
-                                    <Border Background="{DynamicResource Panel}" CornerRadius="12" Padding="16,12" Margin="0,0,6,0">
+                                    <Border Background="{DynamicResource Panel}" CornerRadius="0" Padding="16,12" Margin="0,0,6,0">
                                         <StackPanel>
                                             <TextBlock Text="BIOS" Style="{StaticResource Label}"/>
                                             <TextBlock x:Name="BoardBiosLine" TextWrapping="Wrap" Text="—" FontWeight="SemiBold"/>
@@ -1147,7 +1149,7 @@
                                         </StackPanel>
                                     </Border>
                                     <!-- Chipset: instalado x site da AMD -->
-                                    <Border Background="{DynamicResource Panel}" CornerRadius="12" Padding="16,12" Margin="6,0,0,0">
+                                    <Border Background="{DynamicResource Panel}" CornerRadius="0" Padding="16,12" Margin="6,0,0,0">
                                         <StackPanel>
                                             <TextBlock Text="CHIPSET" Style="{StaticResource Label}"/>
                                             <TextBlock x:Name="BoardChipLine" TextWrapping="Wrap" Text="—" FontWeight="SemiBold"/>
@@ -1228,7 +1230,7 @@
                             <Border Grid.Column="2" Style="{StaticResource CardBorder}">
                                 <StackPanel>
                                     <DockPanel Margin="0,0,0,10">
-                                        <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
+                                        <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="0" Background="{DynamicResource AccentGradient}" Margin="0,0,12,0">
                                             <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
@@ -1422,7 +1424,7 @@
                         <StackPanel Margin="36,30,36,30">
                             <Grid Margin="0,0,0,20">
                                 <StackPanel Orientation="Horizontal">
-                                    <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top" Visibility="Collapsed">
+                                    <Border Width="46" Height="46" CornerRadius="0" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top" Visibility="Collapsed">
                                         <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource Icons}" FontSize="22" Foreground="{DynamicResource OnAccent}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
@@ -1468,14 +1470,14 @@
                     <!-- Janela "Ajustes do jogo" sobre a biblioteca -->
                     <Grid x:Name="LOverlay" Visibility="Collapsed" Background="#B3000000">
                         <Border x:Name="LDialog" Width="660" Background="{DynamicResource Card}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1"
-                                CornerRadius="12" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,24">
+                                CornerRadius="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,24">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <Border Background="{DynamicResource Panel}" CornerRadius="12,12,0,0" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="12,8">
+                                <Border Background="{DynamicResource Panel}" CornerRadius="0" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="12,8">
                                     <Grid>
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="Assets/logo.png" Width="16" Height="16" Margin="0,0,8,0"/>
@@ -1840,7 +1842,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <Border Width="44" Height="44" CornerRadius="11" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
+                                        <Border Width="44" Height="44" CornerRadius="0" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0">
                                             <TextBlock Text="&#xE95E;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
@@ -1965,7 +1967,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,16">
                             <StackPanel Orientation="Horizontal" Margin="0,0,170,0">
-                                <Border Width="46" Height="46" CornerRadius="12" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top" Visibility="Collapsed">
+                                <Border Width="46" Height="46" CornerRadius="0" Background="{DynamicResource AccentGradient}" Margin="0,0,14,0" VerticalAlignment="Top" Visibility="Collapsed">
                                     <TextBlock Text="&#xE7BF;" FontFamily="{StaticResource Icons}" FontSize="22" Foreground="{DynamicResource OnAccent}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
@@ -2351,9 +2353,9 @@
                                     <ColumnDefinition Width="300"/>
                                 </Grid.ColumnDefinitions>
                                 <!-- Prévia com os números reais deste PC -->
-                                <Border Background="#0A0A0A" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="6" MinHeight="150" Padding="10">
+                                <Border Background="#0A0A0A" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0" MinHeight="150" Padding="10">
                                     <Grid>
-                                        <Border x:Name="OvPreviewBox" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="10" Padding="14,10"
+                                        <Border x:Name="OvPreviewBox" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="0" Padding="14,10"
                                                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,18">
                                             <Grid x:Name="OvPreviewRoot" TextElement.FontFamily="Segoe UI">
                                             <ItemsControl x:Name="OvPreviewV" MinWidth="200">
@@ -3067,7 +3069,7 @@
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Margin="2,14,0,10">
                                                 <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource Fg}"/>
-                                                <Border Background="{DynamicResource Hover}" CornerRadius="8" Padding="7,1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                <Border Background="{DynamicResource Hover}" CornerRadius="0" Padding="7,1" Margin="10,0,0,0" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding ItemCount}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Muted}"/>
                                                 </Border>
                                             </StackPanel>
@@ -3077,7 +3079,7 @@
                             </ItemsControl.GroupStyle>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Width="268" Height="92" Margin="0,0,12,12" CornerRadius="10" BorderThickness="1" Padding="12"
+                                    <Border Width="268" Height="92" Margin="0,0,12,12" CornerRadius="0" BorderThickness="1" Padding="12"
                                             Cursor="Hand" MouseLeftButtonUp="AppCard_Click" ToolTip="{Binding Description}">
                                         <Border.Style>
                                             <Style TargetType="Border">
@@ -3105,7 +3107,7 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <!-- Ícone num quadrado claro: todos ficam iguais, mesmo os escuros -->
-                                            <Border Width="44" Height="44" CornerRadius="10" Background="{DynamicResource IconTile}" VerticalAlignment="Top">
+                                            <Border Width="44" Height="44" CornerRadius="0" Background="{DynamicResource IconTile}" VerticalAlignment="Top">
                                                 <Grid>
                                                     <TextBlock Text="{Binding Initial}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Accent}"
                                                                HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -3130,12 +3132,12 @@
                                             </StackPanel>
                                             <!-- Marcação: círculo (selecionável) ou selo INSTALADO -->
                                             <Grid Grid.Column="2" VerticalAlignment="Top">
-                                                <Border x:Name="tick" Width="20" Height="20" CornerRadius="10" BorderThickness="1.5"
+                                                <Border x:Name="tick" Width="20" Height="20" CornerRadius="0" BorderThickness="1.5"
                                                         BorderBrush="{DynamicResource LineStrong}" Background="Transparent">
                                                     <TextBlock x:Name="tickGlyph" Text="&#xE73E;" FontFamily="{StaticResource Icons}" FontSize="12" FontWeight="Bold"
                                                                Foreground="{DynamicResource OnAccent}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
                                                 </Border>
-                                                <Border x:Name="installedChip" Background="#264ED17A" CornerRadius="6" Padding="6,2" Visibility="Collapsed">
+                                                <Border x:Name="installedChip" Background="#264ED17A" CornerRadius="0" Padding="6,2" Visibility="Collapsed">
                                                     <TextBlock Text="INSTALADO" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource ChartGpu}"/>
                                                 </Border>
                                             </Grid>
@@ -3303,7 +3305,7 @@
                                                     <ColumnDefinition Width="36"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource IconTile}">
+                                                <Border Width="36" Height="36" CornerRadius="0" Background="{DynamicResource IconTile}">
                                                     <Grid>
                                                         <TextBlock Text="{Binding Initial}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Accent}"
                                                                    HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -3380,7 +3382,7 @@
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
                                                         <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="Bold"/>
-                                                        <Border Background="{DynamicResource Hover}" CornerRadius="8" Padding="7,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                        <Border Background="{DynamicResource Hover}" CornerRadius="0" Padding="7,1" Margin="8,0,0,0" VerticalAlignment="Center">
                                                             <TextBlock Text="{Binding ItemCount}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Muted}"/>
                                                         </Border>
                                                     </StackPanel>
@@ -3401,10 +3403,10 @@
                                                     </Grid.ColumnDefinitions>
                                                     <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center" Margin="0,0,12,0"/>
                                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                                                        <Border Background="{DynamicResource Hover}" CornerRadius="6" Padding="7,2">
+                                                        <Border Background="{DynamicResource Hover}" CornerRadius="0" Padding="7,2">
                                                             <TextBlock Text="{Binding Kind}" FontSize="10.5" FontWeight="SemiBold" Foreground="{DynamicResource Accent}"/>
                                                         </Border>
-                                                        <Border x:Name="weak" Background="#26FFCF4D" CornerRadius="6" Padding="7,2" Margin="0,4,0,0" Visibility="Collapsed">
+                                                        <Border x:Name="weak" Background="#26FFCF4D" CornerRadius="0" Padding="7,2" Margin="0,4,0,0" Visibility="Collapsed">
                                                             <TextBlock Text="CONFIRA" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource TempWarn}"/>
                                                         </Border>
                                                     </StackPanel>
@@ -3734,7 +3736,7 @@
                                     Arrastar outro ponto muda só ele. Ctrl+D volta a curva ao padrão; Ctrl+F abre o editor em janela própria.
                                     Linha fina = fábrica, quadradinhos = como vai ficar.
                                 </TextBlock>
-                                <Border Height="320" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="10">
+                                <Border Height="320" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0">
                                     <Canvas x:Name="OcVfCanvas" ClipToBounds="True" Background="Transparent" Margin="6"/>
                                 </Border>
                                 <TextBlock x:Name="OcVfInfo" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,8,0,4"/>
@@ -3758,7 +3760,7 @@
                                 </TextBlock>
                                 <CheckBox x:Name="OcFanCurveOn" Content="Usar a curva de fans" Margin="0,0,0,10"
                                           Checked="OcFanCurveOn_Changed" Unchecked="OcFanCurveOn_Changed"/>
-                                <Border Height="260" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="10">
+                                <Border Height="260" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0">
                                     <Canvas x:Name="OcFanCanvas" ClipToBounds="True" Background="Transparent" Margin="6"/>
                                 </Border>
                                 <Grid Margin="0,10,0,0">
@@ -4099,7 +4101,7 @@
             <!-- ===== Tela de entrada: o app só libera depois do login com o GitHub (MainWindow.Account.cs) ===== -->
             <Grid x:Name="LoginGate" Grid.Row="1" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" Visibility="Collapsed">
                 <Border Width="440" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="36,32"
-                        Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="18">
+                        Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="0">
                     <StackPanel>
                         <Image Source="Assets/logo.png" Width="64" Height="64" RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center"/>
                         <TextBlock Text="Bem-vindo ao PcismoMaster" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,16,0,0"/>
@@ -4107,7 +4109,7 @@
                                    FontSize="13" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"/>
                         <Button x:Name="BtnGateLogin" Style="{StaticResource PrimaryButton}" Content="Entrar com o GitHub" Padding="18,10" FontSize="14"
                                 HorizontalAlignment="Center" Margin="0,22,0,0" Click="BtnGhLogin_Click"/>
-                        <Border x:Name="GateCodeBox" Visibility="Collapsed" Margin="0,18,0,0" Padding="14,12" CornerRadius="12" Background="{DynamicResource Line}">
+                        <Border x:Name="GateCodeBox" Visibility="Collapsed" Margin="0,18,0,0" Padding="14,12" CornerRadius="0" Background="{DynamicResource Line}">
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="Digite este código na página do GitHub que abriu (já está copiado):" FontSize="12" Foreground="{DynamicResource Muted}"
                                            TextWrapping="Wrap" TextAlignment="Center"/>
