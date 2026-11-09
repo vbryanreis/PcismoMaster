@@ -437,6 +437,12 @@
                                     <TextBlock Text="Inicialização" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavTasks" Style="{StaticResource NavItem}" Tag="PageTasks" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Tarefas agendadas" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavApps" Style="{StaticResource NavItem}" Tag="PageApps" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE719;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -1326,6 +1332,14 @@
                 </ScrollViewer>
 
                 <!-- ===== INTEGRAÇÃO (iluminação) ===== -->
+                <ScrollViewer x:Name="PageTasks" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <TextBlock Text="Tarefas agendadas" Style="{StaticResource H1}"/>
+                        <TextBlock Text="O que o Windows e os programas rodam sozinhos · executar, parar, ligar, desligar e apagar" Style="{StaticResource Sub}" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                        <StackPanel x:Name="TasksHost"/>
+                    </StackPanel>
+                </ScrollViewer>
+
                 <ScrollViewer x:Name="PageInteg" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
@@ -3096,8 +3110,12 @@
                                                                    ToolTip="{Binding Command}" Margin="0,2,0,0"/>
                                                         <TextBlock Text="{Binding Source}" Foreground="{DynamicResource Faint}" FontSize="10.5" Margin="0,1,0,0"/>
                                                     </StackPanel>
-                                                    <Button Grid.Column="2" Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,5" FontSize="12"
-                                                            Tag="{Binding}" Click="StartupRemove_Click" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                                                        <Button Style="{StaticResource OutlineButton}" Content="ABRIR LOCAL" Padding="12,5" FontSize="12"
+                                                                Tag="{Binding}" Click="StartupOpenLocation_Click" ToolTip="Abre a pasta do programa no Explorer, com o arquivo selecionado"/>
+                                                        <Button Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,5" FontSize="12"
+                                                                Tag="{Binding}" Click="StartupRemove_Click" Margin="8,0,0,0"/>
+                                                    </StackPanel>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>

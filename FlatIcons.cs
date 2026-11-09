@@ -92,7 +92,7 @@ public static class FlatIcons
         ["NavOptSvc"] = "gears", ["NavOptBios"] = "chip", ["NavOptClean"] = "sparkle", ["NavOptLook"] = "palette", ["NavOptProfiles"] = "layers",
         ["NavLauncher"] = "layers", ["NavDeals"] = "tag", ["NavGames"] = "target", ["NavBottleneck"] = "gauge", ["NavOverlay"] = "overlay",
         ["NavBench"] = "stopwatch", ["NavStress"] = "bolt", ["NavOc"] = "flame", ["NavStartup"] = "power", ["NavApps"] = "box",
-        ["NavUninstall"] = "trash", ["NavInteg"] = "palette", ["NavUtil"] = "wrench", ["NavMakerPorts"] = "plug", ["NavMakerDrv"] = "chip",
+        ["NavUninstall"] = "trash", ["NavInteg"] = "palette", ["NavTasks"] = "stopwatch", ["NavUtil"] = "wrench", ["NavMakerPorts"] = "plug", ["NavMakerDrv"] = "chip",
     };
 
     /// <summary>Glifos da fonte de ícones que têm desenho próprio (cabeçalhos de cartão e blocos do Início).</summary>

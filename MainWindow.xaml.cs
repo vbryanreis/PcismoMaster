@@ -297,6 +297,7 @@ public partial class MainWindow : Window
             case "PageDeals": InitDeals(); break;
             case "PageDriver": InitDriver(); break;
             case "PageStartup": ScanStartup(); break;
+            case "PageTasks": InitTasks(); break;
             case "PageApps": InitApps(); break;
             case "PageMakerPorts": ScanUsb(); break;
             case "PageMakerDrv": InitMakerDrivers(); break;
@@ -310,7 +311,7 @@ public partial class MainWindow : Window
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageHome, PageOptStart, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageOptStart, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageTasks, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 

@@ -5,7 +5,7 @@ namespace ResetExplode.Modular;
 
 /// <summary>Um tipo de lixo da Limpeza: pastas (com curinga * em um nível), idade mínima dos arquivos e serviço a parar antes.</summary>
 public sealed record CleanCategory(string Id, string Title, string Description, bool DefaultOn, string[] Roots, double MinAgeHours = 0,
-    string? FileMask = null, string[]? StopServices = null, bool RecycleBin = false);
+    string? FileMask = null, string[]? StopServices = null, bool RecycleBin = false, bool WholeFolder = false);
 
 /// <summary>
 /// Limpeza: mede e apaga arquivos que o Windows e os programas recriam sozinhos. Nunca segue atalhos de pasta
@@ -43,6 +43,9 @@ public static class Cleanup
             new[] { L(@"Microsoft\Windows\Explorer") }, FileMask: "thumbcache_*.db"),
         new("prefetch", "Prefetch", "Dados que o Windows usa para abrir programas mais rápido. Ele recria, mas os primeiros dias podem ficar mais lentos.", false,
             new[] { Win("Prefetch") }, FileMask: "*.pf"),
+        new("windows_old", "Windows antigo (Windows.old)", "A cópia do Windows anterior que fica depois de uma atualização grande ou reinstalação. Costuma ter de 10 a 30 GB. " +
+            "AVISO: depois de apagar não dá mais para voltar para a versão anterior do Windows (Configurações > Recuperação > Voltar).", false,
+            new[] { Path.Combine(Path.GetPathRoot(Win(""))!, "Windows.old") }, WholeFolder: true),
     };
 
     /// <summary>As pastas reais de um tipo (expande o * de perfis de navegador).</summary>
@@ -110,6 +113,7 @@ public static class Cleanup
             SHEmptyRecycleBin(IntPtr.Zero, null, 0x1 | 0x2 | 0x4); // sem confirmação, sem barra, sem som
             return (size - RecycleSize().Bytes, 0);
         }
+        if (c.WholeFolder) return CleanWholeFolder(c);
         long freed = 0; int skipped = 0;
         foreach (var root in c.Roots.SelectMany(Expand))
         {
@@ -128,6 +132,22 @@ public static class Cleanup
             if (c.FileMask == null) RemoveEmptyDirs(new DirectoryInfo(root));
         }
         return (freed, skipped);
+    }
+
+    /// <summary>Pastas protegidas pelo Windows (Windows.old): toma posse, dá acesso aos Administradores e apaga a pasta inteira.</summary>
+    private static (long Freed, int Skipped) CleanWholeFolder(CleanCategory c)
+    {
+        var (before, _) = Measure(c);
+        foreach (var root in c.Roots.Where(Directory.Exists))
+        {
+            string q = "\"" + root.TrimEnd('\\') + "\"";
+            var psi = new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c takeown /f {q} /r /d y >nul 2>&1 & icacls {q} /grant *S-1-5-32-544:F /t /c /q >nul 2>&1 & rd /s /q {q}")
+                { CreateNoWindow = true, UseShellExecute = false };
+            using var p = System.Diagnostics.Process.Start(psi);
+            p?.WaitForExit();
+        }
+        var (after, left) = Measure(c);
+        return (Math.Max(0, before - after), left);
     }
 
     private static void RemoveEmptyDirs(DirectoryInfo root)

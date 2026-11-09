@@ -5,7 +5,7 @@ public enum OptPage { Debloat, Windows, Mouse, Teclado, Gpu }
 
 /// <summary>Nível no Debloat (Essencial e Recomendado vêm marcados; Avançado nunca). Nas outras páginas é Normal.</summary>
 /// <summary>Aba do TWEAKING na mesma ordem e com os mesmos nomes do guia da Adamx.</summary>
-public enum GuideTab { Geral, Privacidade, Energia, Rede, Avancado, Mitigacoes, Aparencia }
+public enum GuideTab { Geral, Privacidade, Energia, Rede, Avancado, Mitigacoes, Aparencia, Servicos }
 
 public enum OptLevel { Essencial, Recomendado, Avancado, Normal }
 
@@ -75,9 +75,14 @@ public static class OptCatalog
         return delayed ? new[] { Lm(p, "Start", start), Lm(p, "DelayedAutostart", 1) } : new[] { Lm(p, "Start", start) };
     }
     private static OptExtra X(ExtraKind k, params string[] a) => new(k, a);
+    /// <summary>Serviço extra: desativado e parado ao aplicar, sempre com o aviso do que deixa de funcionar.</summary>
+    private static OptTweak Sv(string id, string group, string svc, string title, string what, string breaks) =>
+        T(id, OptPage.Windows, N, "Serviços · " + group, "Desligar: " + title, what + " (serviço " + svc + ")", Svc(svc, 4),
+          warn: "Desliga o serviço " + svc + ". O que para de funcionar: " + breaks + " Para voltar, use Desfazer.", stop: new[] { svc });
     private static Setting[] S(params Setting[] s) => s;
     private static Setting[] SS(params Setting[][] s) => s.SelectMany(x => x).ToArray();
 
+    private const string DeskIcons = @"Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel";
     private const string Adv = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
     private const string Cdm = @"Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager";
     private const string Pol = @"SOFTWARE\Policies\Microsoft\Windows";
@@ -485,6 +490,170 @@ public static class OptCatalog
                 S(), new[] { X(ExtraKind.Bcd, "disabledynamictick", "yes") },
                 warn: "Evite em notebook na bateria. Se o PC usa BitLocker, tenha a chave de recuperação à mão: mexer na inicialização pode pedir a chave.", restart: true),
 
+            // ---- Energia: USB ----
+            T("usb_selective_suspend_off", W, N, "Energia", "Desligar a suspensão seletiva do USB", "O Windows para de desligar portas USB ociosas no plano de energia ativo. Mouse, teclado, headset e controle não \"dormem\" e não dão engasgo ao acordar.",
+                S(), new[] { X(ExtraKind.Power, "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226", "0") },
+                warn: "Em notebook na bateria a autonomia cai um pouco."),
+
+            // ---- Geral ----
+            T("developer_mode", W, N, "Geral", "Ligar o Modo de desenvolvedor", "Permite instalar apps de fora da Microsoft Store (.appx/.msix), usar links simbólicos sem ser administrador e outras opções de programação.",
+                S(Lm(@"SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock", "AllowDevelopmentWithoutDevLicense", 1)),
+                warn: "Só ligue se você programa ou precisa instalar apps .appx de fora da Store: apps de fontes desconhecidas passam a poder ser instalados."),
+
+            // ---- Aparência: barra de tarefas, Explorer e área de trabalho ----
+            T("clock_seconds", W, N, "Aparência", "Mostrar os segundos no relógio", "O relógio da barra de tarefas passa a mostrar os segundos.",
+                S(Cu(Adv, "ShowSecondsInSystemClock", 1)), warn: "Usa um pouquinho mais de processador para redesenhar o relógio a cada segundo.", explorer: true),
+            T("last_active_click", W, N, "Aparência", "Clique na barra abre a última janela do app", "Com várias janelas do mesmo programa, um clique no ícone da barra vai direto para a última usada, em vez de abrir as miniaturas.",
+                S(Cu(Adv, "LastActiveClick", 1)), explorer: true),
+            T("snap_assist_off", W, N, "Aparência", "Sem sugestões ao encaixar janelas", "Ao arrastar uma janela para o canto, o Windows não abre mais a lista das outras janelas para preencher o resto da tela.",
+                S(Cu(Adv, "SnapAssist", 0))),
+            T("item_checkboxes", W, N, "Aparência", "Caixas de seleção nos arquivos", "O Explorer mostra uma caixinha em cada arquivo e pasta para selecionar vários sem segurar Ctrl.",
+                S(Cu(Adv, "AutoCheckSelect", 1)), explorer: true),
+            T("desktop_icons", W, N, "Aparência", "Ícones do sistema na área de trabalho", "Mostra Este Computador, a pasta do usuário, a Rede e o Painel de Controle na área de trabalho (a Lixeira continua como está).",
+                S(Cu(DeskIcons, "{20D04FE0-3AEA-1069-A2D8-08002B30309D}", 0), Cu(DeskIcons, "{59031a47-3f72-44a7-89c5-5595fe6b30ee}", 0),
+                  Cu(DeskIcons, "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}", 0), Cu(DeskIcons, "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}", 0)), explorer: true),
+            T("shortcut_arrow_off", W, N, "Aparência", "Tirar a setinha dos atalhos", "Os atalhos da área de trabalho e das pastas ficam sem a seta no canto do ícone.",
+                S(LmT(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons", "29", @"%windir%\System32\shell32.dll,-50")),
+                warn: "Atalhos ficam iguais aos arquivos de verdade: cuidado para não apagar o programa achando que é o atalho. Em alguns PCs aparece um quadrado preto no lugar da seta: desfaça se acontecer.", explorer: true),
+
+            // ---- Serviços: cada um mostra o que para de funcionar; os já existentes (SysMain, WSearch, Spooler…) ficam onde estão ----
+            Sv("svc_xbl_auth", "Xbox", "XblAuthManager", "Login do Xbox Live", "Faz o login da conta Xbox nos jogos e no app Xbox.",
+                "Jogos do Game Pass e da Microsoft Store que pedem a conta Xbox não entram online e podem nem abrir."),
+            Sv("svc_xbl_save", "Xbox", "XblGameSave", "Salvamento na nuvem do Xbox", "Sincroniza os saves dos jogos Xbox/Game Pass com a nuvem.",
+                "Os saves dos jogos Game Pass/Xbox deixam de ir e voltar da nuvem: você pode perder progresso ao trocar de PC."),
+            Sv("svc_xbox_net", "Xbox", "XboxNetApiSvc", "Rede do Xbox Live", "Testa e configura a conexão para o multiplayer do Xbox Live.",
+                "O chat de voz e o multiplayer de jogos Xbox/Game Pass podem parar de conectar."),
+            Sv("svc_xbox_gip", "Xbox", "XboxGipSvc", "Acessórios Xbox", "Atualiza e configura controles e acessórios Xbox.",
+                "Controles Xbox continuam funcionando, mas o firmware deles não atualiza e o app Acessórios Xbox para de configurar os botões."),
+
+            Sv("svc_remote_registry", "Acesso remoto", "RemoteRegistry", "Registro remoto", "Deixa outro computador da rede ler e mudar o registro deste PC.",
+                "Ferramentas de administração de rede de empresa deixam de mexer no registro deste PC à distância."),
+            Sv("svc_rdp", "Acesso remoto", "TermService", "Área de Trabalho Remota (servidor)", "Recebe conexões da Área de Trabalho Remota neste PC.",
+                "Ninguém consegue mais entrar neste PC pela Área de Trabalho Remota (você ainda consegue acessar outros PCs)."),
+            Sv("svc_rdp_cfg", "Acesso remoto", "SessionEnv", "Configuração da Área de Trabalho Remota", "Prepara as sessões da Área de Trabalho Remota.",
+                "Entrar neste PC pela Área de Trabalho Remota deixa de funcionar."),
+            Sv("svc_rdp_redir", "Acesso remoto", "UmRdpService", "Redirecionamento da Área de Trabalho Remota", "Leva impressoras, discos e portas para dentro de uma sessão remota.",
+                "Em sessões remotas neste PC, impressoras e discos do outro computador não aparecem."),
+
+            Sv("svc_ics", "Rede", "SharedAccess", "Compartilhamento da internet (ICS)", "Divide a internet deste PC com outros aparelhos.",
+                "O Hotspot Móvel e o compartilhamento de internet do Windows param. Algumas máquinas virtuais usam este serviço para ter internet."),
+            Sv("svc_hotspot", "Rede", "icssvc", "Hotspot Móvel", "Transforma o PC num ponto de acesso Wi-Fi.",
+                "O Hotspot Móvel das Configurações deixa de funcionar."),
+            Sv("svc_netbios_helper", "Rede", "lmhosts", "Auxiliar do NetBIOS", "Resolve nomes de PCs antigos da rede local pelo NetBIOS.",
+                "Achar pastas e impressoras compartilhadas pelo nome em PCs antigos da rede pode falhar."),
+            Sv("svc_tcp_sharing", "Rede", "NetTcpPortSharing", "Compartilhamento de portas Net.Tcp", "Usado por alguns programas .NET de empresa para dividir portas TCP.",
+                "Programas corporativos feitos em WCF que dependem disso param de receber conexões."),
+            Sv("svc_alljoyn", "Rede", "AJRouter", "Roteador AllJoyn", "Comunicação com aparelhos de casa inteligente antigos (AllJoyn).",
+                "Aparelhos IoT que usam AllJoyn deixam de conversar com o PC (quase nenhum usa hoje)."),
+            Sv("svc_wmp_share", "Rede", "WMPNetworkSvc", "Compartilhamento do Windows Media Player", "Compartilha as bibliotecas do Media Player com outros aparelhos da rede.",
+                "TVs e consoles deixam de ver as músicas e vídeos do Windows Media Player pela rede."),
+            Sv("svc_remote_access", "Rede", "RemoteAccess", "Roteamento e acesso remoto", "Roteia tráfego de rede para empresas (servidor de VPN do próprio Windows).",
+                "O PC deixa de funcionar como roteador ou servidor de VPN do Windows."),
+
+            Sv("svc_fax", "Impressão e scanner", "Fax", "Fax", "Envia e recebe fax pelo modem do PC.",
+                "O Fax e Scanner do Windows não envia nem recebe fax."),
+            Sv("svc_scanner", "Impressão e scanner", "stisvc", "Aquisição de imagens (scanner)", "Conversa com scanners e algumas câmeras.",
+                "Scanners e algumas câmeras deixam de ser reconhecidos pelos apps do Windows."),
+            Sv("svc_print_notify", "Impressão e scanner", "PrintNotify", "Notificações de impressora", "Mostra avisos das extensões dos drivers de impressora.",
+                "Avisos de tinta acabando e telas extras dos drivers de impressora deixam de aparecer."),
+
+            Sv("svc_dps", "Diagnóstico", "DPS", "Diagnóstico de problemas", "Detecta problemas e alimenta as soluções de problemas do Windows.",
+                "As \"soluções de problemas\" do Windows e o diagnóstico de rede deixam de funcionar; o Monitor de Recursos pode mostrar menos detalhes."),
+            Sv("svc_wdi_service", "Diagnóstico", "WdiServiceHost", "Host do serviço de diagnóstico", "Roda os diagnósticos que precisam de serviço.",
+                "As soluções de problemas automáticas do Windows ficam mais limitadas."),
+            Sv("svc_wdi_system", "Diagnóstico", "WdiSystemHost", "Host do sistema de diagnóstico", "Roda os diagnósticos que precisam de acesso ao sistema.",
+                "As soluções de problemas automáticas do Windows ficam mais limitadas."),
+            Sv("svc_wer", "Diagnóstico", "WerSvc", "Relatório de erros do Windows", "Junta e envia para a Microsoft os relatórios quando um programa trava.",
+                "Travamentos não geram mais relatório nem a busca por solução no Windows."),
+            Sv("svc_wer_cpl", "Diagnóstico", "wercplsupport", "Painel de relatórios de problemas", "Mostra o histórico de relatórios de problemas no Painel de Controle.",
+                "O histórico de \"Relatórios de problemas\" do Painel de Controle fica vazio."),
+            Sv("svc_diagsvc", "Diagnóstico", "diagsvc", "Execução de diagnósticos", "Roda diagnósticos pedidos pelo suporte da Microsoft.",
+                "O app Obter Ajuda não consegue rodar diagnósticos automáticos."),
+            Sv("svc_troubleshoot", "Diagnóstico", "TroubleshootingSvc", "Solução de problemas recomendada", "Aplica sozinho soluções de problemas recomendadas pela Microsoft.",
+                "O Windows deixa de aplicar sozinho as correções recomendadas."),
+            Sv("svc_wap_push", "Diagnóstico", "dmwappushservice", "Roteamento de mensagens WAP Push", "Recebe mensagens de gerenciamento de dispositivo (usado também pela telemetria).",
+                "PCs gerenciados por empresa (Intune/MDM) podem deixar de receber políticas."),
+
+            Sv("svc_geolocation", "Sensores e localização", "lfsvc", "Geolocalização", "Informa a localização do PC para os apps.",
+                "Mapas, Clima e o fuso horário automático deixam de saber onde você está."),
+            Sv("svc_sensor", "Sensores e localização", "SensorService", "Sensores", "Gerencia os sensores do aparelho (luz, orientação, movimento).",
+                "Em notebook e tablet, o brilho automático e a rotação da tela param."),
+            Sv("svc_sensor_data", "Sensores e localização", "SensorDataService", "Dados de sensores", "Entrega os dados dos sensores aos apps.",
+                "Em notebook e tablet, o brilho automático e a rotação da tela param."),
+            Sv("svc_sensor_monitor", "Sensores e localização", "SensrSvc", "Monitoramento de sensores", "Ajusta o PC conforme os sensores (ex.: brilho pela luz do ambiente).",
+                "O brilho automático pela luz do ambiente para."),
+
+            Sv("svc_bluetooth", "Bluetooth e telefone", "bthserv", "Bluetooth", "Procura e conecta aparelhos Bluetooth.",
+                "PERIGOSO para quem usa Bluetooth: fones, mouses, teclados e controles Bluetooth param de funcionar."),
+            Sv("svc_bt_audio", "Bluetooth e telefone", "BTAGService", "Áudio Bluetooth (viva-voz)", "Usa fones Bluetooth como microfone em chamadas.",
+                "O microfone de fones Bluetooth para de funcionar (o som continua)."),
+            Sv("svc_bt_avctp", "Bluetooth e telefone", "BthAvctpSvc", "Controles de mídia Bluetooth", "Leva os botões de play/pausa e volume dos fones Bluetooth para o PC.",
+                "Os botões de play, pausa e volume dos fones Bluetooth deixam de funcionar."),
+            Sv("svc_phone", "Bluetooth e telefone", "PhoneSvc", "Telefonia", "Gerencia o estado de telefonia do aparelho.",
+                "Chamadas pelo Vincular ao Celular podem parar de funcionar."),
+
+            Sv("svc_biometric", "Biometria e cartões", "WbioSrvc", "Biometria do Windows", "Leitor de digital e reconhecimento facial do Windows Hello.",
+                "PERIGOSO para quem entra com o rosto ou a digital: o Windows Hello biométrico para; entre com PIN ou senha."),
+            Sv("svc_smartcard", "Biometria e cartões", "SCardSvr", "Cartão inteligente", "Lê cartões inteligentes (certificado digital em cartão, e-CPF/e-CNPJ A3).",
+                "Certificados digitais em cartão ou token (A3) param de funcionar."),
+            Sv("svc_smartcard_enum", "Biometria e cartões", "ScDeviceEnum", "Enumeração de cartões inteligentes", "Prepara leitores de cartão inteligente.",
+                "Leitores de cartão e tokens de certificado podem não ser reconhecidos."),
+            Sv("svc_cert_prop", "Biometria e cartões", "CertPropSvc", "Propagação de certificados", "Copia os certificados do cartão inteligente para o Windows.",
+                "Certificados digitais em cartão ou token (A3) deixam de aparecer para o navegador e os programas."),
+            Sv("svc_natural_auth", "Biometria e cartões", "NaturalAuthentication", "Autenticação natural", "Bloqueio dinâmico: bloqueia o PC quando o celular pareado se afasta.",
+                "O Bloqueio dinâmico pelo celular para de funcionar."),
+
+            Sv("svc_retail_demo", "Outros", "RetailDemo", "Modo de demonstração de loja", "Só usado nos PCs de vitrine das lojas.",
+                "Nenhum efeito em PC de uso normal."),
+            Sv("svc_wallet", "Outros", "WalletService", "Carteira", "Guarda dados da carteira digital do Windows.",
+                "Apps que usam a carteira do Windows deixam de funcionar (quase nenhum)."),
+            Sv("svc_payments_nfc", "Outros", "SEMgrSvc", "Pagamentos e NFC", "Pagamentos por NFC e elementos seguros.",
+                "Pagamentos por aproximação no PC (raros) param."),
+            Sv("svc_insider", "Outros", "wisvc", "Programa Windows Insider", "Recebe as versões de teste do Windows Insider.",
+                "Se você está no Windows Insider, deixa de receber as versões de teste."),
+            Sv("svc_parental", "Outros", "WpcMonSvc", "Controle dos pais", "Aplica os limites do Microsoft Family nas contas de criança.",
+                "Limites de tempo e filtros do Microsoft Family deixam de valer neste PC."),
+            Sv("svc_data_usage", "Outros", "DusmSvc", "Uso de dados", "Conta os dados usados e respeita os limites de conexão limitada.",
+                "O uso de dados por app e os limites de conexão limitada (celular roteado) deixam de funcionar."),
+            Sv("svc_seclogon", "Outros", "seclogon", "Logon secundário", "Permite \"Executar como outro usuário\".",
+                "\"Executar como outro usuário\" e alguns instaladores que trocam de conta deixam de funcionar."),
+            Sv("svc_touch_keyboard", "Outros", "TabletInputService", "Teclado virtual e escrita à mão", "Teclado de toque, painel de emojis e escrita com caneta.",
+                "PERIGOSO: no Windows 11 a digitação pode parar em alguns campos (Iniciar, busca, apps da Store), e o teclado virtual, o painel de emojis (Win + .) e a caneta param. Desfaça se o teclado sumir de algum lugar."),
+            Sv("svc_camera_frame", "Outros", "FrameServer", "Servidor de quadros da câmera", "Divide a webcam entre vários apps ao mesmo tempo.",
+                "PERIGOSO: a webcam pode parar no Teams, Discord, navegador e no app Câmera."),
+            Sv("svc_store_install", "Outros", "InstallService", "Instalação da Microsoft Store", "Instala e atualiza os apps da Microsoft Store.",
+                "PERIGOSO: a Microsoft Store não instala nem atualiza apps (incluindo o winget, usado em Instalar apps)."),
+            Sv("svc_edge_update", "Outros", "edgeupdate", "Atualização do Microsoft Edge", "Mantém o Edge e o WebView2 atualizados.",
+                "O Edge e o WebView2 (usado por vários programas) param de receber correções de segurança."),
+            Sv("svc_edge_update_m", "Outros", "edgeupdatem", "Atualização do Microsoft Edge (2)", "O segundo serviço de atualização do Edge.",
+                "O Edge e o WebView2 param de receber correções de segurança."),
+            Sv("svc_edge_elevation", "Outros", "MicrosoftEdgeElevationService", "Elevação do Microsoft Edge", "Ajuda o Edge com tarefas que pedem administrador.",
+                "Algumas atualizações e recursos do Edge podem falhar."),
+
+            Sv("svc_mixed_reality", "Realidade mista", "MixedRealityOpenXRSvc", "Realidade mista OpenXR", "Suporte a óculos de realidade mista da Microsoft.",
+                "Óculos Windows Mixed Reality deixam de funcionar."),
+            Sv("svc_spectrum", "Realidade mista", "spectrum", "Percepção espacial", "Mapeamento espacial para realidade mista.",
+                "Óculos Windows Mixed Reality deixam de funcionar."),
+            Sv("svc_perception_sim", "Realidade mista", "perceptionsimulation", "Simulação de percepção", "Simulador de realidade mista para desenvolvedores.",
+                "O simulador de realidade mista para de funcionar."),
+
+            Sv("svc_vm_heartbeat", "Máquina virtual", "vmicheartbeat", "Hyper-V: pulsação", "Só funciona quando este Windows roda dentro de uma máquina virtual Hyper-V.",
+                "Só afeta este Windows se ele for uma máquina virtual Hyper-V: o host deixa de saber se ela está viva."),
+            Sv("svc_vm_shutdown", "Máquina virtual", "vmicshutdown", "Hyper-V: desligamento", "Deixa o host Hyper-V desligar esta máquina virtual.",
+                "Só afeta máquinas virtuais Hyper-V: o host não consegue desligá-la com segurança."),
+            Sv("svc_vm_timesync", "Máquina virtual", "vmictimesync", "Hyper-V: sincronizar hora", "Acerta o relógio da máquina virtual pelo host.",
+                "Só afeta máquinas virtuais Hyper-V: o relógio pode atrasar."),
+            Sv("svc_vm_kvp", "Máquina virtual", "vmickvpexchange", "Hyper-V: troca de dados", "Troca informações entre a máquina virtual e o host.",
+                "Só afeta máquinas virtuais Hyper-V."),
+            Sv("svc_vm_vss", "Máquina virtual", "vmicvss", "Hyper-V: cópia de sombra", "Backups da máquina virtual feitos pelo host.",
+                "Só afeta máquinas virtuais Hyper-V: o backup pelo host fica menos seguro."),
+            Sv("svc_vm_guest", "Máquina virtual", "vmicguestinterface", "Hyper-V: interface do convidado", "Serviços de integração entre a máquina virtual e o host.",
+                "Só afeta máquinas virtuais Hyper-V."),
+            Sv("svc_vm_session", "Máquina virtual", "vmicvmsession", "Hyper-V: PowerShell Direct", "Permite ao host rodar PowerShell dentro da máquina virtual.",
+                "Só afeta máquinas virtuais Hyper-V."),
+            Sv("svc_vm_rdv", "Máquina virtual", "vmicrdv", "Hyper-V: Área de Trabalho Remota", "Sessão aprimorada da máquina virtual.",
+                "Só afeta máquinas virtuais Hyper-V: a sessão aprimorada para."),
+
             // ---- Mitigações: só para testar; deixa o PC menos protegido ----
             T("spectre_meltdown_off", W, N, "Mitigações", "Desligar as proteções contra Spectre e Meltdown", "Desliga no Windows as correções de software para as falhas Spectre e Meltdown do processador. Em alguns processadores, principalmente Intel antigos, dá um pouco mais de desempenho. Serve para testar e comparar na sua máquina.",
                 S(Lm(@"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", "FeatureSettingsOverride", 3),
@@ -575,7 +744,10 @@ public static class OptCatalog
 
     public static string LevelText(OptLevel l) => l switch { OptLevel.Essencial => "Essencial", OptLevel.Recomendado => "Recomendado", OptLevel.Avancado => "Avançado", _ => "" };
 
-    public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Energia", "Privacidade", "Jogos", "Rede", "IA", "Mitigações" };
+    public static readonly string[] Categories = { "Geral", "Aparência", "Desempenho", "Energia", "Privacidade", "Jogos", "Rede", "IA", "Mitigações",
+        "Serviços · Xbox", "Serviços · Rede", "Serviços · Acesso remoto", "Serviços · Impressão e scanner", "Serviços · Diagnóstico",
+        "Serviços · Sensores e localização", "Serviços · Bluetooth e telefone", "Serviços · Biometria e cartões", "Serviços · Outros",
+        "Serviços · Realidade mista", "Serviços · Máquina virtual" };
 
     /// <summary>Aba do guia onde um ajuste das páginas Windows, Mouse e Teclado aparece (Debloat e GPU têm página própria).</summary>
     public static GuideTab Tab(OptTweak t) => t.Category switch
@@ -586,6 +758,7 @@ public static class OptCatalog
         "Desempenho" => GuideTab.Avancado,
         "Mitigações" => GuideTab.Mitigacoes,
         "Aparência" => GuideTab.Aparencia,
+        var c when c.StartsWith("Serviços") => GuideTab.Servicos,
         _ => GuideTab.Geral,
     };
 

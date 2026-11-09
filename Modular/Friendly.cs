@@ -109,6 +109,7 @@ public static class PageCatalog
         new("NavStartup", "Inicialização", "FERRAMENTAS", "Programas que abrem junto com o Windows.", "inicializacao startup abrir junto lento ligar", false, ""),
         new("NavApps", "Instalar apps", "FERRAMENTAS", "Instalar programas populares com um clique.", "instalar programas apps winget baixar", false, ""),
         new("NavUninstall", "Desinstalar apps", "FERRAMENTAS", "Desinstalar programas e limpar o que eles deixam para trás.", "desinstalar remover programas sobras revo", false, ""),
+        new("NavTasks", "Tarefas agendadas", "FERRAMENTAS", "O que o Windows e os programas rodam sozinhos: executar, desligar ou apagar.", "tarefas agendadas agendador schtasks task scheduler atualizador", true, ""),
         new("NavInteg", "Integrações", "FERRAMENTAS", "Iluminação RGB e programas de terceiros.", "rgb icue iluminacao integracao", true, ""),
         new("NavUtil", "Utilidades", "FERRAMENTAS", "Baixar vídeos e achar arquivos na hora.", "baixar video youtube buscar arquivo finder", false, ""),
         new("NavMakerPorts", "Portas", "MAKER", "Portas USB/serial de Arduino e ESP.", "arduino esp serial com porta", true, ""),

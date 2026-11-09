@@ -381,7 +381,7 @@ Test("Abas do guia: todo ajuste de Windows, Mouse e Teclado cai em uma aba; Spec
     var mine = OptCatalog.All.Where(t => t.Page is OptPage.Windows or OptPage.Mouse or OptPage.Teclado && t.Id != "new_users").ToList();
     Assert(mine.Count == Enum.GetValues<GuideTab>().Sum(g => OptCatalog.ForTab(g).Count()));
     Assert(OptCatalog.ForTab(GuideTab.Mitigacoes).Single().Id == "spectre_meltdown_off" && OptCatalog.ById("spectre_meltdown_off")!.Warning!.StartsWith("PERIGOSO"));
-    Assert(OptCatalog.Services().Any(t => t.Id == "sysmain_off" || t.StopServices?.Contains("SysMain") == true) && OptCatalog.ForTab(GuideTab.Energia).Count() == 3);
+    Assert(OptCatalog.Services().Any(t => t.Id == "sysmain_off" || t.StopServices?.Contains("SysMain") == true) && OptCatalog.ForTab(GuideTab.Energia).Count() == 4 && OptCatalog.ForTab(GuideTab.Servicos).All(t => t.Warning != null && t.StopServices?.Length == 1 && OptCatalog.Services().Contains(t)) && OptCatalog.ForTab(GuideTab.Servicos).Count() > 60);
 });
 Test("Limpeza: respeita idade e máscara, expande perfis e não sai da pasta", () => {
     string root = Path.Combine(temp, "clean");
