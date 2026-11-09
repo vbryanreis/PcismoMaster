@@ -132,6 +132,7 @@
                         WindowChrome.IsHitTestVisibleInChrome="True">
                 <Button x:Name="BtnMode" Style="{StaticResource ModeButton}" Click="Mode_Click" Margin="0,0,10,0" VerticalAlignment="Center"
                         ToolTip="Simples mostra só o essencial e seguro. Avançado mostra tudo (sensores, overclock, scripts, ajustes técnicos)."/>
+                <Button x:Name="BtnColors" Style="{StaticResource CaptionButton}" Content="&#xE790;" Click="Colors_Click" ToolTip="Cores do programa"/>
                 <Button x:Name="BtnTheme" Style="{StaticResource CaptionButton}" Content="&#xE706;" Click="Theme_Click" ToolTip="Modo claro"/>
                 <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Min_Click" ToolTip="Minimizar"/>
                 <Button x:Name="BtnMax" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="Max_Click" ToolTip="Maximizar"/>

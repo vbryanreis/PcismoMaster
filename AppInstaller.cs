@@ -252,8 +252,10 @@ public static class AppInstaller
 
         return p.ExitCode switch
         {
-            0 => (true, "Instalado."),
-            unchecked((int)0x8A15002B) or unchecked((int)0x8A150061) => (true, "Já estava instalado."),
+            0 => (true, upgrade ? "Atualizado." : "Instalado."),
+            unchecked((int)0x8A15002B) => (true, upgrade ? "Já está na versão mais recente." : "Já estava instalado."),
+            unchecked((int)0x8A150061) => (true, "Já estava instalado."),
+            unchecked((int)0x8A150010) => (false, "Não está instalado: instale primeiro."),
             unchecked((int)0x8A150014) => (false, "Pacote não encontrado no winget."),
             unchecked((int)0x8A150008) => (false, "Falha no download: confira a internet e tente de novo."),
             _ => (false, $"Falhou (código 0x{p.ExitCode:X8}). {LastLine(output)}".Trim()),

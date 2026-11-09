@@ -81,6 +81,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         // Versão exibida no menu lateral lida do próprio assembly (fonte: <Version> em PcismoMaster.csproj)
         SideVersion.Text = "v" + (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.2.5");
+        LoadCustomColors();
         ThemeManager.Apply(_settings.LightTheme);
         UpdateThemeButton();
         ShowPage("PageHome");
@@ -128,6 +129,7 @@ public partial class MainWindow : Window
         };
         _timer.Start();
         ApplyPageLayout();
+        FlatIcons.ApplyToNav(GrpTweakItems.Parent as Panel ?? GrpTweakItems);
         SetupTweakSteps();
 
         StateChanged += (_, _) =>

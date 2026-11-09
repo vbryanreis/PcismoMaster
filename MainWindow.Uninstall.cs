@@ -173,9 +173,21 @@ public partial class MainWindow
     private void BtnUnRefresh_Click(object sender, RoutedEventArgs e)
     {
         if (_unBusy) return;
-        _programs = null;
-        UnLeftoverCard.Visibility = Visibility.Collapsed;
-        _ = LoadProgramsAsync();
+        _ = ReloadProgramsAsync();
+    }
+
+    /// <summary>ATUALIZAR LISTA: trava os botões enquanto lê e limpa a seleção e as sobras do programa anterior.</summary>
+    private async Task ReloadProgramsAsync()
+    {
+        SetUnBusy(true);
+        try
+        {
+            _programs = null;
+            UninstallList.SelectedItem = null;
+            UnLeftoverCard.Visibility = Visibility.Collapsed;
+            await LoadProgramsAsync();
+        }
+        finally { SetUnBusy(false); }
     }
 
     private void SetUnBusy(bool busy)
