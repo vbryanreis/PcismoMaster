@@ -156,7 +156,8 @@ public partial class MainWindow
 
     private TextBlock IssueLine(WinIssue i)
     {
-        var t = OptText($"  ⚠ {i.Title} — {i.StatusText} (desde a {i.OriginKb})", i.Open ? "TempWarn" : "Muted", 11.5);
+        string since = i.OriginKb.Length > 0 ? $"desde a {i.OriginKb}" : "a Microsoft não informou qual atualização causou";
+        var t = OptText($"  ⚠ {i.Title} — {i.StatusText} ({since})",i.Open ? "TempWarn" : "Muted", 11.5);
         t.ToolTip = i.Summary + "\n\nAtualizado: " + i.Updated;
         return t;
     }
