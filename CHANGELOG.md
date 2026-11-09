@@ -2,6 +2,16 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.20.0
+
+- **Abas do TWEAKING reorganizadas** para avaliar item por item com mais facilidade.
+- **Resumo no topo**: quantos ajustes já estão ligados e quantos recomendados ainda faltam. O LIGAR OS RECOMENDADOS mostra a lista antes de confirmar.
+- **Filtros simples**: Mostrar (Todos, Recomendados, Ligados, Desligados, Sem risco), Tema e pesquisa (que também procura no texto do aviso).
+- **Três blocos**: RECOMENDADOS, OPCIONAIS e ARRISCADOS. Os arriscados ficam fechados até você pedir e se abrem quando a pesquisa encontra algum deles.
+- **Selos em cada cartão**: SEM RISCO, ATENÇÃO ou PERIGOSO, além de PEDE REINICIAR ou REINICIA O EXPLORER.
+- **"Quando evitar"** na frente de cada aviso, e uma legenda "Como ler" no topo.
+- Versão atualizada para 0.20.0.
+
 ## 0.19.1
 
 - **Windows Update ganhou aba própria**: é o passo 02 do TWEAKING, logo depois do Começar aqui, com os bloqueios, o leitor de atualizações e os botões. Os passos seguintes foram renumerados (Drivers 03 … Perfis 16).
