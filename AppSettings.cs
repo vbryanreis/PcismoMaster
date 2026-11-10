@@ -107,6 +107,12 @@ public sealed class AppSettings
     public string? ColorIconA { get; set; }
     public string? ColorIconB { get; set; }
     public string? ColorIconC { get; set; }
+    public string? ColorFg { get; set; }
+    public string? ColorMuted { get; set; }
+    public string? ColorBg { get; set; }
+    public string? ColorCard { get; set; }
+    /// <summary>Idioma do programa: "pt", "en" ou "es".</summary>
+    public string Language { get; set; } = "pt";
     /// <summary>Botões principais na cor de destaque em vez de branco/preto.</summary>
     public bool ColorAccentButtons { get; set; }
     /// <summary>Modo avançado: mostra sensores, overclock, scripts e ajustes técnicos. Começa no Simples.</summary>

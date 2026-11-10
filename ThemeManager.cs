@@ -139,6 +139,11 @@ public static class ThemeManager
     public static string? CustomIconA { get; set; }
     public static string? CustomIconB { get; set; }
     public static string? CustomIconC { get; set; }
+    /// <summary>Texto principal, texto secundário, fundo do programa e cartões/painéis.</summary>
+    public static string? CustomFg { get; set; }
+    public static string? CustomMuted { get; set; }
+    public static string? CustomBg { get; set; }
+    public static string? CustomCard { get; set; }
     /// <summary>Botões principais, abas marcadas e o quadrado dos cartões na cor de destaque (em vez do branco/preto).</summary>
     public static bool AccentButtons { get; set; }
 
@@ -151,6 +156,15 @@ public static class ThemeManager
 
     /// <summary>Texto legível em cima de uma cor: preto em cor clara, branco em cor escura.</summary>
     public static Color OnColor(Color c) => (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) / 255 > 0.6 ? Color.FromRgb(0x0E, 0x0E, 0x10) : Colors.White;
+
+    /// <summary>Clareia (amount &gt; 0) ou escurece a cor; em cor muito clara, "clarear" escurece, para continuar dando contraste.</summary>
+    public static Color Shade(Color c, double amount)
+    {
+        bool light = (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) / 255 > 0.6;
+        if (light) amount = -Math.Abs(amount);
+        byte F(byte v) => (byte)Math.Clamp(Math.Round(amount >= 0 ? v + (255 - v) * amount : v * (1 + amount)), 0, 255);
+        return Color.FromRgb(F(c.R), F(c.G), F(c.B));
+    }
 
     private static void Set(object key, Color c)
     {
@@ -177,5 +191,14 @@ public static class ThemeManager
         if (ParseColor(CustomIconA) is Color ia) Set("IconA", ia);
         if (ParseColor(CustomIconB) is Color ib) Set("IconB", ib);
         if (ParseColor(CustomIconC) is Color ic) Set("IconC", ic);
+        if (ParseColor(CustomFg) is Color fg) Set("Fg", fg);
+        if (ParseColor(CustomMuted) is Color mu) { Set("Muted", mu); Set("Faint", Color.FromArgb(0xB4, mu.R, mu.G, mu.B)); }
+        if (ParseColor(CustomBg) is Color bg)
+        {
+            Set("Bg", bg); Set("Ink", bg); Set(SystemColors.ControlBrushKey, bg);
+            // o menu lateral um pouco mais escuro (ou mais claro, num fundo escuro) que o fundo
+            Set("Panel", Shade(bg, -0.04));
+        }
+        if (ParseColor(CustomCard) is Color cd) { Set("Card", cd); Set("Hover", Shade(cd, 0.06)); }
     }
 }

@@ -689,6 +689,16 @@ Test("Motherboard: AMD chipset page gives version, date and the official install
     Assert(BoardSupport.ParseAmdChipset("<html>nada</html>", pages[0]) == null);
     Assert(BoardSupport.CompareVersions("8.09.28.1124", "7.01.08.129") > 0 && BoardSupport.Comparable("8.09.28.1124", "7.01.08.129"));
 });
+Test("Language: translations file is well formed, keeps CAPS and translates each part of a title", () => {
+    var bad = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Modular", "Lang.txt")).Where(l => l.Length > 0 && !l.StartsWith("#") && l.Split('|').Length != 3).ToList();
+    if (bad.Count > 0) throw new Exception("bad lines: " + string.Join(" / ", bad.Take(3)));
+    Assert(ResetExplode.Modular.Loc.Count > 400);
+    Assert(ResetExplode.Modular.Loc.T("ABRIR LOCAL", "en") == "OPEN LOCATION");
+    Assert(ResetExplode.Modular.Loc.T("Pesquisar", "es") == "Buscar");
+    Assert(ResetExplode.Modular.Loc.T("TWEAKING · Geral", "en") == "TWEAKING · General");
+    Assert(ResetExplode.Modular.Loc.T("texto que não existe", "en") == "texto que não existe");
+    Assert(ResetExplode.Modular.Loc.T("Pesquisar", "pt") == "Pesquisar");
+});
 Console.WriteLine($"{passed} tests passed. No production tweaks applied.");
 Directory.Delete(temp, true);
 
