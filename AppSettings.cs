@@ -100,6 +100,8 @@ public sealed class AppSettings
 
     // Aparência
     public bool LightTheme { get; set; }
+    /// <summary>Tema Legacy: o visual da 0.12.0 (roxo → azul, hover azul, cantos arredondados, ícones antigos). Vale ao abrir o app.</summary>
+    public bool LegacyTheme { get; set; }
     /// <summary>Cores do programa escolhidas pelo usuário (hex #RRGGBB; null = a do tema).</summary>
     public string? ColorAccent { get; set; }
     public string? ColorIconA { get; set; }

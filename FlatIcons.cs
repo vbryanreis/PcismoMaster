@@ -116,6 +116,7 @@ public static class FlatIcons
     /// <summary>O ícone desenhado (ou null se a chave não existe), no tamanho pedido.</summary>
     public static FrameworkElement? Create(string? key, double size)
     {
+        if (ThemeManager.Legacy) return null; // tema Legacy: ficam os glifos da fonte, como na 0.12.0
         if (key == null || !Shapes.TryGetValue(key, out var layers)) return null;
         var canvas = new Canvas { Width = 24, Height = 24 };
         foreach (var l in layers)

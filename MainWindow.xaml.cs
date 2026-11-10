@@ -78,7 +78,9 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
+        ThemeManager.UseLegacy(_settings.LegacyTheme); // antes do InitializeComponent: os estilos são lidos ao montar a janela
         InitializeComponent();
+        ApplyLegacyChrome();
         // Versão exibida no menu lateral lida do próprio assembly (fonte: <Version> em PcismoMaster.csproj)
         SideVersion.Text = "v" + (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.2.5");
         LoadCustomColors();
@@ -101,7 +103,7 @@ public partial class MainWindow : Window
         InitBench();
         SnapshotUsb();
         RefreshDrives();
-        TitlePage.Text = "INÍCIO";
+        TitlePage.Text = PageTitle("Início");
         InitHome();
         UpdateDashboard();
 
@@ -281,7 +283,7 @@ public partial class MainWindow : Window
             group.IsChecked = true;
             name = $"{group.Content} · {name}";
         }
-        TitlePage.Text = name.ToUpper(new System.Globalization.CultureInfo("pt-BR"));
+        TitlePage.Text = PageTitle(name);
         UpdatePageHelp(item.Name);
 
         if (page != "PageUtil") LeaveFinder();

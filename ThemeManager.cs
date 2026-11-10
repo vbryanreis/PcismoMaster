@@ -44,10 +44,85 @@ public static class ThemeManager
         (SystemColors.InactiveSelectionHighlightBrushKey, "#1C1C20", "#E4E4E0"),
     };
 
+    // ---- Tema Legacy: o visual da 0.12.0 (roxo → azul, hover azul, cantos arredondados, ícones de glifo) ----
+
+    /// <summary>Paleta da 0.12.0. O destaque em degradê (AccentGradient, OnAccent, AccentSoft) vem do ThemeLegacy.xaml.</summary>
+    private static readonly (object Key, string Dark, string Light)[] LegacyPalette =
+    {
+        ("Bg", "#07060D", "#FFFFFF"),
+        ("Panel", "#0B0A14", "#F6F4FD"),
+        ("Card", "#110F1D", "#FFFFFF"),
+        ("Hover", "#1B1830", "#ECE8FA"),
+        ("Line", "#24203A", "#DAD4F0"),
+        ("LineStrong", "#3F3866", "#9088B8"),
+        ("Fg", "#F4F2FF", "#14111F"),
+        ("Muted", "#9B95B8", "#4A4560"),
+        ("Faint", "#7A7499", "#6A6485"),
+        ("Ink", "#07060D", "#FFFFFF"),
+        ("ThumbBrush", "#2C2746", "#D6D0EE"),
+        ("ThumbHover", "#5A5290", "#ABA2D6"),
+        ("ThumbDrag", "#8A80C8", "#8A80C8"),
+        ("Accent", "#A66BFF", "#8B3FF0"),
+        ("NavHover", "#3EC6EA", "#1E9BC4"), // hover das categorias: ciano no escuro, um azul mais fechado no modo claro
+        // Chaves criadas depois da 0.12.0, em tons do tema antigo
+        ("TagBlue", "#29B4D9", "#1E9BC4"),
+        ("TagAmber", "#FFCF4D", "#A86F00"),
+        ("TagGreen", "#4ED17A", "#1E8A4C"),
+        ("IconA", "#A66BFF", "#8B3FF0"),
+        ("IconB", "#29B4D9", "#1E9BC4"),
+        ("IconC", "#F4F2FF", "#14111F"),
+        (SystemColors.ControlBrushKey, "#07060D", "#FFFFFF"),
+        (SystemColors.HighlightBrushKey, "#1B1830", "#ECE8FA"),
+        (SystemColors.InactiveSelectionHighlightBrushKey, "#1B1830", "#ECE8FA"),
+    };
+
+    /// <summary>Tema Legacy ligado (vale desde a abertura: os estilos são lidos uma vez, então trocar pede reiniciar o app).</summary>
+    public static bool Legacy { get; private set; }
+
+    /// <summary>Liga o tema Legacy: põe o ThemeLegacy.xaml por cima do Theme.xaml. Chamar antes de criar a janela principal.</summary>
+    public static void UseLegacy(bool on)
+    {
+        if (Legacy || !on) { Legacy |= on; return; }
+        Legacy = true;
+        try
+        {
+            var dicts = Application.Current.Resources.MergedDictionaries;
+            dicts.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/ThemeLegacy.xaml") });
+        }
+        catch (Exception ex) { Legacy = false; DriverClean.Log($"Tema Legacy não carregou: {ex.Message}"); }
+    }
+
+    private static System.Windows.Media.Effects.DropShadowEffect Glow(string hex, double blur, double opacity)
+    {
+        var e = new System.Windows.Media.Effects.DropShadowEffect
+            { Color = (Color)ColorConverter.ConvertFromString(hex), ShadowDepth = 0, BlurRadius = blur, Opacity = opacity };
+        e.Freeze();
+        return e;
+    }
+
+    /// <summary>Canto de um elemento montado no código: reto no tema atual, o arredondado da 0.12.0 no Legacy.</summary>
+    public static CornerRadius R(double r) => Legacy ? new CornerRadius(r) : new CornerRadius(0);
+    public static CornerRadius R(double tl, double tr, double br, double bl) => Legacy ? new CornerRadius(tl, tr, br, bl) : new CornerRadius(0);
+
     public static void Apply(bool light)
     {
         IsLight = light;
         var res = Application.Current.Resources;
+        if (Legacy)
+        {
+            // Tira as chaves que o tema atual põe aqui em cima, para valerem as do ThemeLegacy.xaml (o degradê roxo → ciano)
+            foreach (var (key, _, _) in Palette) res.Remove(key);
+            foreach (var (key, dark, lightHex) in LegacyPalette)
+            {
+                var b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(light ? lightHex : dark));
+                b.Freeze();
+                res[key] = b;
+            }
+            // Brilho do hover no menu lateral: no escuro, o da 0.12.0; no claro, curto e fraco para o texto ficar nítido
+            res["NavGlowItem"] = Glow(light ? "#8B3FF0" : "#A647FE", light ? 3 : 8, light ? 0.25 : 0.8);
+            res["NavGlowGroup"] = Glow(light ? "#1E9BC4" : "#5FB0FF", light ? 3 : 10, light ? 0.25 : 0.85);
+            return; // no Legacy as cores escolhidas em Cores do programa não entram
+        }
         foreach (var (key, dark, lightHex) in Palette)
         {
             var color = (Color)ColorConverter.ConvertFromString(light ? lightHex : dark);

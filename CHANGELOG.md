@@ -2,6 +2,11 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.21.0
+
+- **Tema Legacy**: em **Cores do programa** (botão da paleta na barra de título) há agora a seção **Tema**, com **Atual** e **Legacy**. O Legacy devolve o visual da 0.12.0: degradê roxo → azul, hover azul no menu, cantos arredondados, cabeçalho "PcismoMaster" sem caixa alta, menu lateral em painel arredondado, botões e selos antigos e os ícones de antes (glifos no lugar dos ícones chapados). No modo claro, o brilho do hover do menu (azul nas categorias, roxo nas sub-abas) ficou mais curto e fraco, para o texto não parecer estourado; no escuro ele é o mesmo da 0.12.0. As funções e ferramentas novas continuam todas lá; muda só a aparência. Trocar de tema reinicia o app. No Legacy as cores personalizadas ficam guardadas e voltam ao escolher o tema atual.
+- Versão atualizada para 0.21.0.
+
 ## 0.20.1
 
 - **Corrigido em Desinstalar apps**: depois de desinstalar um programa, escolher outro na lista não funcionava, porque a seleção ficava presa no app que já tinha sido removido e era preciso fechar e abrir o PcismoMaster. Agora a lista troca de programa normalmente.

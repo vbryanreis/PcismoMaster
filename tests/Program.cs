@@ -577,6 +577,17 @@ Test("Friendly UI: home tasks and search lead to real pages, and simple mode hid
     Assert(PageCatalog.Search("overclock", false).Count == 0 && PageCatalog.Search("overclock", true).First().Nav == "NavOc");
     Assert(PageCatalog.Search("  ", true).Count == 0 && PageCatalog.Search("driver", false).First().Nav == "NavDriver");
 });
+Test("Legacy theme: every corner token used in the XAML exists in both themes (0 in the current one, rounded in Legacy)", () => {
+    string Repo(string f) => File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", f));
+    var key = new System.Text.RegularExpressions.Regex("<CornerRadius x:Key=\"(R[0-9_]+)\">([^<]+)</CornerRadius>");
+    var cur = key.Matches(Repo("Theme.xaml")).ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value.Trim());
+    var old = key.Matches(Repo("ThemeLegacy.xaml")).ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value.Trim());
+    Assert(cur.Count > 0 && cur.Keys.OrderBy(k => k).SequenceEqual(old.Keys.OrderBy(k => k)));
+    Assert(cur.Values.All(v => v == "0") && old.All(kv => kv.Value != "0" && kv.Key == "R" + kv.Value.Replace(",", "_")));
+    foreach (var f in new[] { "MainWindow.xaml", "ToastWindow.xaml" })
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(Repo(f), @"DynamicResource (R[0-9_]+)\}"))
+            Assert(cur.ContainsKey(m.Groups[1].Value));
+});
 Test("Uninstall list: entries of apps already removed are orphans; a vanished uninstaller with the folder still there is not", () => {
     string dir = Path.Combine(temp, "orphan-app");
     Directory.CreateDirectory(dir);
