@@ -63,7 +63,7 @@ public partial class MainWindow
             var g = new UniformGrid { Rows = 2, Columns = 2, Width = size * 0.56, Height = size * 0.56 };
             foreach (var c in new[] { "#F25022", "#7FBA00", "#00A4EF", "#FFB900" })
                 g.Children.Add(new Border { Background = Hex(c), Margin = new Thickness(size * 0.02) });
-            return new Border { Width = size, Height = size, CornerRadius = new CornerRadius(0), Background = Hex("#1B1B22"), Child = g };
+            return new Border { Width = size, Height = size, CornerRadius = ThemeManager.R(size * 0.26), Background = Hex("#1B1B22"), Child = g };
         }
         (string bg, string fg, string? stripe, string text) = b switch
         {
@@ -80,7 +80,7 @@ public partial class MainWindow
         {
             return new Border
             {
-                Width = size, Height = size, CornerRadius = new CornerRadius(0), Background = (Brush)FindResource("AccentGradient"),
+                Width = size, Height = size, CornerRadius = ThemeManager.R(size * 0.26), Background = (Brush)FindResource("AccentGradient"),
                 Child = new TextBlock { Text = "", FontFamily = (FontFamily)FindResource("Icons"), FontSize = size * 0.4, Foreground = (Brush)FindResource("OnAccent"),
                                         HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
             };
@@ -88,7 +88,7 @@ public partial class MainWindow
         double font = size * (text.Length > 5 ? 0.22 : 0.3);
         return new Border
         {
-            Height = size, MinWidth = size, CornerRadius = new CornerRadius(0), Background = Hex(bg), Padding = new Thickness(size * 0.18, 0, size * 0.18, 0),
+            Height = size, MinWidth = size, CornerRadius = ThemeManager.R(size * 0.26), Background = Hex(bg), Padding = new Thickness(size * 0.18, 0, size * 0.18, 0),
             BorderBrush = stripe != null ? Hex(stripe) : null, BorderThickness = stripe != null ? new Thickness(0, 0, 0, Math.Max(2, size * 0.07)) : new Thickness(0),
             Child = new TextBlock { Text = text, Foreground = Hex(fg), FontWeight = FontWeights.Black, FontSize = font, HorizontalAlignment = HorizontalAlignment.Center,
                                     VerticalAlignment = VerticalAlignment.Center },

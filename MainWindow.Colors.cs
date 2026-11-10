@@ -79,13 +79,17 @@ public partial class MainWindow
         var root = new StackPanel { Margin = new Thickness(24, 20, 24, 20) };
         win.Content = root;
         root.Children.Add(new TextBlock { Text = "Cores do programa", FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 4) });
-        root.Children.Add(OptText("Escolha à esquerda o que pintar e arraste no quadrado e na barra de tons. A cor muda no app na hora.", "Muted", 12, 16));
+        root.Children.Add(ThemeChoice(win));
+        root.Children.Add(OptText(ThemeManager.Legacy
+            ? "No tema Legacy as cores são as da 0.12.0. As cores escolhidas aqui valem quando você voltar ao tema atual."
+            : "Escolha à esquerda o que pintar e arraste no quadrado e na barra de tons. A cor muda no app na hora.", "Muted", 12, 16));
 
         var body = new Grid();
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(220) });
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
         body.ColumnDefinitions.Add(new ColumnDefinition());
         root.Children.Add(body);
+        if (ThemeManager.Legacy) { body.IsEnabled = false; body.Opacity = 0.4; }
 
         // ---- Esquerda: o que pintar ----
         var list = new StackPanel();
@@ -158,6 +162,7 @@ public partial class MainWindow
         var bar = new WrapPanel { HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 20, 0, 0) };
         bar.Children.Add(TweakButton("Voltar tudo ao padrão", false, (_, _) =>
         {
+            if (ThemeManager.Legacy) return;
             foreach (var t in targets) t.Set(null);
             _settings.ColorAccentButtons = false;
             btns.IsChecked = false;

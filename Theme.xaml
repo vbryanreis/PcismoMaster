@@ -74,6 +74,20 @@
         <Setter Property="Foreground" Value="{DynamicResource Faint}"/>
     </Style>
 
+    <!-- Cantos: os tokens R* valem 0 aqui (cantos retos); o tema Legacy (ThemeLegacy.xaml) devolve os arredondados da 0.12.0 -->
+    <CornerRadius x:Key="R3">0</CornerRadius>
+    <CornerRadius x:Key="R4">0</CornerRadius>
+    <CornerRadius x:Key="R6">0</CornerRadius>
+    <CornerRadius x:Key="R8">0</CornerRadius>
+    <CornerRadius x:Key="R10">0</CornerRadius>
+    <CornerRadius x:Key="R11">0</CornerRadius>
+    <CornerRadius x:Key="R12">0</CornerRadius>
+    <CornerRadius x:Key="R12_12_0_0">0</CornerRadius>
+    <CornerRadius x:Key="R14">0</CornerRadius>
+    <CornerRadius x:Key="R16">0</CornerRadius>
+    <CornerRadius x:Key="R17">0</CornerRadius>
+    <CornerRadius x:Key="R18">0</CornerRadius>
+
     <FontFamily x:Key="Mono">Cascadia Mono, Consolas</FontFamily>
     <FontFamily x:Key="Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
     <!-- Fonte das abas de navegação: clean e bem legível, no estilo de apps de tecnologia.

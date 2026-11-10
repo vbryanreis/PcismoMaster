@@ -74,9 +74,14 @@ public partial class MainWindow
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition());
-        var icon = new Border { Width = 44, Height = 44, CornerRadius = new CornerRadius(0), Margin = new Thickness(0, 0, 14, 0), VerticalAlignment = VerticalAlignment.Top,
+        var icon = new Border { Width = 44, Height = 44, CornerRadius = ThemeManager.R(12), Margin = new Thickness(0, 0, 14, 0), VerticalAlignment = VerticalAlignment.Top,
             Child = FlatIcons.ForGlyph(t.Icon, 26) };
         icon.SetResourceReference(Border.BackgroundProperty, "Hover");
+        if (ThemeManager.Legacy) // tema Legacy: glifo na cor do bloco sobre um fundo da mesma cor, como na 0.12.0
+        {
+            icon.Background = new SolidColorBrush(Color.FromArgb(0x2A, c.R, c.G, c.B));
+            icon.Child = new TextBlock { Text = t.Icon, FontFamily = (FontFamily)FindResource("Icons"), FontSize = 20, Foreground = accent, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        }
         var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
         text.Children.Add(new TextBlock { Text = t.Title, FontSize = 15, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
         text.Children.Add(new TextBlock { Text = t.Description, Foreground = (Brush)FindResource("Muted"), FontSize = 12.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 0) });
@@ -106,12 +111,17 @@ public partial class MainWindow
         }
         foreach (var p in found.Take(8))
         {
-            var row = new Border { Padding = new Thickness(14, 10, 14, 10), CornerRadius = new CornerRadius(0), Cursor = Cursors.Hand, Background = Brushes.Transparent };
+            var row = new Border { Padding = new Thickness(14, 10, 14, 10), CornerRadius = ThemeManager.R(10), Cursor = Cursors.Hand, Background = Brushes.Transparent };
             var sp = new StackPanel { Orientation = Orientation.Horizontal };
-            var pi = FlatIcons.ForGlyph(p.Icon, 16);
-            pi.Margin = new Thickness(0, 0, 14, 0);
-            pi.VerticalAlignment = VerticalAlignment.Center;
-            sp.Children.Add(pi);
+            if (ThemeManager.Legacy) // tema Legacy: glifo no roxo do destaque, como na 0.12.0
+                sp.Children.Add(new TextBlock { Text = p.Icon, FontFamily = (FontFamily)FindResource("Icons"), FontSize = 15, Width = 30, VerticalAlignment = VerticalAlignment.Center, Foreground = (Brush)FindResource("Accent") });
+            else
+            {
+                var pi = FlatIcons.ForGlyph(p.Icon, 16);
+                pi.Margin = new Thickness(0, 0, 14, 0);
+                pi.VerticalAlignment = VerticalAlignment.Center;
+                sp.Children.Add(pi);
+            }
             var tx = new StackPanel();
             tx.Children.Add(new TextBlock { Text = p.Group.Length > 0 ? $"{p.Title}  ·  {FriendlyText.Apply(p.Group)}" : p.Title, FontWeight = FontWeights.SemiBold });
             tx.Children.Add(new TextBlock { Text = p.Description, Foreground = (Brush)FindResource("Muted"), FontSize = 12, TextWrapping = TextWrapping.Wrap });

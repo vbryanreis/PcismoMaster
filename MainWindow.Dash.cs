@@ -291,7 +291,7 @@ public partial class MainWindow
         DashChart.Children.Add(dot);
         var bubble = new Border
         {
-            Background = (Brush)FindResource("Hover"), CornerRadius = new CornerRadius(0), Padding = new Thickness(10, 5, 10, 5),
+            Background = (Brush)FindResource("Hover"), CornerRadius = ThemeManager.R(8), Padding = new Thickness(10, 5, 10, 5),
             Child = new TextBlock { Text = DashChartValue.Text, FontFamily = mono, FontWeight = FontWeights.SemiBold, Foreground = DashChartValue.Foreground }
         };
         bubble.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));

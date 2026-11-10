@@ -53,6 +53,13 @@ public partial class MainWindow
     {
         var b = new Border { Style = (Style)FindResource("MaintBadge"), Padding = new Thickness(6, 2, 6, 2), Margin = new Thickness(0, 0, 6, 0),
             BorderBrush = brush, Child = new TextBlock { Text = text.ToUpperInvariant() } };
+        if (ThemeManager.Legacy) // tema Legacy: selo com fundo suave na cor do status, como na 0.12.0
+        {
+            var c = brush is SolidColorBrush s ? s.Color : Colors.Gray;
+            b.Padding = new Thickness(7, 2, 7, 2);
+            b.Background = new SolidColorBrush(Color.FromArgb(0x26, c.R, c.G, c.B));
+            ((TextBlock)b.Child).Text = text;
+        }
         TextElement.SetForeground(b, brush);
         return b;
     }

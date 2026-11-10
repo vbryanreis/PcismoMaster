@@ -12,7 +12,7 @@ namespace ResetExplode;
 public sealed class SectionHeader : DockPanel
 {
     public static readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon), typeof(string), typeof(SectionHeader),
-        new PropertyMetadata("", (d, e) => ((SectionHeader)d)._tile.Child = FlatIcons.ForGlyph((string)e.NewValue, 24)));
+        new PropertyMetadata("", (d, e) => ((SectionHeader)d)._tile.Child = TileIcon((string)e.NewValue)));
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(SectionHeader),
         new PropertyMetadata("", (d, e) => ((SectionHeader)d)._title.Text = (string)e.NewValue));
     public static readonly DependencyProperty SubtitleProperty = DependencyProperty.Register(nameof(Subtitle), typeof(string), typeof(SectionHeader),
@@ -30,14 +30,25 @@ public sealed class SectionHeader : DockPanel
     {
         Margin = new Thickness(0, 0, 0, 12);
         _sub.SetResourceReference(TextBlock.ForegroundProperty, "Muted");
-        _tile.Child = FlatIcons.ForGlyph("", 24);
-        _tile.SetResourceReference(Border.BackgroundProperty, "Hover");
+        _tile.Child = TileIcon("");
+        if (ThemeManager.Legacy) _tile.CornerRadius = new CornerRadius(11); // tema Legacy: quadrado arredondado no degradê do tema
+        _tile.SetResourceReference(Border.BackgroundProperty, ThemeManager.Legacy ? "AccentGradient" : "Hover");
         SetDock(_tile, Dock.Left);
         Children.Add(_tile);
         var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
         text.Children.Add(_title);
         text.Children.Add(_sub);
         Children.Add(text);
+    }
+
+    /// <summary>Ícone chapado no tema atual; no Legacy, o glifo da fonte em branco sobre o degradê (como na 0.12.0).</summary>
+    private static FrameworkElement TileIcon(string glyph)
+    {
+        if (!ThemeManager.Legacy) return FlatIcons.ForGlyph(glyph, 24);
+        var tb = new TextBlock { Text = glyph, FontSize = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        tb.SetResourceReference(TextBlock.FontFamilyProperty, "Icons");
+        tb.SetResourceReference(TextBlock.ForegroundProperty, "OnAccent");
+        return tb;
     }
 
     private void SetSubtitle(string s)

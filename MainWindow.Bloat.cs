@@ -299,7 +299,7 @@ public partial class MainWindow
             foreach (var w in warnings)
                 box.Children.Add(new TextBlock { Text = "• " + w, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 6),
                     Foreground = risk == ScriptRisk.Seguro ? (Brush)FindResource("Fg") : RiskBrush(risk) });
-            root.Children.Add(new Border { BorderBrush = RiskBrush(risk), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(0),
+            root.Children.Add(new Border { BorderBrush = RiskBrush(risk), BorderThickness = new Thickness(1), CornerRadius = ThemeManager.R(6),
                 Padding = new Thickness(12, 10, 12, 4), Margin = new Thickness(0, 0, 0, 12),
                 Child = new ScrollViewer { MaxHeight = 260, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = box } });
         }
