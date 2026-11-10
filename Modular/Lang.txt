@@ -1,0 +1,543 @@
+# Traduções: português | inglês | espanhol. Uma por linha; a busca ignora maiúsculas e o texto em CAIXA ALTA continua em CAIXA ALTA.
+1 passada|1 pass|1 pasada
+25% ou mais|25% or more|25% o más
+50% ou mais|50% or more|50% o más
+75% ou mais|75% or more|75% o más
+90% ou mais|90% or more|90% o más
+30 mil unidades em batalha|30k units in battle|30 mil unidades en batalla
++ adicionar programa|+ Add program|+ Añadir programa
+abrir|Open|Abrir
+abrir backups|Open backups|Abrir copias
+abrir local|Open location|Abrir ubicación
+abrir o openrgb|Open OpenRGB|Abrir OpenRGB
+agora|Now|Ahora
+ajustes da placa de vídeo (aplicados depois de instalar, ou quando você clicar em aplicar)|Graphics card settings (applied after installing, or when you click Apply)|Ajustes de la tarjeta gráfica (se aplican al instalar o al pulsar Aplicar)
+alterar|Change|Cambiar
+análise de sessão|Session analysis|Análisis de sesión
+api key do isthereanydeal|IsThereAnyDeal API key|Clave API de IsThereAnyDeal
+aplicar|Apply|Aplicar
+aplicar nas opções da steam|Apply to Steam options|Aplicar en las opciones de Steam
+argumentos de inicialização|Launch arguments|Argumentos de inicio
+ativar controle|Enable control|Activar control
+atualizar|Update|Actualizar
+atualizar lista|Refresh list|Actualizar lista
+atualizar o instalador de aplicativo (microsoft store)|Update App Installer (Microsoft Store)|Actualizar el Instalador de aplicación (Microsoft Store)
+azul|Blue|Azul
+abre a pasta do programa no explorer, com o arquivo selecionado|Opens the program folder in Explorer with the file selected|Abre la carpeta del programa en el Explorador con el archivo seleccionado
+abre no explorador, no editor do registro ou no agendador de tarefas para conferir|Opens in Explorer, Registry Editor or Task Scheduler so you can check|Abre en el Explorador, el Editor del Registro o el Programador de tareas para revisar
+abrir painel de controle nvidia|Open NVIDIA Control Panel|Abrir Panel de control de NVIDIA
+abrir profile inspector|Open Profile Inspector|Abrir Profile Inspector
+abrir detalhes|Open details|Abrir detalles
+abrir o github de novo|Open GitHub again|Abrir GitHub de nuevo
+acabando logo|Ending soon|Terminan pronto
+acabou de formatar? siga as abas do tweaking na ordem, uma por uma, até o final|Just formatted? Follow the TWEAKING tabs in order, one by one, to the end|¿Acabas de formatear? Sigue las pestañas de TWEAKING en orden, una a una, hasta el final
+adicionar jogo (.exe)…|Add game (.exe)…|Añadir juego (.exe)…
+aguardando a verificação|Waiting for the check|Esperando la verificación
+aguardando…|Waiting…|Esperando…
+ainda não pesquisado.|Not searched yet.|Aún no buscado.
+ajustes do firmware: o que cada um faz e onde mexer|Firmware settings: what each one does and where to change it|Ajustes del firmware: qué hace cada uno y dónde cambiarlo
+ajustes específicos do jogo|Game-specific settings|Ajustes específicos del juego
+alta|High|Alta
+alto|High|Alto
+ambos|Both|Ambos
+antes de formatar ou de trocar um driver|Before formatting or changing a driver|Antes de formatear o cambiar un driver
+apagar|Delete|Borrar
+aparência|Appearance|Apariencia
+aquece 20 s e mede 3 passadas de 30 s (~2 min). use para comparar.|Warms up 20 s and measures 3 passes of 30 s (~2 min). Use it to compare.|Calienta 20 s y mide 3 pasadas de 30 s (~2 min). Úsalo para comparar.
+aquece 5 s e mede 3 passadas de 10 s (~35 s). só para uma ideia rápida.|Warms up 5 s and measures 3 passes of 10 s (~35 s). Just a quick idea.|Calienta 5 s y mide 3 pasadas de 10 s (~35 s). Solo una idea rápida.
+arco-íris|Rainbow|Arcoíris
+arduino, esp32 e conversores seriais · remova dispositivos fantasmas e libere números com presos|Arduino, ESP32 and serial adapters · remove ghost devices and free stuck COM numbers|Arduino, ESP32 y conversores serie · elimina dispositivos fantasma y libera números COM atascados
+arquivos|Files|Archivos
+ativar / desativar na inicialização|Enable / disable at startup|Activar / desactivar al inicio
+atualizar as duas agora|Update both now|Actualizar las dos ahora
+automático (limpa e reinicia sozinho)|Automatic (cleans and restarts by itself)|Automático (limpia y reinicia solo)
+avançado|Advanced|Avanzado
+baixar|Download|Descargar
+baixar o mais recente de|Download the latest from|Descargar lo más reciente de
+baixar o sdk da corsair|Download the Corsair SDK|Descargar el SDK de Corsair
+brilho|Brightness|Brillo
+backup dos drivers|Driver backup|Copia de los drivers
+baixar a bios mais recente|Download the latest BIOS|Descargar la BIOS más reciente
+baixar e instalar directx|Download and install DirectX|Descargar e instalar DirectX
+baixar e instalar visual c++ (todas)|Download and install Visual C++ (all)|Descargar e instalar Visual C++ (todas)
+baixar o driver nvidia mais recente e instalar|Download and install the latest NVIDIA driver|Descargar e instalar el driver NVIDIA más reciente
+baixar vídeos|Download videos|Descargar vídeos
+baixe apenas conteúdo que você tem direito de baixar. para links privados do instagram pode ser preciso estar logado no navegador.|Only download content you have the right to download. Private Instagram links may require being signed in on the browser.|Descarga solo contenido que tengas derecho a descargar. Para enlaces privados de Instagram puede que necesites iniciar sesión en el navegador.
+baixo|Low|Bajo
+bateria, fonte de energia e consumo|Battery, power source and consumption|Batería, fuente de energía y consumo
+bem-vindo ao pcismomaster|Welcome to PcismoMaster|Bienvenido a PcismoMaster
+benchmark de cpu por renderização 3d (path tracing), no mesmo princípio do cinebench|CPU benchmark through 3D rendering (path tracing), same principle as Cinebench|Benchmark de CPU por renderizado 3D (path tracing), con el mismo principio que Cinebench
+biblioteca|Library|Biblioteca
+bibliotecas para jogos (visual c++ e directx)|Game libraries (Visual C++ and DirectX)|Bibliotecas para juegos (Visual C++ y DirectX)
+cancelar|Cancel|Cancelar
+carga|Load|Carga
+carregar mais|Load more|Cargar más
+ch340 · cp2102/cp210x · ftdi · prolific · arduino — diagnóstico, reinstalação e troca de versão do driver|CH340 · CP2102/CP210x · FTDI · Prolific · Arduino — diagnosis, reinstall and driver version switch|CH340 · CP2102/CP210x · FTDI · Prolific · Arduino — diagnóstico, reinstalación y cambio de versión del driver
+clock no teto (mhz)|Clock cap (MHz)|Límite de clock (MHz)
+componente|Component|Componente
+componentes|Components|Componentes
+conectados agora|Connected now|Conectados ahora
+conectar tudo|Connect all|Conectar todo
+configuração testada|Tested configuration|Configuración probada
+confira|Check|Revisa
+consumo / uso|Power / usage|Consumo / uso
+consumo cpu|CPU power|Consumo CPU
+consumo gpu|GPU power|Consumo GPU
+cor|Color|Color
+corrigir|Fix|Corregir
+cpu · temperatura|CPU · Temperature|CPU · Temperatura
+curva padrão|Default curve|Curva predeterminada
+cancelar reinício|Cancel restart|Cancelar reinicio
+carga da cpu|CPU load|Carga de la CPU
+carga máxima com corte automático por temperatura|Maximum load with automatic temperature cut-off|Carga máxima con corte automático por temperatura
+cartões|Cards|Tarjetas
+cartões com a capa|Cards with cover|Tarjetas con portada
+cena de jogo (gpu)|Game scene (GPU)|Escena de juego (GPU)
+centro inferior|Bottom center|Centro inferior
+centro superior|Top center|Centro superior
+chave da api|API key|Clave de la API
+chave da api howmanyfps|HowManyFPS API key|Clave API de HowManyFPS
+chave da api do isthereanydeal|IsThereAnyDeal API key|Clave API de IsThereAnyDeal
+cidade de objetos|City of objects|Ciudad de objetos
+clique e aperte a tecla ou combinação (esc cancela)|Click and press the key or combination (Esc cancels)|Haz clic y pulsa la tecla o combinación (Esc cancela)
+clique em verificar tudo.|Click CHECK ALL.|Haz clic en VERIFICAR TODO.
+clique em iniciar, abra o jogo e jogue normalmente. ao final você recebe o diagnóstico.|Click start, open the game and play normally. At the end you get the diagnosis.|Haz clic en iniciar, abre el juego y juega normalmente. Al final recibes el diagnóstico.
+clique na caixa e aperte a tecla. funciona com o jogo em primeiro plano; use uma tecla ou combinação que o jogo não use.|Click the box and press the key. Works with the game in the foreground; use a key or combination the game does not use.|Haz clic en la casilla y pulsa la tecla. Funciona con el juego en primer plano; usa una tecla o combinación que el juego no use.
+clock, memória, tensão, energia, curva v/f e curva de fans no estilo do msi afterburner · verificador de estabilidade e guia da bios|Clock, memory, voltage, power, V/F curve and fan curve in MSI Afterburner style · stability checker and BIOS guide|Clock, memoria, voltaje, energía, curva V/F y curva de ventiladores al estilo MSI Afterburner · verificador de estabilidad y guía de la BIOS
+cole aqui a sua api key|Paste your API key here|Pega aquí tu clave API
+começar aqui|Start here|Empieza aquí
+como comparar com confiança|How to compare reliably|Cómo comparar con confianza
+compactação|Compression|Compresión
+compressão e combinação de memória, sysmain, desligamento e prioridade do processador|Memory compression and combining, SysMain, shutdown and processor priority|Compresión y combinación de memoria, SysMain, apagado y prioridad del procesador
+confere o que está instalado e baixa o que faltar direto das fontes oficiais|Checks what is installed and downloads what is missing straight from official sources|Comprueba lo instalado y descarga lo que falte directamente de las fuentes oficiales
+consumo|Power|Consumo
+controle exclusivo (corsair: se não mudar nada, desmarque e tente de novo)|Exclusive control (Corsair: if nothing changes, uncheck and try again)|Control exclusivo (Corsair: si no cambia nada, desmarca y vuelve a intentar)
+copiar|Copy|Copiar
+copiar código|Copy code|Copiar código
+cor fixa|Solid color|Color fijo
+cores do programa|Program colors|Colores del programa
+cria ponto de restauração|Creates a restore point|Crea un punto de restauración
+criar ponto de restauração antes|Create a restore point first|Crear un punto de restauración antes
+curva de fans|Fan curve|Curva de ventiladores
+curva tensão × frequência (v/f)|Voltage × frequency curve (V/F)|Curva voltaje × frecuencia (V/F)
+desconto mínimo|Minimum discount|Descuento mínimo
+desempenho|Performance|Rendimiento
+desempenho · bench|Performance · Bench|Rendimiento · Bench
+desfazer liberação|Undo release|Deshacer liberación
+desinstalar selecionado|Uninstall selected|Desinstalar seleccionado
+desmarcar|Uncheck|Desmarcar
+discos físicos|Physical disks|Discos físicos
+duração|Duration|Duración
+duração (min)|Duration (min)|Duración (min)
+da minha biblioteca|From my library|De mi biblioteca
+descobre o que está limitando o seu fps: gpu, cpu, memória ou temperatura|Finds what is limiting your FPS: GPU, CPU, memory or temperature|Descubre qué limita tus FPS: GPU, CPU, memoria o temperatura
+descubra se o lag vem do seu pc, do wi-fi ou do provedor|Find out if the lag comes from your PC, the Wi-Fi or your provider|Descubre si el lag viene de tu PC, del Wi-Fi o del proveedor
+desenvolvimento|Development|Desarrollo
+desfazer as limpezas|Undo the cleanups|Deshacer las limpiezas
+desfazer tudo|Undo everything|Deshacer todo
+desinstalador oficial + varredura profunda de sobras (pastas, arquivos ocultos, registro, inicialização e tarefas), com lixeira e backup|Official uninstaller + deep scan for leftovers (folders, hidden files, registry, startup and tasks), with Recycle Bin and backup|Desinstalador oficial + análisis profundo de restos (carpetas, archivos ocultos, registro, inicio y tareas), con Papelera y copia de seguridad
+desinstalar apps|Uninstall apps|Desinstalar apps
+detector de gargalo|Bottleneck detector|Detector de cuello de botella
+detecção de fps|FPS detection|Detección de FPS
+devolve o registro e as tarefas da última remoção de sobras. pastas e arquivos voltam pela lixeira.|Restores the registry and tasks from the last leftover removal. Folders and files come back through the Recycle Bin.|Devuelve el registro y las tareas de la última eliminación de restos. Carpetas y archivos vuelven por la Papelera.
+diagnóstico|Diagnosis|Diagnóstico
+digite este código na página do github que abriu (já está copiado):|Type this code on the GitHub page that opened (already copied):|Escribe este código en la página de GitHub que se abrió (ya está copiado):
+digite este código no github (já copiado):|Type this code on GitHub (already copied):|Escribe este código en GitHub (ya copiado):
+digite o nome de um jogo para ver o preço em cada loja e o menor preço da história.|Type a game name to see the price in each store and the all-time lowest price.|Escribe el nombre de un juego para ver el precio en cada tienda y el mínimo histórico.
+disco|Disk|Disco
+discos|Disks|Discos
+dispositivos|Devices|Dispositivos
+documentos|Documents|Documentos
+driver studio (criação) em vez de game ready|Studio driver (creation) instead of Game Ready|Driver Studio (creación) en lugar de Game Ready
+driver instalado x mais recente, o que mudou em cada versão, instalação limpa e os ajustes do driver|Installed vs latest driver, what changed in each version, clean install and driver settings|Driver instalado vs. más reciente, qué cambió en cada versión, instalación limpia y ajustes del driver
+drivers certificados pela microsoft|Microsoft-certified drivers|Drivers certificados por Microsoft
+drivers incluídos|Included drivers|Drivers incluidos
+drivers instalados no windows|Drivers installed in Windows|Drivers instalados en Windows
+drivers seriais|Serial drivers|Drivers serie
+durante o teste|During the test|Durante la prueba
+erros de hardware recentes|Recent hardware errors|Errores de hardware recientes
+etapa|Step|Etapa
+expandir tudo|Expand all|Expandir todo
+exportar relatório|Export report|Exportar informe
+efeito|Effect|Efecto
+efeitos visuais, modo escuro, transparência, menu de contexto e explorer|Visual effects, dark mode, transparency, context menu and Explorer|Efectos visuales, modo oscuro, transparencia, menú contextual y Explorador
+em alta|Trending|En tendencia
+energia|Power|Energía
+entrar|Sign in|Iniciar sesión
+entrar com o github|Sign in with GitHub|Iniciar sesión con GitHub
+entre com a sua conta do github para usar o programa. nenhuma senha passa pelo app: você autoriza direto no site do github.|Sign in with your GitHub account to use the program. No password goes through the app: you authorize directly on the GitHub site.|Inicia sesión con tu cuenta de GitHub para usar el programa. Ninguna contraseña pasa por la app: autorizas directamente en el sitio de GitHub.
+enxuta (debloat)|Lean (debloat)|Ligera (debloat)
+equilíbrio do hardware|Hardware balance|Equilibrio del hardware
+escolha o instalador oficial do ddu baixado do site da wagnardsoft|Choose the official DDU installer downloaded from the Wagnardsoft site|Elige el instalador oficial de DDU descargado del sitio de Wagnardsoft
+escolher o instalador…|Choose the installer…|Elegir el instalador…
+esconder as explicações (voltam em início)|Hide the explanations (they come back in Home)|Ocultar las explicaciones (vuelven en Inicio)
+esconder instalados|Hide installed|Ocultar instalados
+especificações completas e sensores em tempo real|Full specifications and real-time sensors|Especificaciones completas y sensores en tiempo real
+eventos recentes|Recent events|Eventos recientes
+executável do jogo|Game executable|Ejecutable del juego
+extras|Extras|Extras
+extrema|Extreme|Extrema
+fechar|Close|Cerrar
+fechar programas que prendem a porta|Close programs holding the port|Cerrar programas que bloquean el puerto
+ferramentas|Tools|Herramientas
+formato|Format|Formato
+fps agora|FPS now|FPS ahora
+fps esperado no seu pc|Expected FPS on your PC|FPS esperados en tu PC
+fps estimado|Estimated FPS|FPS estimados
+fps, frametime e sensores por cima do jogo|FPS, frametime and sensors on top of the game|FPS, frametime y sensores encima del juego
+faltam o yt-dlp e o ffmpeg|yt-dlp and ffmpeg are missing|Faltan yt-dlp y ffmpeg
+favoritos|Favorites|Favoritos
+fazer a revisão agora|Run the check-up now|Hacer la revisión ahora
+fazer backup|Back up|Hacer copia
+fechar junto com o jogo|Close together with the game|Cerrar junto con el juego
+ferramentas úteis do dia a dia|Handy everyday tools|Herramientas útiles del día a día
+game dvr, modo de jogo, mouse, teclado, windows update e apps em segundo plano|Game DVR, Game Mode, mouse, keyboard, Windows Update and background apps|Game DVR, Modo de juego, ratón, teclado, Windows Update y apps en segundo plano
+gargalo|Bottleneck|Cuello de botella
+geral|General|General
+gráficos|Graphics|Gráficos
+gráficos (gravado no windows, vale sempre que o jogo abrir)|Graphics (saved in Windows, applies every time the game opens)|Gráficos (guardado en Windows, vale siempre que se abra el juego)
+grátis|Free|Gratis
+guia: overclock na bios|Guide: overclocking in the BIOS|Guía: overclock en la BIOS
+histerese (°c)|Hysteresis (°C)|Histéresis (°C)
+histórico|History|Historial
+hardware e software detectados|Detected hardware and software|Hardware y software detectados
+horizontal (barra)|Horizontal (bar)|Horizontal (barra)
+iniciar|Start|Iniciar
+iniciar análise|Start analysis|Iniciar análisis
+iniciar verificação|Start check|Iniciar verificación
+instalado|Installed|Instalado
+instalar|Install|Instalar
+instalar / atualizar a ide|Install / update the IDE|Instalar / actualizar el IDE
+instalar selecionados|Install selected|Instalar seleccionados
+instalar todos|Install all|Instalar todos
+instalação|Installation|Instalación
+intensidade|Intensity|Intensidad
+ir para instalar apps|Go to Install apps|Ir a Instalar apps
+iluminação e efeitos do pc · corsair icue, openrgb (msi, gigabyte, asus...) e razer chroma (em teste)|PC lighting and effects · Corsair iCUE, OpenRGB (MSI, Gigabyte, ASUS...) and Razer Chroma (in testing)|Iluminación y efectos del PC · Corsair iCUE, OpenRGB (MSI, Gigabyte, ASUS...) y Razer Chroma (en prueba)
+imagem|Image|Imagen
+impedir o windows update de instalar um driver de vídeo sozinho (dá para desfazer)|Stop Windows Update from installing a graphics driver by itself (can be undone)|Impedir que Windows Update instale un driver de vídeo por su cuenta (se puede deshacer)
+inferior direito|Bottom right|Inferior derecha
+inferior esquerdo|Bottom left|Inferior izquierda
+inicialização|Startup|Inicio
+instala o painel nvidia (se faltar) e baixa o profile inspector mais novo do github, com o sha-256 conferido|Installs the NVIDIA panel (if missing) and downloads the newest Profile Inspector from GitHub, with SHA-256 checked|Instala el panel NVIDIA (si falta) y descarga el Profile Inspector más nuevo de GitHub, con el SHA-256 verificado
+instalar apps|Install apps|Instalar apps
+integração|Integration|Integración
+integrações|Integrations|Integraciones
+início|Home|Inicio
+jogos|Games|Juegos
+janela|Window|Ventana
+jogos instalados no seu pc que estão em promoção agora, na loja mais barata. bom pra presentear ou indicar pros amigos, e pra pegar dlcs.|Games installed on your PC that are on sale now, at the cheapest store. Good for gifting, recommending to friends and grabbing DLCs.|Juegos instalados en tu PC que están en oferta ahora, en la tienda más barata. Bueno para regalar, recomendar a amigos y conseguir DLCs.
+já terminei · procurar sobras|I'm done · find leftovers|Ya terminé · buscar restos
+ler da placa|Read from card|Leer de la tarjeta
+liberar números com presos|Free stuck COM numbers|Liberar números COM atascados
+limite cpu °c|CPU limit °C|Límite CPU °C
+limite gpu °c|GPU limit °C|Límite GPU °C
+limpar|Clean|Limpiar
+limpar cache da ide|Clear IDE cache|Limpiar caché del IDE
+limpar memória|Free memory|Liberar memoria
+linha final|Final line|Línea final
+lojas (nenhuma marcada = todas)|Stores (none checked = all)|Tiendas (ninguna marcada = todas)
+leituras ao vivo|Live readings|Lecturas en vivo
+lendo sensores…|Reading sensors…|Leyendo sensores…
+liberar drivers pelo windows update|Allow drivers through Windows Update|Permitir drivers por Windows Update
+liberar memória ram, fechar o que atrapalha o jogo e apagar arquivos temporários|Free RAM, close what gets in the game's way and delete temporary files|Liberar memoria RAM, cerrar lo que estorba al juego y borrar archivos temporales
+liga prioridade alta, alto desempenho, gpu dedicada e sem otimizações de tela cheia|Turns on high priority, High performance, dedicated GPU and no fullscreen optimizations|Activa prioridad alta, Alto rendimiento, GPU dedicada y sin optimizaciones de pantalla completa
+limitação de energia, agrupamento de timers e dynamic tick|Power throttling, timer coalescing and dynamic tick|Limitación de energía, agrupación de temporizadores y dynamic tick
+limpeza|Cleanup|Limpieza
+limpeza completa do driver de vídeo (ddu)|Full graphics driver cleanup (DDU)|Limpieza completa del driver de vídeo (DDU)
+link do vídeo|Video link|Enlace del vídeo
+lista|List|Lista
+lista com banner|List with banner|Lista con banner
+mais recente|Latest|Más reciente
+manutenção|Maintenance|Mantenimiento
+marcar todas|Check all|Marcar todas
+marcar todos|Check all|Marcar todos
+memória e disco|Memory and disk|Memoria y disco
+memória ram|RAM|Memoria RAM
+modo|Mode|Modo
+mp3 (áudio)|MP3 (audio)|MP3 (audio)
+mp4 (vídeo)|MP4 (video)|MP4 (vídeo)
+maior desconto|Biggest discount|Mayor descuento
+mais populares|Most popular|Más populares
+mais recentes|Newest|Más recientes
+manual (abre o ddu no modo de segurança)|Manual (opens DDU in safe mode)|Manual (abre DDU en modo seguro)
+marcado = ligação clara com o app. confira = só bate com o nome do fabricante ou é parecido: abra antes de remover. pastas do windows, pastas pessoais e o registro do sistema nunca aparecem.|Checked = clearly tied to the app. CHECK = only matches the publisher name or looks similar: open it before removing. Windows folders, personal folders and the system registry never show up.|Marcado = vínculo claro con la app. REVISA = solo coincide con el nombre del fabricante o se parece: ábrelo antes de borrar. Las carpetas de Windows, las personales y el registro del sistema nunca aparecen.
+marcar os recomendados|Check the recommended ones|Marcar los recomendados
+maximizar|Maximize|Maximizar
+melhor avaliados na steam|Top rated on Steam|Mejor valorados en Steam
+memória e carregamento|Memory and loading|Memoria y carga
+menor preço|Lowest price|Precio más bajo
+mensagens|Messages|Mensajes
+meus jogos|My games|Mis juegos
+minimizar|Minimize|Minimizar
+mitigações|Mitigations|Mitigaciones
+moderado|Moderate|Moderado
+modo claro|Light mode|Modo claro
+modo de janela|Window mode|Modo de ventana
+monitor, agendamento da placa de vídeo e energia do pci express|Monitor, graphics card scheduling and PCI Express power|Monitor, programación de la tarjeta gráfica y energía de PCI Express
+monitoramento|Monitoring|Monitoreo
+mostramos só programas de verdade (componentes do windows, drivers e atualizações ficam de fora). a desinstalação usa o próprio desinstalador do programa; depois procuramos sobras para você revisar. nada sai sem você marcar e confirmar: pastas e arquivos vão para a lixeira e o registro e as tarefas ganham backup.|We only show real programs (Windows components, drivers and updates are left out). Uninstalling uses the program's own uninstaller; then we look for leftovers for you to review. Nothing is removed until you check and confirm: folders and files go to the Recycle Bin and the registry and tasks get a backup.|Solo mostramos programas reales (componentes de Windows, drivers y actualizaciones quedan fuera). La desinstalación usa el propio desinstalador del programa; después buscamos restos para que los revises. Nada se borra sin que marques y confirmes: carpetas y archivos van a la Papelera y el registro y las tareas tienen copia.
+mostrar a lista|Show the list|Mostrar la lista
+mostrar overlay agora|Show overlay now|Mostrar overlay ahora
+mostrar também dlcs e pacotes|Also show DLCs and bundles|Mostrar también DLCs y paquetes
+mostrar todos os ausentes (não só portas com e placas)|Show all missing ones (not only COM ports and boards)|Mostrar todos los ausentes (no solo puertos COM y placas)
+médio|Medium|Medio
+mídia|Media|Multimedia
+mínimo 10 min|Minimum 10 min|Mínimo 10 min
+nvidia profile inspector (orbmu2k), baixado da última versão no github|NVIDIA Profile Inspector (Orbmu2k), downloaded from the latest GitHub release|NVIDIA Profile Inspector (Orbmu2k), descargado de la última versión en GitHub
+nada ainda. benchmarks, testes e dispositivos conectados aparecem aqui.|Nothing yet. Benchmarks, tests and connected devices show up here.|Nada aún. Benchmarks, pruebas y dispositivos conectados aparecen aquí.
+nativo|Native|Nativo
+navegadores|Browsers|Navegadores
+nenhum driver de chip serial instalado além dos do próprio windows.|No serial chip driver installed besides Windows' own.|Ningún driver de chip serie instalado aparte de los de Windows.
+nenhum resultado ainda.|No results yet.|Aún no hay resultados.
+nenhum selecionado|None selected|Ninguno seleccionado
+nenhuma placa ou conversor serial conectado. plugue a placa e clique em verificar.|No board or serial adapter connected. Plug in the board and click CHECK.|Ninguna placa o conversor serie conectado. Conecta la placa y haz clic en VERIFICAR.
+no monitor onde o jogo está.|On the monitor where the game is.|En el monitor donde está el juego.
+normal (driver completo)|Normal (full driver)|Normal (driver completo)
+notas completas no site da nvidia|Full notes on the NVIDIA site|Notas completas en el sitio de NVIDIA
+números com reservados|Reserved COM numbers|Números COM reservados
+o baixador usa o yt-dlp (motor) e o ffmpeg (conversor), ambos grátis. instale os dois pela aba instalar apps (uma vez só) e volte aqui.|The downloader uses yt-dlp (engine) and ffmpeg (converter), both free. Install both from the Install apps tab (only once) and come back here.|El descargador usa yt-dlp (motor) y ffmpeg (conversor), ambos gratis. Instala los dos desde la pestaña Instalar apps (una sola vez) y vuelve aquí.
+o que falta instalar, se a atualização tem problema conhecido e os bloqueios de drivers e do update|What is left to install, whether the update has known issues, and the driver and Update blocks|Lo que falta instalar, si la actualización tiene problemas conocidos y los bloqueos de drivers y de Update
+o que mostrar|What to show|Qué mostrar
+o que o windows e os programas rodam sozinhos · executar, parar, ligar, desligar e apagar|What Windows and programs run by themselves · run, stop, enable, disable and delete|Lo que Windows y los programas ejecutan solos · ejecutar, detener, activar, desactivar y borrar
+onde o jogo roda (drm) · nenhum marcado = qualquer|Where the game runs (DRM) · none checked = any|Dónde se ejecuta el juego (DRM) · ninguno marcado = cualquiera
+opacidade do fundo|Background opacity|Opacidad del fondo
+opções avançadas (argumentos, steam e programas auxiliares)|Advanced options (arguments, Steam and helper programs)|Opciones avanzadas (argumentos, Steam y programas auxiliares)
+ordenar|Sort|Ordenar
+otimizar|Optimize|Optimizar
+os essenciais depois de formatar o pc · versão oficial mais recente, instalação silenciosa|The essentials after formatting the PC · latest official version, silent install|Lo esencial tras formatear el PC · versión oficial más reciente, instalación silenciosa
+os jogos que você marcou com o coração, no preço mais barato de agora. os em promoção vêm primeiro. para acompanhar um jogo que não está em promoção, procure por ele em pesquisar e toque no coração.|The games you marked with the heart, at today's cheapest price. Those on sale come first. To follow a game that is not on sale, search for it and tap the heart.|Los juegos que marcaste con el corazón, al precio más barato de ahora. Los que están en oferta van primero. Para seguir un juego que no está en oferta, búscalo y toca el corazón.
+outras ferramentas|Other tools|Otras herramientas
+padrão|Default|Predeterminado
+pasta de destino|Destination folder|Carpeta de destino
+perfil para mais fps|Profile for more FPS|Perfil para más FPS
+perfis|Profiles|Perfiles
+pesquisar|Search|Buscar
+placa de vídeo|Graphics card|Tarjeta gráfica
+placa-mãe e bios|Motherboard and BIOS|Placa base y BIOS
+posição|Position|Posición
+preço máximo|Max price|Precio máximo
+procurar|Search|Buscar
+programas auxiliares|Helper programs|Programas auxiliares
+pacotes prontos e os seus perfis · veja o que cada um mexe antes de aplicar|Ready-made packs and your profiles · see what each one changes before applying|Paquetes listos y tus perfiles · mira qué cambia cada uno antes de aplicar
+padrão do jogo|Game default|Predeterminado del juego
+para programas que não desinstalam mais (desinstalador sumiu ou dá erro): não roda o desinstalador e procura tudo o que sobrou, inclusive a entrada em programas e recursos.|For programs that no longer uninstall (uninstaller missing or failing): it does not run the uninstaller and looks for everything left, including the entry in Programs and Features.|Para programas que ya no se desinstalan (el desinstalador falta o da error): no ejecuta el desinstalador y busca todo lo que quedó, incluida la entrada en Programas y características.
+parado|Stopped|Detenido
+pastas|Folders|Carpetas
+perfil global nvidia no padrão do driver|NVIDIA global profile back to driver default|Perfil global NVIDIA al predeterminado del driver
+placa de rede, netbios, ipv6, nagle e prioridade dos jogos|Network adapter, NetBIOS, IPv6, Nagle and game priority|Tarjeta de red, NetBIOS, IPv6, Nagle y prioridad de los juegos
+placa de vídeo, placa-mãe, chipset e bibliotecas: o que está instalado comparado com o site oficial de cada fabricante.|Graphics card, motherboard, chipset and libraries: what is installed compared with each manufacturer's official site.|Tarjeta gráfica, placa base, chipset y bibliotecas: lo instalado comparado con el sitio oficial de cada fabricante.
+placa-mãe: bios, chipset e drivers|Motherboard: BIOS, chipset and drivers|Placa base: BIOS, chipset y drivers
+placas e conversores conectados|Connected boards and adapters|Placas y conversores conectados
+portas com|COM ports|Puertos COM
+preparar e reiniciar no modo de segurança|Prepare and restart in safe mode|Preparar y reiniciar en modo seguro
+pressione iniciar para renderizar a cena|Press START to render the scene|Pulsa INICIAR para renderizar la escena
+preço dos jogos agora nas lojas (steam, epic, gog, nuuvem e outras), com o menor preço da história. clique num jogo para abrir a oferta direto na loja.|Game prices in stores now (Steam, Epic, GOG, Nuuvem and others), with the all-time low. Click a game to open the deal in the store.|Precio de los juegos ahora en las tiendas (Steam, Epic, GOG, Nuuvem y otras), con el mínimo histórico. Haz clic en un juego para abrir la oferta en la tienda.
+privacidade|Privacy|Privacidad
+procurando seus jogos…|Looking for your games…|Buscando tus juegos…
+procurar atualização|Check for updates|Buscar actualización
+procurar de novo|Search again|Buscar de nuevo
+programas de inicialização|Startup programs|Programas de inicio
+programas para fechar|Programs to close|Programas para cerrar
+programas que abrem junto com o windows · desative ou remova o que não precisa|Programs that open with Windows · disable or remove what you don't need|Programas que se abren con Windows · desactiva o quita lo que no necesites
+programas que já foram removidos, mas deixaram a entrada no registro (por isso continuavam na lista). sai com backup.|Programs already removed but that left their registry entry (that's why they stayed on the list). Removed with backup.|Programas ya eliminados que dejaron su entrada en el registro (por eso seguían en la lista). Se borra con copia.
+promoções|Deals|Ofertas
+pronto|Done|Listo
+pronto. o teste leva cerca de 30 segundos.|Ready. The test takes about 30 seconds.|Listo. La prueba tarda unos 30 segundos.
+prévia com os números reais deste pc|Preview with this PC's real numbers|Vista previa con los números reales de este PC
+página oficial|Official page|Página oficial
+página de bios do modelo|Model BIOS page|Página de BIOS del modelo
+página de drivers do modelo|Model drivers page|Página de drivers del modelo
+página do directx (microsoft)|DirectX page (Microsoft)|Página de DirectX (Microsoft)
+página do chipset|Chipset page|Página del chipset
+página do vcredist|vcredist page|Página de vcredist
+página oficial do driver|Official driver page|Página oficial del driver
+qualidade|Quality|Calidad
+qualquer|Any|Cualquiera
+recolher tudo|Collapse all|Contraer todo
+redefinir|Reset|Restablecer
+referência medida|Measured reference|Referencia medida
+reinstalar|Reinstall|Reinstalar
+reler curva|Reload curve|Releer curva
+remover|Remove|Quitar
+remover marcadas|Remove checked|Quitar marcadas
+remover selecionados|Remove selected|Quitar seleccionados
+remover teto|Remove cap|Quitar límite
+remoção forçada|Forced removal|Eliminación forzada
+resolução|Resolution|Resolución
+restaurar removidos|Restore removed|Restaurar eliminados
+restaurar última limpeza|Restore last cleanup|Restaurar última limpieza
+resultado|Result|Resultado
+resultados|Results|Resultados
+rodar benchmark|Run benchmark|Ejecutar benchmark
+reaplicar os últimos ajustes aplicados sempre que o pcismomaster abrir|Reapply the last applied settings every time PcismoMaster opens|Volver a aplicar los últimos ajustes cada vez que se abra PcismoMaster
+reativa os serviços e as entradas de inicialização que a instalação enxuta desligou|Re-enables the services and startup entries the lean install turned off|Reactiva los servicios y entradas de inicio que la instalación ligera desactivó
+recomendado 1 vez por semana|Recommended once a week|Recomendado 1 vez por semana
+recomeça mínimo, máximo e média a partir de agora|Restarts minimum, maximum and average from now|Reinicia mínimo, máximo y media a partir de ahora
+rede|Network|Red
+registro|Registry|Registro
+reiniciar agora|Restart now|Reiniciar ahora
+reiniciar e atualizar|Restart and update|Reiniciar y actualizar
+remove o driver de vídeo por inteiro no modo de segurança, para reinstalar do zero|Removes the whole graphics driver in safe mode, to reinstall from scratch|Elimina el driver de vídeo por completo en modo seguro, para reinstalar desde cero
+reparos do windows|Windows repairs|Reparaciones de Windows
+reparos e reinícios do windows num clique · cada ferramenta pede confirmação antes de rodar|Windows repairs and restarts in one click · each tool asks for confirmation before running|Reparaciones y reinicios de Windows en un clic · cada herramienta pide confirmación antes de ejecutarse
+respiração|Breathing|Respiración
+revisão semanal|Weekly check-up|Revisión semanal
+rápido|Fast|Rápido
+salvar|Save|Guardar
+salvar chave|Save key|Guardar clave
+salva um relatório (html ou json) com sistema, ram, discos, gpu, sensores e benchmarks. números de série são omitidos.|Saves a report (HTML or JSON) with system, RAM, disks, GPU, sensors and benchmarks. Serial numbers are left out.|Guarda un informe (HTML o JSON) con sistema, RAM, discos, GPU, sensores y benchmarks. Los números de serie se omiten.
+salvar ajustes|Save settings|Guardar ajustes
+saúde do pc|PC health|Salud del PC
+saúde, desgaste e temperatura de cada disco|Health, wear and temperature of each disk|Salud, desgaste y temperatura de cada disco
+se ainda não estiver instalado, instala pela microsoft store|If not installed yet, installs it from the Microsoft Store|Si aún no está instalado, lo instala desde Microsoft Store
+segurança|Security|Seguridad
+seguro|Safe|Seguro
+sem bordas|Borderless|Sin bordes
+sem conta|No account|Sin cuenta
+sem temperatura e consumo da cpu|No CPU temperature or power|Sin temperatura ni consumo de la CPU
+sensores|Sensors|Sensores
+sensores ao vivo|Live sensors|Sensores en vivo
+serviços|Services|Servicios
+serviços do windows que dá para desligar, e o que para de funcionar|Windows services you can turn off, and what stops working|Servicios de Windows que se pueden desactivar y qué deja de funcionar
+seus jogos instalados, com "preparar e jogar" e os ajustes individuais de cada um. os arquivos dos jogos nunca são tocados.|Your installed games, with "Prepare and play" and each one's own settings. The game files are never touched.|Tus juegos instalados, con "Preparar y jugar" y los ajustes de cada uno. Los archivos de los juegos nunca se tocan.
+simples mostra só o essencial e seguro. avançado mostra tudo (sensores, overclock, scripts, ajustes técnicos).|Simple shows only the essential and safe. Advanced shows everything (sensors, overclock, scripts, technical settings).|Simple muestra solo lo esencial y seguro. Avanzado muestra todo (sensores, overclock, scripts, ajustes técnicos).
+simulação de jogo (cpu)|Game simulation (CPU)|Simulación de juego (CPU)
+sistema|System|Sistema
+spectre e meltdown: o ganho, o risco e como desfazer|Spectre and Meltdown: the gain, the risk and how to undo|Spectre y Meltdown: la ganancia, el riesgo y cómo deshacer
+superior direito|Top right|Superior derecha
+superior esquerdo|Top left|Superior izquierda
+suporte do fabricante|Manufacturer support|Soporte del fabricante
+só as claras|Only the clear ones|Solo las claras
+só fps|FPS only|Solo FPS
+só menor preço da história|Only all-time lows|Solo mínimo histórico
+tamanho|Size|Tamaño
+tamanho do teste|Test size|Tamaño de la prueba
+tecla para ligar/desligar|Toggle key|Tecla para activar/desactivar
+temp. cpu|CPU temp.|Temp. CPU
+temp. gpu|GPU temp.|Temp. GPU
+temperatura|Temperature|Temperatura
+tempo|Time|Tiempo
+testar|Test|Probar
+teste|Test|Prueba
+tipo|Type|Tipo
+tudo|All|Todo
+também remover drivers de áudio realtek e sound blaster (o pc fica sem som até reinstalar)|Also remove Realtek and Sound Blaster audio drivers (the PC has no sound until reinstalled)|También quitar drivers de audio Realtek y Sound Blaster (el PC queda sin sonido hasta reinstalar)
+tarefas agendadas|Scheduled tasks|Tareas programadas
+taxa de atualização (hz)|Refresh rate (Hz)|Tasa de refresco (Hz)
+tela cheia|Fullscreen|Pantalla completa
+telemetria, id de publicidade, digitação e fala, sugestões de busca, permissões e ia|Telemetry, advertising ID, typing and speech, search suggestions, permissions and AI|Telemetría, ID de publicidad, escritura y voz, sugerencias de búsqueda, permisos e IA
+temperatura da cpu|CPU temperature|Temperatura de la CPU
+temperatura da gpu|GPU temperature|Temperatura de la GPU
+temperaturas|Temperatures|Temperaturas
+tipo de argumento (depende do jogo)|Argument type (depends on the game)|Tipo de argumento (depende del juego)
+tirar do windows o que pesa e espiona, em três níveis · cada item tem desfazer|Remove what slows down and spies from Windows, in three levels · each item can be undone|Quitar de Windows lo que pesa y espía, en tres niveles · cada elemento se puede deshacer
+todas as placas|All boards|Todas las placas
+todos|All|Todos
+todos os drivers instalados|All installed drivers|Todos los drivers instalados
+traz para cá o ajuste aplicado agora na placa (inclusive pelo msi afterburner)|Brings in the setting currently applied on the card (including from MSI Afterburner)|Trae el ajuste aplicado ahora en la tarjeta (incluso por MSI Afterburner)
+trocar .exe|Change .exe|Cambiar .exe
+unidade|Unit|Unidad
+unidades|Units|Unidades
+usb e portas com|USB and COM ports|USB y puertos COM
+uso da ram livre|Free RAM usage|Uso de la RAM libre
+uso nos últimos 60 s|Usage in the last 60 s|Uso en los últimos 60 s
+usar a curva de fans|Use the fan curve|Usar la curva de ventiladores
+usar um ddu que eu baixei…|Use a DDU I downloaded…|Usar un DDU que descargué…
+use um instalador de driver nvidia, amd ou intel que você já baixou|Use an NVIDIA, AMD or Intel driver installer you already downloaded|Usa un instalador de driver NVIDIA, AMD o Intel que ya descargaste
+utilidades|Utilities|Utilidades
+utilitários|Utilities|Utilidades
+velocidade (respiração e arco-íris)|Speed (breathing and rainbow)|Velocidad (respiración y arcoíris)
+ver|View|Ver
+verde|Green|Verde
+verificar|Check|Verificar
+verificar tudo|Check all|Verificar todo
+vermelho|Red|Rojo
+vale · cena de jogo|Valley · game scene|Valle · escena de juego
+varredura de sobras|Leftover scan|Análisis de restos
+ver versões anteriores|See previous versions|Ver versiones anteriores
+verificador de estabilidade|Stability checker|Verificador de estabilidad
+verificar de novo|Check again|Verificar de nuevo
+verificar placa-mãe de novo|Check motherboard again|Verificar placa base de nuevo
+vertical (lista e gráfico)|Vertical (list and graph)|Vertical (lista y gráfico)
+visão geral|Overview|Resumen
+zerar mín. / máx. / média|Reset min. / max. / avg.|Reiniciar mín. / máx. / media
+zerar pontos editados|Reset edited points|Reiniciar puntos editados
+equilibrado|balanced|equilibrado
+limita a cpu|CPU-limited|limita la CPU
+limita a gpu|GPU-limited|limita la GPU
+limites|limits|límites
+multi-core · nenhum teste ainda|multi-core · no test yet|multi-core · aún sin prueba
+✓  reparar a imagem do windows|✓  Repair the Windows image|✓  Reparar la imagen de Windows
+✓  verificar o disco|✓  Check the disk|✓  Verificar el disco
+✓  verificar os arquivos protegidos do sistema|✓  Check protected system files|✓  Verificar los archivos protegidos del sistema
+# Menu, Início e páginas
+manutenção|Maintenance|Mantenimiento
+desempenho|Performance|Rendimiento
+configurações|Settings|Configuración
+olá! o que você quer fazer?|Hi! What do you want to do?|¡Hola! ¿Qué quieres hacer?
+tarefas mais comuns|Most common tasks|Tareas más comunes
+modo simples|Simple mode|Modo simple
+modo avançado|Advanced mode|Modo avanzado
+sair|Sign out|Salir
+ver como o pc está|See how the PC is doing|Ver cómo está el PC
+temperatura, uso e saúde agora.|Temperature, usage and health now.|Temperatura, uso y salud ahora.
+deixar o pc mais rápido|Make the PC faster|Hacer el PC más rápido
+passo a passo do tweaking, tudo com desfazer.|TWEAKING step by step, all with undo.|Paso a paso de TWEAKING, todo con deshacer.
+remover apps que vêm com o windows|Remove apps that come with Windows|Quitar apps que vienen con Windows
+debloat em três níveis ou app por app.|Debloat in three levels or app by app.|Debloat en tres niveles o app por app.
+consertar e limpar o windows|Fix and clean Windows|Reparar y limpiar Windows
+reparos, arquivos temporários e revisão.|Repairs, temporary files and check-up.|Reparaciones, archivos temporales y revisión.
+desinstalar programas|Uninstall programs|Desinstalar programas
+e apagar as sobras que ficam.|And delete the leftovers.|Y borrar los restos.
+instalar programas|Install programs|Instalar programas
+os populares, com um clique.|The popular ones, in one click.|Los populares, en un clic.
+atualizar o driver de vídeo|Update the graphics driver|Actualizar el driver de vídeo
+nvidia, amd e intel.|NVIDIA, AMD and Intel.|NVIDIA, AMD e Intel.
+abrir jogos com o perfil certo.|Open games with the right profile.|Abrir juegos con el perfil adecuado.
+programas que abrem com o windows|Programs that open with Windows|Programas que se abren con Windows
+deixe o pc ligar mais rápido.|Make the PC boot faster.|Haz que el PC arranque más rápido.
+promoções de jogos|Game deals|Ofertas de juegos
+preços nas lojas agora.|Store prices now.|Precios en las tiendas ahora.
+energia (ajustes)|Power (settings)|Energía (ajustes)
+rede (ajustes)|Network (settings)|Red (ajustes)
+gpu e monitor|GPU and monitor|GPU y monitor
+portas|Ports|Puertos
+próximo|Next|Siguiente
+# Configurações
+idioma|Language|Idioma
+tema|Theme|Tema
+atualização do programa|Program update|Actualización del programa
+procurar atualização agora|Check for updates now|Buscar actualización ahora
+cores|Colors|Colores
+voltar tudo ao padrão|Reset everything to default|Volver todo a lo predeterminado
+botões principais na cor de destaque|Main buttons in the accent color|Botones principales en el color de acento
+destaque|Accent|Acento
+ícones · cor 1|Icons · color 1|Iconos · color 1
+ícones · cor 2|Icons · color 2|Iconos · color 2
+ícones · cor 3|Icons · color 3|Iconos · color 3
+texto|Text|Texto
+texto secundário|Secondary text|Texto secundario
+fundo do programa|Program background|Fondo del programa
+cartões e painéis|Cards and panels|Tarjetas y paneles
+versão instalada|Installed version|Versión instalada
+a atualização automática só funciona no .exe publicado (este é um build de teste).|Automatic update only works in the published .exe (this is a test build).|La actualización automática solo funciona en el .exe publicado (esta es una compilación de prueba).
+procurando atualização…|Checking for updates…|Buscando actualización…
+atualização do programa, idioma, tema e cores|Program update, language, theme and colors|Actualización del programa, idioma, tema y colores
+português, inglês ou espanhol. troca na hora; o que ainda não tem tradução continua em português.|Portuguese, English or Spanish. Switches instantly; anything not yet translated stays in Portuguese.|Portugués, inglés o español. Cambia al instante; lo que aún no tiene traducción sigue en portugués.
+o visual atual ou o legacy (o antigo, da 0.12.0). dá para alternar quando quiser.|The current look or Legacy (the old one, from 0.12.0). You can switch whenever you like.|El aspecto actual o Legacy (el antiguo, de la 0.12.0). Puedes alternar cuando quieras.
+destaque, textos, fundo do programa, cartões e as três cores dos ícones.|Accent, texts, program background, cards and the three icon colors.|Acento, textos, fondo del programa, tarjetas y los tres colores de los iconos.
+escolha à esquerda o que pintar e arraste no quadrado e na barra de tons. a cor muda no app na hora.|Pick on the left what to paint and drag in the square and the hue bar. The color changes in the app instantly.|Elige a la izquierda qué pintar y arrastra en el cuadrado y la barra de tonos. El color cambia en la app al instante.
+atual|Current|Actual
+grafite, cantos retos e ícones chapados.|Graphite, square corners and flat icons.|Grafito, esquinas rectas e iconos planos.
+o visual da 0.12.0: roxo → azul, hover azul, cantos arredondados e os ícones antigos.|The 0.12.0 look: purple → blue, blue hover, rounded corners and the old icons.|El aspecto de la 0.12.0: morado → azul, hover azul, esquinas redondeadas y los iconos antiguos.
+trocar de tema reinicia o pcismomaster. as funções são as mesmas nos dois.|Switching themes restarts PcismoMaster. The features are the same in both.|Cambiar de tema reinicia PcismoMaster. Las funciones son las mismas en los dos.
+etiquetas, links, seleção e realce do modo.|Tags, links, selection and mode highlight.|Etiquetas, enlaces, selección y realce del modo.
+títulos e o texto principal de todas as telas.|Titles and the main text of every screen.|Títulos y el texto principal de todas las pantallas.
+explicações, legendas e textos mais apagados.|Explanations, captions and dimmer texts.|Explicaciones, leyendas y textos más tenues.
+o fundo das telas e do menu lateral.|The background of the screens and the side menu.|El fondo de las pantallas y del menú lateral.
+o fundo dos cartões, caixas e listas.|The background of cards, boxes and lists.|El fondo de las tarjetas, cajas y listas.
+a cor principal dos ícones.|The main icon color.|El color principal de los iconos.
+a cor de realce dos ícones.|The icon highlight color.|El color de realce de los iconos.
+a cor clara dos ícones (escura no modo claro).|The light icon color (dark in light mode).|El color claro de los iconos (oscuro en modo claro).
+o que você quer fazer?|What do you want to do?|¿Qué quieres hacer?

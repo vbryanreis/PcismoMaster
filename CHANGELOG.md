@@ -2,6 +2,17 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.22.0
+
+- **Nova aba Configurações** (no fim do menu lateral; o botão da paleta na barra de cima também abre). Ela reúne:
+  - **Atualização do programa**: a versão instalada e o botão para procurar atualização.
+  - **Idioma**: português, inglês ou espanhol. A troca vale na hora e fica salva. Menu, títulos, explicações das páginas, botões e o Início estão traduzidos; o que ainda não tem tradução continua em português.
+  - **Tema**: o atual ou o Legacy (o antigo, da 0.12.0), alternando quando quiser.
+  - **Cores**: além do destaque e das três cores dos ícones, agora também o **texto**, o **texto secundário**, o **fundo do programa** e os **cartões e painéis**.
+- As cores deixaram de abrir numa janela separada e ficam dentro da aba Configurações.
+- Teste novo do arquivo de traduções (57 testes).
+- Versão atualizada para 0.22.0.
+
 ## 0.21.0
 
 - **Tema Legacy**: em **Cores do programa** (botão da paleta na barra de título) há agora a seção **Tema**, com **Atual** e **Legacy**. O Legacy devolve o visual da 0.12.0: degradê roxo → azul, hover azul no menu, cantos arredondados, cabeçalho "PcismoMaster" sem caixa alta, menu lateral em painel arredondado, botões e selos antigos e os ícones de antes (glifos no lugar dos ícones chapados). No modo claro, o brilho do hover do menu (azul nas categorias, roxo nas sub-abas) ficou mais curto e fraco, para o texto não parecer estourado; no escuro ele é o mesmo da 0.12.0. As funções e ferramentas novas continuam todas lá; muda só a aparência. Trocar de tema reinicia o app. No Legacy as cores personalizadas ficam guardadas e voltam ao escolher o tema atual.

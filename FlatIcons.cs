@@ -89,7 +89,7 @@ public static class FlatIcons
     {
         ["NavHome"] = "home", ["NavDash"] = "eye", ["NavSystem"] = "monitor", ["NavSensors"] = "thermo", ["NavGpu"] = "gpu", ["NavDisks"] = "disk",
         ["NavEnergy"] = "battery", ["NavNet"] = "signal", ["NavMaint"] = "wrench",
-        ["NavOptStart"] = "checklist", ["NavOptUpdate"] = "update", ["NavOptDebloat"] = "trash", ["NavOptGeral"] = "gear", ["NavOptPriv"] = "lock", ["NavOptPower"] = "bolt",
+        ["NavSettings"] = "gear", ["NavOptStart"] = "checklist", ["NavOptUpdate"] = "update", ["NavOptDebloat"] = "trash", ["NavOptGeral"] = "gear", ["NavOptPriv"] = "lock", ["NavOptPower"] = "bolt",
         ["NavOptNet"] = "globe", ["NavOptAdv"] = "sliders", ["NavOptGpu"] = "gpu", ["NavDriver"] = "download", ["NavOptMitig"] = "shield",
         ["NavOptSvc"] = "gears", ["NavOptBios"] = "chip", ["NavOptClean"] = "sparkle", ["NavOptLook"] = "palette", ["NavOptProfiles"] = "layers",
         ["NavLauncher"] = "layers", ["NavDeals"] = "tag", ["NavGames"] = "target", ["NavBottleneck"] = "gauge", ["NavOverlay"] = "overlay",

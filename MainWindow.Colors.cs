@@ -21,6 +21,10 @@ public partial class MainWindow
         ThemeManager.CustomIconA = _settings.ColorIconA;
         ThemeManager.CustomIconB = _settings.ColorIconB;
         ThemeManager.CustomIconC = _settings.ColorIconC;
+        ThemeManager.CustomFg = _settings.ColorFg;
+        ThemeManager.CustomMuted = _settings.ColorMuted;
+        ThemeManager.CustomBg = _settings.ColorBg;
+        ThemeManager.CustomCard = _settings.ColorCard;
         ThemeManager.AccentButtons = _settings.ColorAccentButtons;
     }
 
@@ -58,12 +62,20 @@ public partial class MainWindow
 
     // ---- Janela ----
 
-    private void Colors_Click(object sender, RoutedEventArgs e)
+    /// <summary>O botão da paleta na barra de título abre Configurações, onde ficam tema, cores e idioma.</summary>
+    private void Colors_Click(object sender, RoutedEventArgs e) => NavSettings.IsChecked = true;
+
+    /// <summary>Seletor de cores do programa (destaque, textos, fundo e ícones), montado dentro da aba Configurações.</summary>
+    private void BuildColorPicker(Panel root)
     {
         bool light = ThemeManager.IsLight;
         var targets = new[]
         {
             new ColorTarget("Destaque", "Etiquetas, links, seleção e realce do modo.", light ? "#2F5BE0" : "#7C9CFF", () => _settings.ColorAccent, v => _settings.ColorAccent = v),
+            new ColorTarget("Texto", "Títulos e o texto principal de todas as telas.", light ? "#111113" : "#ECECEE", () => _settings.ColorFg, v => _settings.ColorFg = v),
+            new ColorTarget("Texto secundário", "Explicações, legendas e textos mais apagados.", light ? "#55555C" : "#9A9AA2", () => _settings.ColorMuted, v => _settings.ColorMuted = v),
+            new ColorTarget("Fundo do programa", "O fundo das telas e do menu lateral.", light ? "#F4F4F2" : "#0E0E10", () => _settings.ColorBg, v => _settings.ColorBg = v),
+            new ColorTarget("Cartões e painéis", "O fundo dos cartões, caixas e listas.", light ? "#FFFFFF" : "#131315", () => _settings.ColorCard, v => _settings.ColorCard = v),
             new ColorTarget("Ícones · cor 1", "A cor principal dos ícones.", light ? "#2F5BE0" : "#3D6BFF", () => _settings.ColorIconA, v => _settings.ColorIconA = v),
             new ColorTarget("Ícones · cor 2", "A cor de realce dos ícones.", light ? "#E8452A" : "#FF5A36", () => _settings.ColorIconB, v => _settings.ColorIconB = v),
             new ColorTarget("Ícones · cor 3", "A cor clara dos ícones (escura no modo claro).", light ? "#1E2A4A" : "#EFE6D2", () => _settings.ColorIconC, v => _settings.ColorIconC = v),
@@ -72,14 +84,6 @@ public partial class MainWindow
         double hue = 0, sat = 0, val = 0;
         bool syncing = false;
 
-        var win = new Window { Title = "Cores do programa", Owner = this, Width = 720, SizeToContent = SizeToContent.Height, ResizeMode = ResizeMode.NoResize,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner, ShowInTaskbar = false };
-        win.SetResourceReference(Window.BackgroundProperty, "Bg");
-        win.SetResourceReference(Window.ForegroundProperty, "Fg");
-        var root = new StackPanel { Margin = new Thickness(24, 20, 24, 20) };
-        win.Content = root;
-        root.Children.Add(new TextBlock { Text = "Cores do programa", FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 4) });
-        root.Children.Add(ThemeChoice(win));
         root.Children.Add(OptText(ThemeManager.Legacy
             ? "No tema Legacy as cores são as da 0.12.0. As cores escolhidas aqui valem quando você voltar ao tema atual."
             : "Escolha à esquerda o que pintar e arraste no quadrado e na barra de tons. A cor muda no app na hora.", "Muted", 12, 16));
@@ -169,7 +173,6 @@ public partial class MainWindow
             ApplyCustomColors();
             Select(current);
         }));
-        bar.Children.Add(TweakButton("Fechar", true, (_, _) => win.Close()));
         root.Children.Add(bar);
 
         // ---- Lógica ----
@@ -234,6 +237,5 @@ public partial class MainWindow
 
         onSelect = Select;
         Select(current);
-        win.ShowDialog();
     }
 }

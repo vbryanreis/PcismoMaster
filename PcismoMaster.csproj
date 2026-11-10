@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>PcismoMaster</AssemblyName>
     <Product>PcismoMaster</Product>
-    <Version>0.21.0</Version>
+    <Version>0.22.0</Version>
     <!-- Sempre otimizado: o BENCH e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -43,6 +43,7 @@
   <!-- Drivers seriais oficiais embutidos (MAKER): cada pasta Drivers\<chip> vira recurso e é extraída na hora de instalar.
        Para incluir outro, basta criar a pasta com o .inf/.cat/.sys e ligá-la em MakerDrivers.Chips (Bundle). -->
   <ItemGroup>
+    <EmbeddedResource Include="Modular\Lang.txt" LogicalName="Lang.txt" />
     <EmbeddedResource Include="Drivers\**\*" Exclude="Drivers\*.md;Drivers\*.txt" LogicalName="Drivers/%(RecursiveDir)%(Filename)%(Extension)" />
     <!-- Catálogo de configurações do driver NVIDIA (nomes, grupos e valores) do nvidiaProfileInspector, licença MIT -->
   </ItemGroup>

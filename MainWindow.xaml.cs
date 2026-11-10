@@ -84,6 +84,7 @@ public partial class MainWindow : Window
         // Versão exibida no menu lateral lida do próprio assembly (fonte: <Version> em PcismoMaster.csproj)
         SideVersion.Text = "v" + (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.2.5");
         LoadCustomColors();
+        InitLanguage();
         ThemeManager.Apply(_settings.LightTheme);
         UpdateThemeButton();
         ShowPage("PageHome");
@@ -306,6 +307,7 @@ public partial class MainWindow : Window
             case "PageMakerDrv": InitMakerDrivers(); break;
             case "PageUtil": InitUtil(); break;
             case "PageUninstall": InitUninstall(); break;
+            case "PageSettings": InitSettings(); break;
             case "PageMaint": InitMaint(); break;
             case "PageOptStart" or "PageOptUpdate" or "PageOptDebloat" or "PageOptGeral" or "PageOptPriv" or "PageOptPower" or "PageOptNet" or "PageOptAdv" or "PageOptMitig" or "PageOptSvc" or "PageOptBios" or "PageOptLook" or "PageOptGpu" or "PageOptProfiles": InitOpt(page); break;
             case "PageOptClean": InitOpt(page); InitMemory(); break;
@@ -314,7 +316,7 @@ public partial class MainWindow : Window
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageHome, PageOptStart, PageOptUpdate, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageTasks, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
+        foreach (var p in new FrameworkElement[] { PageHome, PageSettings, PageOptStart, PageOptUpdate, PageOptDebloat, PageOptGeral, PageOptPriv, PageOptPower, PageOptNet, PageOptAdv, PageOptMitig, PageOptSvc, PageOptBios, PageOptLook, PageOptGpu, PageOptProfiles, PageOptClean, PageMaint, PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOc, PageInteg, PageLauncher, PageDeals, PageDriver, PageStartup, PageTasks, PageApps, PageUtil, PageUninstall, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 
