@@ -22,3 +22,4 @@ ResetExplode-dist/
 dist/
 artifacts/
 dist-*/
+graphify-out/
