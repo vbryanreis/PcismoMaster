@@ -13,6 +13,8 @@ PcismoMaster é um aplicativo **Windows** (WPF, .NET 8, C#) para diagnóstico, m
 - **Tema Legacy** (Configurações → Tema): devolve o visual da 0.12.0 (roxo → azul, hover azul, cantos arredondados, ícones de glifo) sem mexer nas funções. `ThemeLegacy.xaml` é a cópia do Theme.xaml da 0.12.0 e entra por cima do Theme.xaml só no Legacy; a paleta antiga fica em `ThemeManager.LegacyPalette` e o resto em `MainWindow.Legacy.cs`. **Ao arredondar ou endireitar um canto, use os tokens:** no XAML `CornerRadius="{DynamicResource R12}"` (valem 0 no Theme.xaml e o valor antigo no ThemeLegacy.xaml; um token novo vai nos dois) e no código `ThemeManager.R(12)`. Elemento novo pode usar `CornerRadius="0"` direto. Trocar de tema reinicia o app.
 - **JOGOS · Promoções** usa a API do IsThereAnyDeal (`ItadClient.cs`). Favoritos (coração) ficam em `AppSettings.DealFavorites`, sem a waitlist do ITAD (ela exige login OAuth). O filtro de DRM usa o id da loja dona do DRM; a API marca jogos da GOG como "Drm Free" (1000). A chave do app **nunca** vai para o código: entra no Release pelo segredo `ITAD_API_KEY` do GitHub (`-p:ItadApiKey=…`). Respeite os termos da API: crédito visível ao IsThereAnyDeal, não alterar preços nem links e não usar dados de concorrentes deles.
 
+**Mapa do código:** `docs/CODEBASE_MAP.md` (arquitetura, módulos, fluxos, pegadinhas e onde mexer). Grafo navegável opcional em `graphify-out/` (gerado localmente, não versionado).
+
 Documentação de apoio em `docs/projeto/`: fluxo de colaboração (`FLUXO-COLABORACAO.md`), planejamento (`PLANEJAMENTO.md`) e versionamento/lançamento (`ATUALIZACOES.md`). Material de referência do ResetExplode/Ultimate fica em `docs/`.
 
 ## Antes de implementar qualquer alteração
