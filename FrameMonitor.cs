@@ -63,15 +63,27 @@ public sealed class FrameMonitor : IDisposable
                        (e.ProviderGuid == D3D9Provider && id == D3D9PresentStart);
         if (!present) return;
 
+        bool dxgi = e.ProviderGuid == DxgiProvider;
+        ulong chain = Payload(e, dxgi ? "pIDXGISwapChain" : "pSwapchain") ^ (dxgi ? 0UL : 1UL << 63);
+        int flags = (int)Payload(e, "Flags");
         double t = e.TimeStampRelativeMSec;
         lock (_lock)
         {
+            if (!_filter.Accept(e.ProcessID, chain, flags, dxgi, t)) return;
             if (!_presents.TryGetValue(e.ProcessID, out var q)) _presents[e.ProcessID] = q = new Queue<double>();
             q.Enqueue(t);
             while (q.Count > 0 && q.Peek() < t - HistoryMs) q.Dequeue();
             _lastSeen[e.ProcessID] = Stopwatch.GetTimestamp();
             if (_rec != null && e.ProcessID == _recPid && _rec.Count < MaxRecordedFrames) _rec.Add(t);
         }
+    }
+
+    private readonly PresentFilter _filter = new();
+
+    private static ulong Payload(TraceEvent e, string name)
+    {
+        try { return e.PayloadByName(name) switch { ulong u => u, long l => unchecked((ulong)l), int i => unchecked((uint)i), uint u => u, _ => 0 }; }
+        catch { return 0; }
     }
 
     /// <summary>Estatísticas do processo, ou null se ele não apresentou frames nos últimos 2 s.</summary>
@@ -156,7 +168,7 @@ public sealed class FrameMonitor : IDisposable
         {
             foreach (int pid in _lastSeen.Where(kv => Stopwatch.GetElapsedTime(kv.Value).TotalSeconds > 30).Select(kv => kv.Key).ToList())
             {
-                _lastSeen.Remove(pid); _presents.Remove(pid);
+                _lastSeen.Remove(pid); _presents.Remove(pid); _filter.Forget(pid);
                 lock (_names) _names.Remove(pid);
             }
         }

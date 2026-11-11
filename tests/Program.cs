@@ -234,6 +234,16 @@ Test("Overlay: linhas por componente, cor da temperatura e texto do atalho", () 
     Assert(parts[0].Level == 0 && parts[1].Level == 1 && parts[2].Level == 3 && new OverlayPart("X", "X", "", "", 78).Level == 2);
     Assert(OverlayHotkey.Describe(OverlayHotkey.Ctrl | OverlayHotkey.Shift, "O") == "Ctrl + Shift + O" && OverlayHotkey.Describe(0, "F5") == "F5" && OverlayHotkey.Describe(OverlayHotkey.Alt, "D5") == "Alt + 5");
 });
+Test("Overlay: FPS ignora Present de teste e conta uma swapchain só (sem dobrar)", () => {
+    var f = new PresentFilter();
+    Assert(f.Accept(1, 0xA, 0, true, 0));                                   // frame normal
+    Assert(!f.Accept(1, 0xA, PresentFilter.DxgiPresentTest, true, 1));      // DXGI_PRESENT_TEST não é frame
+    Assert(!f.Accept(1, 0xB, 0, true, 2));                                  // segunda swapchain no mesmo frame
+    Assert(!f.Accept(1, 0xA ^ (1UL << 63), 0, false, 3));                    // D3D9 por cima do DXGI
+    Assert(f.Accept(1, 0xA, 0, true, 16));
+    Assert(f.Accept(1, 0xB, 0, true, 1100));                                // a antiga sumiu por 1 s → troca
+    Assert(f.Accept(2, 0xC, 0, true, 5));                                   // outro processo é independente
+});
 Test("Overlay: benchmark (média, mín/máx por segundo, 1% e 0,1% low), variação e CSV", () => {
     // 3 s: 1º segundo a 100 FPS (10 ms), 2º a 50 FPS (20 ms), 3º a 100 FPS, com um engasgo de 100 ms no fim.
     var ts = new List<double> { 0 };
