@@ -7,6 +7,29 @@ namespace ResetExplode;
 public sealed record BenchSummary(string Game, DateTime Start, double Seconds, int Frames, double Avg, double Min, double Max,
                                   double Low1, double Low01, string? CsvPath = null);
 
+/// <summary>
+/// Decide quais eventos Present de um processo são frames de verdade, como o PresentMon:
+/// ignora Present de teste (DXGI_PRESENT_TEST, não mostra nada) e conta só uma cadeia de apresentação por vez.
+/// Sem isso, jogos com D3D9 por cima do DXGI, ou com uma segunda janela/swapchain (ex.: X-Ray/STALKER), contavam em dobro.
+/// </summary>
+public sealed class PresentFilter
+{
+    public const int DxgiPresentTest = 0x1;
+    private const double SwitchAfterMs = 1000; // a cadeia ativa sumiu por 1 s → aceita outra (troca de modo/renderizador)
+    private readonly Dictionary<int, (ulong Chain, double Last)> _active = new();
+
+    /// <param name="chain">Swapchain + provedor (o mesmo ponteiro em D3D9 e DXGI vira cadeias diferentes).</param>
+    public bool Accept(int pid, ulong chain, int flags, bool dxgi, double t)
+    {
+        if (dxgi && (flags & DxgiPresentTest) != 0) return false;
+        if (_active.TryGetValue(pid, out var a) && a.Chain != chain && t - a.Last < SwitchAfterMs) return false;
+        _active[pid] = (chain, t);
+        return true;
+    }
+
+    public void Forget(int pid) => _active.Remove(pid);
+}
+
 /// <summary>Contas de FPS a partir dos instantes (ms) em que cada frame foi apresentado. Sem estado: fácil de testar.</summary>
 public static class FrameMath
 {

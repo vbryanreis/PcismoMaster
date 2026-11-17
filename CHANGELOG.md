@@ -2,6 +2,10 @@
 
 A numeração segue **SemVer** (`MAJOR.MINOR.PATCH`). Regras e processo em [docs/projeto/ATUALIZACOES.md](docs/projeto/ATUALIZACOES.md).
 
+## 0.22.1
+
+- O overlay ignora eventos de teste do DirectX e conta uma única cadeia de apresentação por jogo para evitar FPS duplicado.
+
 ## 0.22.0
 
 - **Nova aba Configurações** (no fim do menu lateral; o botão da paleta na barra de cima também abre). Ela reúne:
